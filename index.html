@@ -3,27 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Patrimonio Personal</title>
+  <title>Mi Patrimonio Personal - Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors pb-12">
 
   <!-- Header / Nav -->
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center gap-3">
-        <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold">€</div>
-        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Control de Patrimonio</h1>
+        <div class="bg-indigo-600 text-white p-2.5 rounded-xl font-bold shadow-md shadow-indigo-500/20">€</div>
+        <div>
+          <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Control de Patrimonio</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Dashboard Financiero Privado</p>
+        </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 flex items-center gap-1">
+        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition">
           💾 Exportar Backup
         </button>
-        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer flex items-center gap-1">
+        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 cursor-pointer transition">
           📂 Importar Backup
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
@@ -34,97 +37,171 @@
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
 
+    <!-- Meta de Ahorro / Goal Banner -->
+    <section class="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <div>
+          <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Objetivo Financiero</span>
+          <h2 class="text-2xl font-bold mt-2">Meta de Patrimonio</h2>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
+          <label class="text-xs text-slate-300 pl-2">Objetivo (€):</label>
+          <input type="number" id="goalInput" class="w-28 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-right text-white font-semibold focus:outline-none focus:border-indigo-500" value="40000" onchange="updateGoal(this.value)">
+        </div>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="space-y-2">
+        <div class="flex justify-between text-xs text-slate-300 font-medium">
+          <span id="goalCurrentText">Actual: 0 €</span>
+          <span id="goalProgressPercent" class="font-bold text-indigo-300">0% alcanzado</span>
+          <span id="goalTargetText">Meta: 40.000 €</span>
+        </div>
+        <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+          <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Summary Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-2 h-full bg-indigo-600"></div>
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
         <h2 id="totalBalance" class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">0,00 €</h2>
-        <span class="inline-block mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">Actualizado</span>
+        <span class="inline-block mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">Global</span>
       </div>
 
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA (Efectivo / Nómina)</p>
         <h3 id="bbvaBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
-        <p class="text-xs text-slate-500 mt-1">Gastos diarios</p>
+        <p class="text-xs text-slate-500 mt-1">Día a día / Transaccional</p>
       </div>
 
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor (Fondos)</p>
         <h3 id="myinvestorBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
-        <p class="text-xs text-slate-500 mt-1">Indexados largo plazo</p>
+        <p class="text-xs text-slate-500 mt-1">Inversiones largo plazo</p>
       </div>
 
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic (Liquidez / BTC)</p>
         <h3 id="trBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
-        <p class="text-xs text-slate-500 mt-1">Cuenta remunerada + BTC</p>
+        <p class="text-xs text-slate-500 mt-1">Cuenta Remunerada + Cripto</p>
       </div>
     </section>
 
-    <!-- Quick Action: Añadir Gasto -->
+    <!-- Quick Action: Registrar Ingreso / Gasto -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Nuevo Gasto / Movimiento</h3>
-      <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-4 gap-4" onsubmit="addExpense(event)">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento</h3>
+      <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" onsubmit="addTransaction(event)">
+        
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
+          <select id="txType" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
+            <option value="expense">➖ Gasto</option>
+            <option value="income">➕ Ingreso</option>
+          </select>
+        </div>
+
         <div>
           <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
-          <input type="text" id="expenseConcept" placeholder="Ej: Compra supermercado" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          <input type="text" id="txConcept" placeholder="Ej: Compra, Nómina..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
         </div>
+
         <div>
           <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
-          <input type="number" step="0.01" id="expenseAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          <input type="number" step="0.01" id="txAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
         </div>
+
         <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Cuenta Origen</label>
-          <select id="expenseAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Categoría</label>
+          <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+            <option value="Supermercado">🛒 Supermercado</option>
+            <option value="Nomina">💼 Nómina / Ingreso</option>
+            <option value="Ocio">🍿 Ocio / Restauración</option>
+            <option value="Inversion">📈 Inversión / Ahorro</option>
+            <option value="Vivienda">🏠 Vivienda / Recibos</option>
+            <option value="Transporte">🚗 Transporte / Gasolina</option>
+            <option value="Suscripciones">📱 Suscripciones</option>
+            <option value="Otros">📦 Otros</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Cuenta</label>
+          <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="bbva">BBVA</option>
             <option value="trade_republic">Trade Republic</option>
             <option value="myinvestor">MyInvestor</option>
           </select>
         </div>
+
         <div class="flex items-end">
-          <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition">
-            Registrar Gasto
+          <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
+            Guardar
           </button>
         </div>
       </form>
     </section>
 
     <!-- Charts Section -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm md:col-span-2">
-        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Evolución del Patrimonio</h3>
-        <canvas id="evolutionChart" class="max-h-64"></canvas>
-      </div>
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
         <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad</h3>
-        <canvas id="distributionChart" class="max-h-64"></canvas>
+        <div class="h-56">
+          <canvas id="distributionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Gastos por Categoría</h3>
+        <div class="h-56">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Evolución del Patrimonio</h3>
+        <div class="h-56">
+          <canvas id="evolutionChart"></canvas>
+        </div>
       </div>
     </section>
 
     <!-- Transaction History Table -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Historial de Movimientos Recientes</h3>
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
+        <div class="flex gap-2">
+          <button onclick="filterTransactions('all')" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Todos</button>
+          <button onclick="filterTransactions('expense')" class="px-2.5 py-1 text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-100">Gastos</button>
+          <button onclick="filterTransactions('income')" class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-100">Ingresos</button>
+        </div>
+      </div>
+
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
             <tr>
               <th class="p-3">Fecha</th>
               <th class="p-3">Concepto</th>
+              <th class="p-3">Categoría</th>
               <th class="p-3">Cuenta</th>
               <th class="p-3 text-right">Importe</th>
               <th class="p-3 text-center">Acción</th>
             </tr>
           </thead>
           <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
-            <!-- Inyectado por JS -->
+            <!-- JS Inject -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Update Account Balances Directly -->
+    <!-- Adjust Account Balances Directly -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajustar Saldo de las Cuentas</h3>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
@@ -148,6 +225,7 @@
 
   <script>
     let state = {
+      goal: 40000,
       accounts: {
         bbva: 3500.00,
         myinvestor: 18200.00,
@@ -156,26 +234,29 @@
       transactions: []
     };
 
+    let currentFilter = 'all';
+
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data');
+      const saved = localStorage.getItem('mi_patrimonio_data_v2');
       if (saved) {
         try {
           state = JSON.parse(saved);
         } catch (e) {
-          console.error("Error cargando localStorage", e);
+          console.error("Error al cargar localStorage", e);
         }
       }
       render();
     }
 
     function save() {
-      localStorage.setItem('mi_patrimonio_data', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v2', JSON.stringify(state));
       render();
     }
 
     function render() {
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
       
+      // Update totals
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = state.accounts.myinvestor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -185,31 +266,56 @@
       document.getElementById('inputMyInvestor').value = state.accounts.myinvestor;
       document.getElementById('inputTR').value = state.accounts.trade_republic;
 
+      // Update Goal
+      document.getElementById('goalInput').value = state.goal || 40000;
+      const target = state.goal || 40000;
+      const percent = Math.min(Math.round((total / target) * 100), 100);
+      document.getElementById('goalCurrentText').innerText = `Actual: ${total.toLocaleString('es-ES', { maximumFractionDigits: 0 })} €`;
+      document.getElementById('goalTargetText').innerText = `Meta: ${target.toLocaleString('es-ES')} €`;
+      document.getElementById('goalProgressPercent').innerText = `${percent}% alcanzado`;
+      document.getElementById('goalProgressBar').style.width = `${percent}%`;
+
       renderTransactions();
       updateCharts();
+    }
+
+    function updateGoal(val) {
+      const num = parseFloat(val);
+      if (num && num > 0) {
+        state.goal = num;
+        save();
+      }
     }
 
     function renderTransactions() {
       const tbody = document.getElementById('transactionsTableBody');
       tbody.innerHTML = '';
 
-      if (state.transactions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay movimientos registrados todavía.</td></tr>`;
+      let list = state.transactions;
+      if (currentFilter !== 'all') {
+        list = list.filter(t => t.type === currentFilter);
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay movimientos registrados.</td></tr>`;
         return;
       }
 
-      // Mostrar ordenados del más reciente al más antiguo
-      const sorted = [...state.transactions].reverse();
+      const sorted = [...list].reverse();
       sorted.forEach(tx => {
         const tr = document.createElement('tr');
-        const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
         const accName = tx.account === 'bbva' ? 'BBVA' : tx.account === 'myinvestor' ? 'MyInvestor' : 'Trade Republic';
+        const isIncome = tx.type === 'income';
+        const amountColor = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-semibold';
+        const prefix = isIncome ? '+' : '-';
 
         tr.innerHTML = `
-          <td class="p-3 text-slate-500 dark:text-slate-400">${dateStr}</td>
+          <td class="p-3 text-slate-500 dark:text-slate-400 text-xs">${dateStr}</td>
           <td class="p-3 font-medium text-slate-900 dark:text-white">${tx.concept}</td>
-          <td class="p-3 text-slate-500 dark:text-slate-400">${accName}</td>
-          <td class="p-3 text-right font-semibold text-rose-600 dark:text-rose-400">-${tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>
+          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${tx.category || 'Otros'}</span></td>
+          <td class="p-3 text-slate-500 dark:text-slate-400 text-xs">${accName}</td>
+          <td class="p-3 text-right ${amountColor}">${prefix}${tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>
           <td class="p-3 text-center">
             <button onclick="deleteTransaction(${tx.id})" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>
           </td>
@@ -218,25 +324,39 @@
       });
     }
 
-    function addExpense(e) {
+    function filterTransactions(type) {
+      currentFilter = type;
+      renderTransactions();
+    }
+
+    function addTransaction(e) {
       e.preventDefault();
-      const concept = document.getElementById('expenseConcept').value;
-      const amount = parseFloat(document.getElementById('expenseAmount').value);
-      const account = document.getElementById('expenseAccount').value;
+      const type = document.getElementById('txType').value;
+      const concept = document.getElementById('txConcept').value;
+      const amount = parseFloat(document.getElementById('txAmount').value);
+      const category = document.getElementById('txCategory').value;
+      const account = document.getElementById('txAccount').value;
 
       if (!amount || amount <= 0) return;
 
-      state.accounts[account] -= amount;
+      if (type === 'expense') {
+        state.accounts[account] -= amount;
+      } else {
+        state.accounts[account] += amount;
+      }
+
       state.transactions.push({
         id: Date.now(),
         date: new Date().toISOString(),
+        type,
         concept,
         amount,
+        category,
         account
       });
 
-      document.getElementById('expenseConcept').value = '';
-      document.getElementById('expenseAmount').value = '';
+      document.getElementById('txConcept').value = '';
+      document.getElementById('txAmount').value = '';
 
       save();
     }
@@ -245,8 +365,12 @@
       const txIndex = state.transactions.findIndex(t => t.id === id);
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
-        // Devolver el dinero a la cuenta correspondiente al eliminar
-        state.accounts[tx.account] += tx.amount;
+        // Revert balance
+        if (tx.type === 'expense') {
+          state.accounts[tx.account] += tx.amount;
+        } else {
+          state.accounts[tx.account] -= tx.amount;
+        }
         state.transactions.splice(txIndex, 1);
         save();
       }
@@ -268,7 +392,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `mi-patrimonio-backup-${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `patrimonio-backup-${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -282,9 +406,9 @@
           if (importedState && importedState.accounts) {
             state = importedState;
             save();
-            alert('¡Copia de seguridad importada con éxito!');
+            alert('¡Copia de seguridad cargada correctamente!');
           } else {
-            alert('El archivo seleccionado no tiene el formato correcto.');
+            alert('El archivo no contiene un formato válido.');
           }
         } catch (err) {
           alert('Error al leer el archivo JSON.');
@@ -296,9 +420,11 @@
     }
 
     let chartDist = null;
+    let chartCat = null;
     let chartEvol = null;
 
     function updateCharts() {
+      // 1. Chart Entidad
       const ctxDist = document.getElementById('distributionChart').getContext('2d');
       if (chartDist) chartDist.destroy();
       chartDist = new Chart(ctxDist, {
@@ -313,20 +439,46 @@
         options: { responsive: true, maintainAspectRatio: false }
       });
 
+      // 2. Chart Categorías (solo gastos)
+      const ctxCat = document.getElementById('categoryChart').getContext('2d');
+      if (chartCat) chartCat.destroy();
+
+      const catTotals = {};
+      state.transactions.filter(t => t.type === 'expense').forEach(t => {
+        catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+      });
+
+      const catLabels = Object.keys(catTotals).length ? Object.keys(catTotals) : ['Sin Gastos'];
+      const catData = Object.keys(catTotals).length ? Object.values(catTotals) : [1];
+      const catColors = ['#f43f5e', '#8b5cf6', '#ec4899', '#f59e0b', '#06b6d4', '#84cc16', '#64748b'];
+
+      chartCat = new Chart(ctxCat, {
+        type: 'pie',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catData,
+            backgroundColor: catColors
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      // 3. Chart Evolución
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
       chartEvol = new Chart(ctxEvol, {
         type: 'line',
         data: {
-          labels: ['Hace 3 Meses', 'Hace 2 Meses', 'Mes Pasado', 'Actual'],
+          labels: ['Mes -3', 'Mes -2', 'Mes -1', 'Actual'],
           datasets: [{
             label: 'Patrimonio (€)',
-            data: [total * 0.92, total * 0.95, total * 0.98, total],
-            borderColor: '#4f46e5',
+            data: [total * 0.90, total * 0.94, total * 0.97, total],
+            borderColor: '#6366f1',
             tension: 0.3,
             fill: true,
-            backgroundColor: 'rgba(79, 70, 229, 0.05)'
+            backgroundColor: 'rgba(99, 102, 241, 0.08)'
           }]
         },
         options: { responsive: true, maintainAspectRatio: false }
