@@ -10,20 +10,20 @@
     body { font-family: system-ui, -apple-system, sans-serif; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors">
 
   <!-- Header / Nav -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center gap-3">
         <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold">€</div>
-        <h1 class="text-xl font-bold text-slate-900">Control de Patrimonio</h1>
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Control de Patrimonio</h1>
       </div>
       <div class="flex items-center gap-2">
-        <button id="btnExport" onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex items-center gap-1">
+        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 flex items-center gap-1">
           💾 Exportar Backup
         </button>
-        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 cursor-pointer flex items-center gap-1">
+        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer flex items-center gap-1">
           📂 Importar Backup
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
@@ -36,46 +36,46 @@
 
     <!-- Summary Cards -->
     <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
-        <h2 id="totalBalance" class="text-3xl font-extrabold text-slate-900 mt-2">0,00 €</h2>
-        <span class="inline-block mt-2 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Actualizado</span>
+        <h2 id="totalBalance" class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">0,00 €</h2>
+        <span class="inline-block mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">Actualizado</span>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA (Efectivo / Nómina)</p>
-        <h3 id="bbvaBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <h3 id="bbvaBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
         <p class="text-xs text-slate-500 mt-1">Gastos diarios</p>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor (Fondos)</p>
-        <h3 id="myinvestorBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <h3 id="myinvestorBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
         <p class="text-xs text-slate-500 mt-1">Indexados largo plazo</p>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic (Liquidez / BTC)</p>
-        <h3 id="trBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <h3 id="trBalance" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">0,00 €</h3>
         <p class="text-xs text-slate-500 mt-1">Cuenta remunerada + BTC</p>
       </div>
     </section>
 
     <!-- Quick Action: Añadir Gasto -->
-    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <h3 class="text-lg font-bold text-slate-900 mb-4">Registrar Nuevo Gasto / Movimiento</h3>
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Nuevo Gasto / Movimiento</h3>
       <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-4 gap-4" onsubmit="addExpense(event)">
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Concepto</label>
-          <input type="text" id="expenseConcept" placeholder="Ej: Compra supermercado" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
+          <input type="text" id="expenseConcept" placeholder="Ej: Compra supermercado" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Importe (€)</label>
-          <input type="number" step="0.01" id="expenseAmount" placeholder="0.00" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
+          <input type="number" step="0.01" id="expenseAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Cuenta Origen</label>
-          <select id="expenseAccount" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Cuenta Origen</label>
+          <select id="expenseAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="bbva">BBVA</option>
             <option value="trade_republic">Trade Republic</option>
             <option value="myinvestor">MyInvestor</option>
@@ -91,34 +91,55 @@
 
     <!-- Charts Section -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm md:col-span-2">
-        <h3 class="text-base font-bold text-slate-900 mb-4">Evolución del Patrimonio</h3>
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm md:col-span-2">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Evolución del Patrimonio</h3>
         <canvas id="evolutionChart" class="max-h-64"></canvas>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-base font-bold text-slate-900 mb-4">Distribución por Entidad</h3>
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad</h3>
         <canvas id="distributionChart" class="max-h-64"></canvas>
       </div>
     </section>
 
+    <!-- Transaction History Table -->
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Historial de Movimientos Recientes</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Fecha</th>
+              <th class="p-3">Concepto</th>
+              <th class="p-3">Cuenta</th>
+              <th class="p-3 text-right">Importe</th>
+              <th class="p-3 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+            <!-- Inyectado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Update Account Balances Directly -->
-    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <h3 class="text-lg font-bold text-slate-900 mb-4">Ajustar Saldo de las Cuentas</h3>
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajustar Saldo de las Cuentas</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">BBVA (€)</label>
-          <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
-          <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
+          <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+          <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Actualizar BBVA</button>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">MyInvestor (€)</label>
-          <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
-          <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">MyInvestor (€)</label>
+          <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+          <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Actualizar MyInvestor</button>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Trade Republic (€)</label>
-          <input type="number" step="0.01" id="inputTR" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
-          <button onclick="updateAccountBalance('trade_republic')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
+          <input type="number" step="0.01" id="inputTR" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+          <button onclick="updateAccountBalance('trade_republic')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Actualizar Trade Republic</button>
         </div>
       </div>
     </section>
@@ -126,7 +147,6 @@
   </main>
 
   <script>
-    // State management
     let state = {
       accounts: {
         bbva: 3500.00,
@@ -136,7 +156,6 @@
       transactions: []
     };
 
-    // Load from localStorage on start
     function init() {
       const saved = localStorage.getItem('mi_patrimonio_data');
       if (saved) {
@@ -149,13 +168,11 @@
       render();
     }
 
-    // Save state to localStorage
     function save() {
       localStorage.setItem('mi_patrimonio_data', JSON.stringify(state));
       render();
     }
 
-    // Render UI
     function render() {
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
       
@@ -168,10 +185,39 @@
       document.getElementById('inputMyInvestor').value = state.accounts.myinvestor;
       document.getElementById('inputTR').value = state.accounts.trade_republic;
 
+      renderTransactions();
       updateCharts();
     }
 
-    // Add Expense
+    function renderTransactions() {
+      const tbody = document.getElementById('transactionsTableBody');
+      tbody.innerHTML = '';
+
+      if (state.transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay movimientos registrados todavía.</td></tr>`;
+        return;
+      }
+
+      // Mostrar ordenados del más reciente al más antiguo
+      const sorted = [...state.transactions].reverse();
+      sorted.forEach(tx => {
+        const tr = document.createElement('tr');
+        const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const accName = tx.account === 'bbva' ? 'BBVA' : tx.account === 'myinvestor' ? 'MyInvestor' : 'Trade Republic';
+
+        tr.innerHTML = `
+          <td class="p-3 text-slate-500 dark:text-slate-400">${dateStr}</td>
+          <td class="p-3 font-medium text-slate-900 dark:text-white">${tx.concept}</td>
+          <td class="p-3 text-slate-500 dark:text-slate-400">${accName}</td>
+          <td class="p-3 text-right font-semibold text-rose-600 dark:text-rose-400">-${tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>
+          <td class="p-3 text-center">
+            <button onclick="deleteTransaction(${tx.id})" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
     function addExpense(e) {
       e.preventDefault();
       const concept = document.getElementById('expenseConcept').value;
@@ -195,7 +241,17 @@
       save();
     }
 
-    // Update Account Balance directly
+    function deleteTransaction(id) {
+      const txIndex = state.transactions.findIndex(t => t.id === id);
+      if (txIndex !== -1) {
+        const tx = state.transactions[txIndex];
+        // Devolver el dinero a la cuenta correspondiente al eliminar
+        state.accounts[tx.account] += tx.amount;
+        state.transactions.splice(txIndex, 1);
+        save();
+      }
+    }
+
     function updateAccountBalance(acc) {
       let val = 0;
       if (acc === 'bbva') val = parseFloat(document.getElementById('inputBBVA').value);
@@ -208,7 +264,6 @@
       }
     }
 
-    // Backup: Export JSON
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const downloadAnchor = document.createElement('a');
@@ -219,7 +274,6 @@
       downloadAnchor.remove();
     }
 
-    // Backup: Import JSON
     function importData(event) {
       const fileReader = new FileReader();
       fileReader.onload = function(e) {
@@ -241,12 +295,10 @@
       }
     }
 
-    // Charts
     let chartDist = null;
     let chartEvol = null;
 
     function updateCharts() {
-      // Distribution Donut Chart
       const ctxDist = document.getElementById('distributionChart').getContext('2d');
       if (chartDist) chartDist.destroy();
       chartDist = new Chart(ctxDist, {
@@ -261,7 +313,6 @@
         options: { responsive: true, maintainAspectRatio: false }
       });
 
-      // Evolution Line Chart (Simulated layout)
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
@@ -282,7 +333,6 @@
       });
     }
 
-    // Start App
     init();
   </script>
 </body>
