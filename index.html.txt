@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Patrimonio Personal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- Header / Nav -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold">€</div>
+        <h1 class="text-xl font-bold text-slate-900">Control de Patrimonio</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnExport" onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex items-center gap-1">
+          💾 Exportar Backup
+        </button>
+        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 cursor-pointer flex items-center gap-1">
+          📂 Importar Backup
+        </label>
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- Summary Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
+        <h2 id="totalBalance" class="text-3xl font-extrabold text-slate-900 mt-2">0,00 €</h2>
+        <span class="inline-block mt-2 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Actualizado</span>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA (Efectivo / Nómina)</p>
+        <h3 id="bbvaBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <p class="text-xs text-slate-500 mt-1">Gastos diarios</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor (Fondos)</p>
+        <h3 id="myinvestorBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <p class="text-xs text-slate-500 mt-1">Indexados largo plazo</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic (Liquidez / BTC)</p>
+        <h3 id="trBalance" class="text-2xl font-bold text-slate-800 mt-2">0,00 €</h3>
+        <p class="text-xs text-slate-500 mt-1">Cuenta remunerada + BTC</p>
+      </div>
+    </section>
+
+    <!-- Quick Action: Añadir Gasto -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Registrar Nuevo Gasto / Movimiento</h3>
+      <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-4 gap-4" onsubmit="addExpense(event)">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Concepto</label>
+          <input type="text" id="expenseConcept" placeholder="Ej: Compra supermercado" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Importe (€)</label>
+          <input type="number" step="0.01" id="expenseAmount" placeholder="0.00" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Cuenta Origen</label>
+          <select id="expenseAccount" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="bbva">BBVA</option>
+            <option value="trade_republic">Trade Republic</option>
+            <option value="myinvestor">MyInvestor</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition">
+            Registrar Gasto
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm md:col-span-2">
+        <h3 class="text-base font-bold text-slate-900 mb-4">Evolución del Patrimonio</h3>
+        <canvas id="evolutionChart" class="max-h-64"></canvas>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 mb-4">Distribución por Entidad</h3>
+        <canvas id="distributionChart" class="max-h-64"></canvas>
+      </div>
+    </section>
+
+    <!-- Update Account Balances Directly -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Ajustar Saldo de las Cuentas</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">BBVA (€)</label>
+          <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
+          <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">MyInvestor (€)</label>
+          <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
+          <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Trade Republic (€)</label>
+          <input type="number" step="0.01" id="inputTR" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-2">
+          <button onclick="updateAccountBalance('trade_republic')" class="w-full py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // State management
+    let state = {
+      accounts: {
+        bbva: 3500.00,
+        myinvestor: 18200.00,
+        trade_republic: 8500.00
+      },
+      transactions: []
+    };
+
+    // Load from localStorage on start
+    function init() {
+      const saved = localStorage.getItem('mi_patrimonio_data');
+      if (saved) {
+        try {
+          state = JSON.parse(saved);
+        } catch (e) {
+          console.error("Error cargando localStorage", e);
+        }
+      }
+      render();
+    }
+
+    // Save state to localStorage
+    function save() {
+      localStorage.setItem('mi_patrimonio_data', JSON.stringify(state));
+      render();
+    }
+
+    // Render UI
+    function render() {
+      const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
+      
+      document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('myinvestorBalance').innerText = state.accounts.myinvestor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('trBalance').innerText = state.accounts.trade_republic.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+      document.getElementById('inputBBVA').value = state.accounts.bbva;
+      document.getElementById('inputMyInvestor').value = state.accounts.myinvestor;
+      document.getElementById('inputTR').value = state.accounts.trade_republic;
+
+      updateCharts();
+    }
+
+    // Add Expense
+    function addExpense(e) {
+      e.preventDefault();
+      const concept = document.getElementById('expenseConcept').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      const account = document.getElementById('expenseAccount').value;
+
+      if (!amount || amount <= 0) return;
+
+      state.accounts[account] -= amount;
+      state.transactions.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        concept,
+        amount,
+        account
+      });
+
+      document.getElementById('expenseConcept').value = '';
+      document.getElementById('expenseAmount').value = '';
+
+      save();
+    }
+
+    // Update Account Balance directly
+    function updateAccountBalance(acc) {
+      let val = 0;
+      if (acc === 'bbva') val = parseFloat(document.getElementById('inputBBVA').value);
+      if (acc === 'myinvestor') val = parseFloat(document.getElementById('inputMyInvestor').value);
+      if (acc === 'trade_republic') val = parseFloat(document.getElementById('inputTR').value);
+
+      if (!isNaN(val)) {
+        state.accounts[acc] = val;
+        save();
+      }
+    }
+
+    // Backup: Export JSON
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `mi-patrimonio-backup-${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // Backup: Import JSON
+    function importData(event) {
+      const fileReader = new FileReader();
+      fileReader.onload = function(e) {
+        try {
+          const importedState = JSON.parse(e.target.result);
+          if (importedState && importedState.accounts) {
+            state = importedState;
+            save();
+            alert('¡Copia de seguridad importada con éxito!');
+          } else {
+            alert('El archivo seleccionado no tiene el formato correcto.');
+          }
+        } catch (err) {
+          alert('Error al leer el archivo JSON.');
+        }
+      };
+      if (event.target.files[0]) {
+        fileReader.readAsText(event.target.files[0]);
+      }
+    }
+
+    // Charts
+    let chartDist = null;
+    let chartEvol = null;
+
+    function updateCharts() {
+      // Distribution Donut Chart
+      const ctxDist = document.getElementById('distributionChart').getContext('2d');
+      if (chartDist) chartDist.destroy();
+      chartDist = new Chart(ctxDist, {
+        type: 'doughnut',
+        data: {
+          labels: ['BBVA', 'MyInvestor', 'Trade Republic'],
+          datasets: [{
+            data: [state.accounts.bbva, state.accounts.myinvestor, state.accounts.trade_republic],
+            backgroundColor: ['#3b82f6', '#6366f1', '#10b981']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      // Evolution Line Chart (Simulated layout)
+      const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
+      if (chartEvol) chartEvol.destroy();
+      const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic;
+      chartEvol = new Chart(ctxEvol, {
+        type: 'line',
+        data: {
+          labels: ['Hace 3 Meses', 'Hace 2 Meses', 'Mes Pasado', 'Actual'],
+          datasets: [{
+            label: 'Patrimonio (€)',
+            data: [total * 0.92, total * 0.95, total * 0.98, total],
+            borderColor: '#4f46e5',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(79, 70, 229, 0.05)'
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    // Start App
+    init();
+  </script>
+</body>
+</html>
