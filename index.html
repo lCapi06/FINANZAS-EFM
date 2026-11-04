@@ -91,7 +91,7 @@
 
     </section>
 
-    <!-- Summary Cards (Con Indicador de Tendencia Mensual) -->
+    <!-- Summary Cards -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between">
         <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
@@ -129,7 +129,7 @@
       </div>
     </section>
 
-    <!-- Resumen de Métricas de Flujo de Caja (Ingresos / Gastos / Ahorro Neto del Mes) -->
+    <!-- Resumen de Flujo de Caja -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -359,8 +359,56 @@
           console.error("Error al cargar localStorage", e);
         }
       }
+
+      // PASO 1: Procesar parámetros automáticos enviados por URL (Atajos de iOS)
+      processUrlShortcuts();
+
       updateYearFilterOptions();
       render();
+    }
+
+    function processUrlShortcuts() {
+      const params = new URLSearchParams(window.location.search);
+      const autoType = params.get('auto_type');
+      const autoConcept = params.get('auto_concept');
+      const autoAmount = parseFloat(params.get('auto_amount'));
+      const autoAccount = params.get('auto_account');
+
+      if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
+        if (autoType === 'expense') {
+          state.accounts[autoAccount] -= autoAmount;
+        } else {
+          state.accounts[autoAccount] += autoAmount;
+        }
+
+        state.transactions.push({
+          id: Date.now(),
+          date: new Date().toISOString(),
+          type: autoType,
+          concept: decodeURIComponent(autoConcept),
+          amount: autoAmount,
+          category: autoType === 'income' ? 'Nomina' : 'Otros',
+          account: autoAccount
+        });
+
+        // Guardar cambios y limpiar la URL para que no duplique al recargar
+        const now = new Date();
+        const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+
+        if (!state.monthlySnapshots) state.monthlySnapshots = {};
+        state.monthlySnapshots[monthYearKey] = {
+          dateLabel: now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+          bbva: state.accounts.bbva,
+          myinvestor: state.accounts.myinvestor,
+          trade_republic_liq: state.accounts.trade_republic_liq,
+          trade_republic_btc: state.accounts.trade_republic_btc,
+          total: total
+        };
+
+        localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     }
 
     function updateYearFilterOptions() {
@@ -418,7 +466,6 @@
       const invested = state.accounts.myinvestor + state.accounts.trade_republic_btc;
       const total = liquid + invested;
 
-      // Totales
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = state.accounts.myinvestor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -430,7 +477,6 @@
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
       document.getElementById('inputTRBtc').value = state.accounts.trade_republic_btc;
 
-      // Estado del Backup
       const backupText = document.getElementById('backupStatusText');
       if (state.lastBackupDate) {
         const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
@@ -441,10 +487,8 @@
         backupText.className = 'text-xs text-amber-500 font-medium mt-1';
       }
 
-      // Indicador de Tendencia Mensual vs Foto Anterior
       updateMonthlyTrend(total);
 
-      // Liquidez vs Inversión
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
       const invPct = total > 0 ? Math.round((invested / total) * 100) : 0;
       document.getElementById('liquidAmount').innerText = liquid.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € (' + liqPct + '%)';
@@ -452,7 +496,6 @@
       document.getElementById('liquidBar').style.width = liqPct + '%';
       document.getElementById('investedBar').style.width = invPct + '%';
 
-      // Meta
       document.getElementById('goalInput').value = state.goal || 40000;
       const target = state.goal || 40000;
       const percent = Math.min(Math.round((total / target) * 100), 100);
@@ -473,7 +516,6 @@
       const keys = Object.keys(state.monthlySnapshots).sort().reverse();
       const nowKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
       
-      // Buscar una foto de un mes previo al actual
       let prevTotal = null;
       for (let i = 0; i < keys.length; i++) {
         if (keys[i] !== nowKey) {
@@ -523,7 +565,6 @@
         return matchMonth && matchYear;
       });
 
-      // Calcular Métricas del Periodo Seleccionado
       let pInc = 0;
       let pExp = 0;
       list.forEach(function(t) {
