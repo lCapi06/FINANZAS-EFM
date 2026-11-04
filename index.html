@@ -19,7 +19,7 @@
         <div class="bg-indigo-600 text-white p-2.5 rounded-xl font-bold shadow-md shadow-indigo-500/20">€</div>
         <div>
           <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Control de Patrimonio</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Dashboard Financiero Privado</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin exportar</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -65,16 +65,16 @@
       </div>
 
       <!-- Liquidez vs Inversiones -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center space-y-4">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Distribución Patrimonial</h3>
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div>
             <div class="flex justify-between text-xs font-semibold mb-1">
               <span class="text-sky-600 dark:text-sky-400">💧 Liquidez / Remunerada</span>
               <span id="liquidAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div id="liquidBar" class="bg-sky-500 h-full" style="width: 0%"></div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div id="liquidBar" class="bg-sky-500 h-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
           <div>
@@ -82,23 +82,26 @@
               <span class="text-emerald-600 dark:text-emerald-400">📈 Inversiones (Fondos + BTC)</span>
               <span id="investedAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div id="investedBar" class="bg-emerald-500 h-full" style="width: 0%"></div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div id="investedBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
         </div>
-        <p class="text-[11px] text-slate-400">BBVA + TR Liquidez vs MyInvestor + TR Bitcoin</p>
       </div>
 
     </section>
 
-    <!-- Summary Cards (4 Cuentas Separadas) -->
+    <!-- Summary Cards (Con Indicador de Tendencia Mensual) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between">
         <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
-        <h2 id="totalBalance" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
-        <span class="inline-block mt-2 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">Global</span>
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
+          <h2 id="totalBalance" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
+        </div>
+        <div class="mt-2">
+          <span id="monthlyTrendBadge" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes anterior</span>
+        </div>
       </div>
 
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -123,6 +126,25 @@
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">TR (Bitcoin)</p>
         <h3 id="trBtcBalance" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
         <p class="text-[11px] text-slate-500 mt-1">Criptomoneda BTC</p>
+      </div>
+    </section>
+
+    <!-- Resumen de Métricas de Flujo de Caja (Ingresos / Gastos / Ahorro Neto del Mes) -->
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
+          <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
+          <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
+        </div>
+        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
+          <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
+          <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
+        </div>
+        <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+          <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro Neto</p>
+          <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+        </div>
       </div>
     </section>
 
@@ -181,7 +203,7 @@
       </form>
     </section>
 
-    <!-- Charts Section (Con Porcentajes %) -->
+    <!-- Charts Section -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
         <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
@@ -205,12 +227,11 @@
       </div>
     </section>
 
-    <!-- Historial de Movimientos (Filtro por Mes y Año) -->
+    <!-- Historial de Movimientos -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
         
-        <!-- Filtros Mes, Año y Tipo -->
         <div class="flex flex-wrap gap-2 items-center">
           <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
             <option value="all">Todos los Meses</option>
@@ -230,8 +251,6 @@
 
           <select id="filterYear" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
             <option value="all">Todos los Años</option>
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
           </select>
 
           <div class="flex gap-1 border-l border-slate-200 dark:border-slate-700 pl-2">
@@ -255,13 +274,12 @@
             </tr>
           </thead>
           <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
-            <!-- JS Inject -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Ajuste Directo de Saldos Separados (4 activos) -->
+    <!-- Ajuste Directo de Saldos -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos (Separados)</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -288,7 +306,7 @@
       </div>
     </section>
 
-    <!-- Historial de Foto de Saldos por Mes/Año -->
+    <!-- Historial de Saldos -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales (Foto de Cuentas)</h3>
       <p class="text-xs text-slate-500 mb-4">Registro histórico guardado cada vez que actualizas tus cuentas.</p>
@@ -305,7 +323,6 @@
             </tr>
           </thead>
           <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
-            <!-- JS Inject -->
           </tbody>
         </table>
       </div>
@@ -323,7 +340,8 @@
         trade_republic_btc: 2500.00
       },
       transactions: [],
-      monthlySnapshots: {}
+      monthlySnapshots: {},
+      lastBackupDate: null
     };
 
     let currentTypeFilter = 'all';
@@ -341,13 +359,43 @@
           console.error("Error al cargar localStorage", e);
         }
       }
+      updateYearFilterOptions();
       render();
     }
 
+    function updateYearFilterOptions() {
+      const yearSelect = document.getElementById('filterYear');
+      const yearsSet = new Set();
+      
+      const currentYear = new Date().getFullYear();
+      yearsSet.add(currentYear);
+
+      state.transactions.forEach(function(tx) {
+        const y = new Date(tx.date).getFullYear();
+        if (y >= 2026) yearsSet.add(y);
+      });
+
+      if (state.monthlySnapshots) {
+        Object.keys(state.monthlySnapshots).forEach(function(k) {
+          const y = parseInt(k.split('-')[0]);
+          if (y >= 2026) yearsSet.add(y);
+        });
+      }
+
+      const sortedYears = Array.from(yearsSet).sort(function(a, b) { return b - a; });
+      
+      yearSelect.innerHTML = '<option value="all">Todos los Años</option>';
+      sortedYears.forEach(function(y) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.innerText = y;
+        yearSelect.appendChild(opt);
+      });
+    }
+
     function save() {
-      // Registrar foto del mes/año actual
       const now = new Date();
-      const monthYearKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
 
       if (!state.monthlySnapshots) state.monthlySnapshots = {};
@@ -361,6 +409,7 @@
       };
 
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      updateYearFilterOptions();
       render();
     }
 
@@ -369,7 +418,7 @@
       const invested = state.accounts.myinvestor + state.accounts.trade_republic_btc;
       const total = liquid + invested;
 
-      // Update totals
+      // Totales
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = state.accounts.myinvestor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -381,26 +430,69 @@
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
       document.getElementById('inputTRBtc').value = state.accounts.trade_republic_btc;
 
-      // Update Liquidez vs Inversión
+      // Estado del Backup
+      const backupText = document.getElementById('backupStatusText');
+      if (state.lastBackupDate) {
+        const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        backupText.innerText = 'Última copia: ' + bDate;
+        backupText.className = 'text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1';
+      } else {
+        backupText.innerText = 'Última copia: Pendiente';
+        backupText.className = 'text-xs text-amber-500 font-medium mt-1';
+      }
+
+      // Indicador de Tendencia Mensual vs Foto Anterior
+      updateMonthlyTrend(total);
+
+      // Liquidez vs Inversión
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
       const invPct = total > 0 ? Math.round((invested / total) * 100) : 0;
-      document.getElementById('liquidAmount').innerText = `${liquid.toLocaleString('es-ES', { maximumFractionDigits: 0 })} € (${liqPct}%)`;
-      document.getElementById('investedAmount').innerText = `${invested.toLocaleString('es-ES', { maximumFractionDigits: 0 })} € (${invPct}%)`;
-      document.getElementById('liquidBar').style.width = `${liqPct}%`;
-      document.getElementById('investedBar').style.width = `${invPct}%`;
+      document.getElementById('liquidAmount').innerText = liquid.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € (' + liqPct + '%)';
+      document.getElementById('investedAmount').innerText = invested.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € (' + invPct + '%)';
+      document.getElementById('liquidBar').style.width = liqPct + '%';
+      document.getElementById('investedBar').style.width = invPct + '%';
 
-      // Update Goal
+      // Meta
       document.getElementById('goalInput').value = state.goal || 40000;
       const target = state.goal || 40000;
       const percent = Math.min(Math.round((total / target) * 100), 100);
-      document.getElementById('goalCurrentText').innerText = `Actual: ${total.toLocaleString('es-ES', { maximumFractionDigits: 0 })} €`;
-      document.getElementById('goalTargetText').innerText = `Meta: ${target.toLocaleString('es-ES')} €`;
-      document.getElementById('goalProgressPercent').innerText = `${percent}% alcanzado`;
-      document.getElementById('goalProgressBar').style.width = `${percent}%`;
+      document.getElementById('goalCurrentText').innerText = 'Actual: ' + total.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('goalTargetText').innerText = 'Meta: ' + target.toLocaleString('es-ES') + ' €';
+      document.getElementById('goalProgressPercent').innerText = percent + '% alcanzado';
+      document.getElementById('goalProgressBar').style.width = percent + '%';
 
       renderTransactions();
       renderSnapshots();
       updateCharts();
+    }
+
+    function updateMonthlyTrend(currentTotal) {
+      const badge = document.getElementById('monthlyTrendBadge');
+      if (!state.monthlySnapshots) return;
+
+      const keys = Object.keys(state.monthlySnapshots).sort().reverse();
+      const nowKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
+      
+      // Buscar una foto de un mes previo al actual
+      let prevTotal = null;
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] !== nowKey) {
+          prevTotal = state.monthlySnapshots[keys[i]].total;
+          break;
+        }
+      }
+
+      if (prevTotal !== null && prevTotal > 0) {
+        const diff = currentTotal - prevTotal;
+        const pct = ((diff / prevTotal) * 100).toFixed(1);
+        const sign = diff >= 0 ? '+' : '';
+        const color = diff >= 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+        badge.className = 'inline-block text-[10px] font-bold px-2 py-0.5 rounded ' + color;
+        badge.innerText = sign + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € (' + sign + pct + '%) vs mes ant.';
+      } else {
+        badge.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500';
+        badge.innerText = 'Primer mes registrado';
+      }
     }
 
     function updateGoal(val) {
@@ -420,26 +512,40 @@
 
       let list = state.transactions;
 
-      // Filtrar por tipo (gasto/ingreso)
       if (currentTypeFilter !== 'all') {
-        list = list.filter(t => t.type === currentTypeFilter);
+        list = list.filter(function(t) { return t.type === currentTypeFilter; });
       }
 
-      // Filtrar por Mes y Año específicos
-      list = list.filter(t => {
+      list = list.filter(function(t) {
         const d = new Date(t.date);
         const matchMonth = (monthVal === 'all') || (d.getMonth() === parseInt(monthVal));
         const matchYear = (yearVal === 'all') || (d.getFullYear() === parseInt(yearVal));
         return matchMonth && matchYear;
       });
 
+      // Calcular Métricas del Periodo Seleccionado
+      let pInc = 0;
+      let pExp = 0;
+      list.forEach(function(t) {
+        if (t.type === 'income') pInc += t.amount;
+        if (t.type === 'expense') pExp += t.amount;
+      });
+
+      document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+      document.getElementById('periodExpense').innerText = '-' + pExp.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+      
+      const pSavings = pInc - pExp;
+      const savingsEl = document.getElementById('periodSavings');
+      savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+      savingsEl.className = 'text-xl font-bold mt-1 ' + (pSavings >= 0 ? 'text-indigo-700 dark:text-indigo-300' : 'text-rose-600 dark:text-rose-400');
+
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay movimientos registrados para este filtro.</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay movimientos registrados para este filtro.</td></tr>';
         return;
       }
 
-      const sorted = [...list].reverse();
-      sorted.forEach(tx => {
+      const sorted = list.slice().reverse();
+      sorted.forEach(function(tx) {
         const tr = document.createElement('tr');
         const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
         
@@ -452,16 +558,15 @@
         const amountColor = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-semibold';
         const prefix = isIncome ? '+' : '-';
 
-        tr.innerHTML = `
-          <td class="p-3 text-slate-500 dark:text-slate-400 text-xs">${dateStr}</td>
-          <td class="p-3 font-medium text-slate-900 dark:text-white">${tx.concept}</td>
-          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${tx.category || 'Otros'}</span></td>
-          <td class="p-3 text-slate-500 dark:text-slate-400 text-xs">${accName}</td>
-          <td class="p-3 text-right ${amountColor}">${prefix}${tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>
-          <td class="p-3 text-center">
-            <button onclick="deleteTransaction(${tx.id})" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>
-          </td>
-        `;
+        tr.innerHTML = 
+          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + dateStr + '</td>' +
+          '<td class="p-3 font-medium text-slate-900 dark:text-white">' + tx.concept + '</td>' +
+          '<td class="p-3"><span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span></td>' +
+          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + accName + '</td>' +
+          '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
+          '<td class="p-3 text-center">' +
+            '<button onclick="deleteTransaction(' + tx.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>' +
+          '</td>';
         tbody.appendChild(tr);
       });
     }
@@ -476,22 +581,21 @@
       tbody.innerHTML = '';
 
       if (!state.monthlySnapshots || Object.keys(state.monthlySnapshots).length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Se guardará al ajustar saldos.</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Se guardará al ajustar saldos.</td></tr>';
         return;
       }
 
       const sortedKeys = Object.keys(state.monthlySnapshots).sort().reverse();
-      sortedKeys.forEach(key => {
+      sortedKeys.forEach(function(key) {
         const snap = state.monthlySnapshots[key];
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-3 font-semibold text-slate-900 dark:text-white capitalize">${snap.dateLabel || key}</td>
-          <td class="p-3 text-slate-600 dark:text-slate-300">${(snap.bbva||0).toLocaleString('es-ES')} €</td>
-          <td class="p-3 text-slate-600 dark:text-slate-300">${(snap.myinvestor||0).toLocaleString('es-ES')} €</td>
-          <td class="p-3 text-slate-600 dark:text-slate-300">${(snap.trade_republic_liq||0).toLocaleString('es-ES')} €</td>
-          <td class="p-3 text-amber-600 dark:text-amber-400">${(snap.trade_republic_btc||0).toLocaleString('es-ES')} €</td>
-          <td class="p-3 text-right font-bold text-slate-900 dark:text-white">${(snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</td>
-        `;
+        tr.innerHTML = 
+          '<td class="p-3 font-semibold text-slate-900 dark:text-white capitalize">' + (snap.dateLabel || key) + '</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.bbva||0).toLocaleString('es-ES') + ' €</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.myinvestor||0).toLocaleString('es-ES') + ' €</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.trade_republic_liq||0).toLocaleString('es-ES') + ' €</td>' +
+          '<td class="p-3 text-amber-600 dark:text-amber-400">' + (snap.trade_republic_btc||0).toLocaleString('es-ES') + ' €</td>' +
+          '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €</td>';
         tbody.appendChild(tr);
       });
     }
@@ -515,11 +619,11 @@
       state.transactions.push({
         id: Date.now(),
         date: new Date().toISOString(),
-        type,
-        concept,
-        amount,
-        category,
-        account
+        type: type,
+        concept: concept,
+        amount: amount,
+        category: category,
+        account: account
       });
 
       document.getElementById('txConcept').value = '';
@@ -529,7 +633,7 @@
     }
 
     function deleteTransaction(id) {
-      const txIndex = state.transactions.findIndex(t => t.id === id);
+      const txIndex = state.transactions.findIndex(function(t) { return t.id === id; });
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
         if (tx.type === 'expense') {
@@ -556,10 +660,14 @@
     }
 
     function exportData() {
+      state.lastBackupDate = new Date().toISOString();
+      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      render();
+
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `patrimonio-backup-${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", 'patrimonio-backup-' + new Date().toISOString().slice(0,10) + '.json');
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -593,7 +701,6 @@
     function updateCharts() {
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
 
-      // 1. Chart Entidad (Con %)
       const ctxDist = document.getElementById('distributionChart').getContext('2d');
       if (chartDist) chartDist.destroy();
       chartDist = new Chart(ctxDist, {
@@ -614,7 +721,7 @@
                 label: function(context) {
                   const val = context.raw || 0;
                   const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                  return ` ${context.label}: ${val.toLocaleString('es-ES')} € (${pct}%)`;
+                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
                 }
               }
             }
@@ -622,13 +729,12 @@
         }
       });
 
-      // 2. Chart Categorías (Con %)
       const ctxCat = document.getElementById('categoryChart').getContext('2d');
       if (chartCat) chartCat.destroy();
 
       const catTotals = {};
       let totalGastos = 0;
-      state.transactions.filter(t => t.type === 'expense').forEach(t => {
+      state.transactions.filter(function(t) { return t.type === 'expense'; }).forEach(function(t) {
         catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
         totalGastos += t.amount;
       });
@@ -655,7 +761,7 @@
                 label: function(context) {
                   const val = context.raw || 0;
                   const pct = totalGastos > 0 ? ((val / totalGastos) * 100).toFixed(1) : 0;
-                  return ` ${context.label}: ${val.toLocaleString('es-ES')} € (${pct}%)`;
+                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
                 }
               }
             }
@@ -663,7 +769,6 @@
         }
       });
 
-      // 3. Chart Evolución
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
       
