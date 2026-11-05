@@ -86,16 +86,16 @@
     <!-- ================================================= -->
     <div id="tabPrincipal" class="space-y-6">
 
-      <!-- Meta de Patrimonio -->
+      <!-- Meta de Patrimonio (Escalonada y Bidireccional) -->
       <section class="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div>
-            <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Objetivo Financiero</span>
-            <h2 class="text-2xl font-bold mt-2">Meta de Patrimonio</h2>
+            <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Hitos de Patrimonio</span>
+            <h2 id="goalTitle" class="text-2xl font-bold mt-2">Objetivo: 50.000 €</h2>
           </div>
-          <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
-            <label class="text-xs text-slate-300 pl-2">Objetivo (€):</label>
-            <input type="number" id="goalInput" class="w-28 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-right text-white font-semibold focus:outline-none focus:border-indigo-500" value="40000" onchange="updateGoal(this.value)">
+          <div class="bg-indigo-950/80 px-4 py-2 rounded-xl border border-indigo-500/30 text-right">
+            <span class="block text-[10px] text-indigo-300 uppercase font-semibold">Mensaje motivacional</span>
+            <p id="goalMotivationText" class="text-xs font-bold text-emerald-400 mt-0.5">¡A por el primer gran escalón!</p>
           </div>
         </div>
         
@@ -103,11 +103,12 @@
           <div class="flex justify-between text-xs text-slate-300 font-medium">
             <span id="goalCurrentText">Actual: 0 €</span>
             <span id="goalProgressPercent" class="font-bold text-indigo-300">0% alcanzado</span>
-            <span id="goalTargetText">Meta: 40.000 €</span>
+            <span id="goalTargetText">Meta actual: 50.000 €</span>
           </div>
           <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
             <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
+          <p class="text-[11px] text-slate-400 mt-1 italic" id="goalSubProgress">Punto de partida: 30.000 € ➔ Siguiente meta: 50.000 €</p>
         </div>
       </section>
 
@@ -229,7 +230,7 @@
         </div>
       </section>
 
-      <!-- Quick Action: Registrar Movimiento (Con soporte para Traspasos) -->
+      <!-- Quick Action: Registrar Movimiento -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento o Traspaso</h3>
         <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3" onsubmit="addTransaction(event)">
@@ -541,7 +542,6 @@
 
   <script>
     let state = {
-      goal: 40000,
       theme: 'dark',
       annualExpenses: 12000,
       accounts: {
@@ -627,7 +627,7 @@
         }
       });
 
-      const saved = localStorage.getItem('mi_patrimonio_data_v13');
+      const saved = localStorage.getItem('mi_patrimonio_data_v14');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -685,7 +685,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v13', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
       updateCharts();
     }
 
@@ -744,7 +744,7 @@
         });
 
         saveSnapshotForDate(now);
-        localStorage.setItem('mi_patrimonio_data_v13', JSON.stringify(state));
+        localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
       }
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -799,7 +799,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v13', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -837,13 +837,46 @@
       renderSubscriptions();
       calculateSimulator();
 
-      document.getElementById('goalInput').value = state.goal || 40000;
-      const target = state.goal || 40000;
-      const percent = Math.min(Math.round((total / target) * 100), 100);
+      // Cálculo de Meta Escalonada Bidireccional (Partiendo de 30k, escalones de 50k)
+      const baseStart = 30000;
+      const step = 50000;
+      
+      let currentTarget = baseStart;
+      let prevTarget = 0;
+
+      if (total >= baseStart) {
+        const diff = total - baseStart;
+        const multiplier = Math.floor(diff / step) + 1;
+        currentTarget = baseStart + (multiplier * step);
+        prevTarget = currentTarget - step;
+      } else {
+        currentTarget = baseStart;
+        prevTarget = 0;
+      }
+
+      const spanInThisTier = Math.max(0, total - prevTarget);
+      const tierSize = currentTarget - prevTarget;
+      const percent = Math.min(Math.max(Math.round((spanInThisTier / tierSize) * 100), 0), 100);
+
+      document.getElementById('goalTitle').innerText = 'Objetivo: ' + currentTarget.toLocaleString('es-ES') + ' €';
       document.getElementById('goalCurrentText').innerText = 'Actual: ' + total.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
-      document.getElementById('goalTargetText').innerText = 'Meta: ' + target.toLocaleString('es-ES') + ' €';
-      document.getElementById('goalProgressPercent').innerText = percent + '% alcanzado';
+      document.getElementById('goalTargetText').innerText = 'Meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
+      document.getElementById('goalProgressPercent').innerText = percent + '% de este tramo';
       document.getElementById('goalProgressBar').style.width = percent + '%';
+      
+      const subProgress = document.getElementById('goalSubProgress');
+      const motivationText = document.getElementById('goalMotivationText');
+
+      if (total >= currentTarget) {
+        motivationText.innerText = '🎉 ¡Objetivo de ' + currentTarget.toLocaleString('es-ES') + ' € superado con éxito!';
+        subProgress.innerText = '¡Imparable! Avanzando hacia el siguiente hito.';
+      } else if (prevTarget > 0 && total >= prevTarget) {
+        motivationText.innerText = '🌟 ¡Has conseguido el objetivo de ' + prevTarget.toLocaleString('es-ES') + ' €!';
+        subProgress.innerText = 'Tramo superado. Partiendo desde ' + prevTarget.toLocaleString('es-ES') + ' € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
+      } else {
+        motivationText.innerText = '🚀 ¡A por el primer gran escalón!';
+        subProgress.innerText = 'Punto de partida: ' + baseStart.toLocaleString('es-ES') + ' € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
+      }
 
       renderTransactions();
       renderSnapshots();
@@ -1071,14 +1104,6 @@
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null);
     }
 
-    function updateGoal(val) {
-      const num = parseFloat(val);
-      if (num && num > 0) {
-        state.goal = num;
-        save();
-      }
-    }
-
     function clearDateFilter() {
       document.getElementById('filterStartDate').value = '';
       document.getElementById('filterEndDate').value = '';
@@ -1129,7 +1154,6 @@
       list.forEach(function(t) {
         if (t.type === 'income') pInc += t.amount;
         if (t.type === 'expense') pExp += t.amount;
-        // Las transferencias (transfer) no alteran el flujo de caja neto mensual
       });
 
       document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
@@ -1332,7 +1356,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v13', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
