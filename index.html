@@ -10,6 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
+  <!-- PWA Manifest autónomo en Data URI -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Finanzas%20Personales%20Pro%22%2C%22short_name%22%3A%22Finanzas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%5D%7D">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -95,7 +97,7 @@
         </div>
       </div>
 
-      <!-- Tarjeta de Libertad Financiera (Regla del 4%) - Personalizable -->
+      <!-- Tarjeta de Libertad Financiera (Regla del 4%) - Personalizable & Con Años Estimados -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
           <div class="flex justify-between items-center">
@@ -105,6 +107,7 @@
           <div class="mt-3">
             <h4 id="fiProgressText" class="text-xl font-extrabold text-slate-900 dark:text-white">0.0%</h4>
             <p id="fiSubtext" class="text-xs text-slate-500 mt-1">De tus gastos anuales cubiertos por pasivos.</p>
+            <p id="fiYearsText" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-1">⏳ Estimación: Calculando...</p>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -343,7 +346,7 @@
         </div>
       </div>
 
-      <!-- NUEVO: Gráfico de Tasa de Ahorro Histórica (%) -->
+      <!-- Gráfico de Tasa de Ahorro Histórica (%) -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Tasa de Ahorro Mensual (%)</h3>
@@ -400,7 +403,7 @@
       </div>
     </section>
 
-    <!-- Historial de Movimientos (Con Buscador, Filtros de Mes/Año y Rango de Fechas) -->
+    <!-- Historial de Movimientos -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
@@ -408,7 +411,7 @@
         <div class="flex flex-wrap gap-2 items-center">
           <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="🔍 Buscar..." class="px-3 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none">
 
-          <!-- NUEVO: Selector de Rango de Fechas Personalizado -->
+          <!-- Selector de Rango de Fechas Personalizado -->
           <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
             <span class="text-[10px] text-slate-400 pl-1">Desde:</span>
             <input type="date" id="filterStartDate" onchange="renderTransactions()" class="bg-transparent text-slate-800 dark:text-slate-200 text-xs focus:outline-none">
@@ -547,7 +550,7 @@
     let chartSavingsRate = null;
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v8');
+      const saved = localStorage.getItem('mi_patrimonio_data_v9');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -558,6 +561,20 @@
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
+      }
+
+      // Registrar Service Worker para PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          const swCode = `
+            self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+            self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+            self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+          `;
+          const blob = new Blob([swCode], { type: 'text/javascript' });
+          const swUrl = URL.createObjectURL(blob);
+          navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed', err));
+        });
       }
 
       const today = new Date().toISOString().split('T')[0];
@@ -592,7 +609,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
       updateCharts();
     }
 
@@ -645,7 +662,7 @@
           });
 
           saveSnapshotForDate(now);
-          localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
+          localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
         }
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -701,7 +718,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -762,6 +779,32 @@
       document.getElementById('fiProgressText').innerText = fiPercent.toFixed(1) + '%';
       document.getElementById('fiSubtext').innerText = 'Patrimonio pasivo para cubrir ' + annualExpenses.toLocaleString('es-ES', {maximumFractionDigits:0}) + '€/año (Meta: ' + fiTarget.toLocaleString('es-ES') + '€).';
       document.getElementById('fiBar').style.width = fiPercent + '%';
+
+      // Cálculo dinámico de años estimados para alcanzar la libertad financiera
+      const yearsEl = document.getElementById('fiYearsText');
+      if (invested >= fiTarget) {
+        yearsEl.innerText = '🎉 ¡Meta de libertad financiera alcanzada!';
+        yearsEl.className = 'text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1';
+      } else {
+        const monthlySave = parseFloat(document.getElementById('simMonthly')?.value) || 300;
+        const annualRate = (parseFloat(document.getElementById('simRate')?.value) || 7.0) / 100;
+        const monthlyRate = annualRate / 12;
+
+        let currentVal = invested;
+        let months = 0;
+        while (currentVal < fiTarget && months < 600) {
+          currentVal = (currentVal + monthlySave) * (1 + monthlyRate);
+          months++;
+        }
+
+        if (months >= 600) {
+          yearsEl.innerText = '⏳ Plazo estimado: +50 años';
+        } else {
+          const years = (months / 12).toFixed(1);
+          yearsEl.innerText = '⏳ Estimación: ~' + years + ' años para la meta';
+        }
+        yearsEl.className = 'text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-1';
+      }
     }
 
     function updateFiExpenses(val) {
@@ -986,7 +1029,6 @@
       list = list.filter(function(t) {
         const d = new Date(t.date);
         
-        // Filtro por Rango de Fechas Personalizado
         let matchRange = true;
         if (startDateVal) {
           matchRange = matchRange && (d >= new Date(startDateVal + 'T00:00:00'));
@@ -1181,7 +1223,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
@@ -1440,7 +1482,7 @@
         }
       });
 
-      // NUEVO: Gráfico de Tasa de Ahorro Histórica (%)
+      // Gráfico de Tasa de Ahorro Histórica (%)
       const ctxSavings = document.getElementById('savingsRateChart').getContext('2d');
       if (chartSavingsRate) chartSavingsRate.destroy();
 
