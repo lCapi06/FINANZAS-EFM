@@ -91,42 +91,69 @@
 
     </section>
 
-    <!-- Summary Cards -->
+    <!-- Summary Cards con Variación Mensual -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      
+      <!-- Patrimonio Total -->
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between">
         <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
           <h2 id="totalBalance" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
         </div>
-        <div class="mt-2">
-          <span id="monthlyTrendBadge" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes anterior</span>
+        <div class="mt-3">
+          <span id="trendTotal" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes ant.</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
-        <h3 id="bbvaBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Efectivo / Día a día</p>
+      <!-- BBVA -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
+          <h3 id="bbvaBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">Efectivo / Día a día</p>
+        </div>
+        <div class="mt-3">
+          <span id="trendBbva" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+        </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
-        <h3 id="myinvestorBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Fondos indexados</p>
+      <!-- MyInvestor -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
+          <h3 id="myinvestorBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">Fondos indexados</p>
+        </div>
+        <div class="mt-3">
+          <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+        </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">TR (Liquidez)</p>
-        <h3 id="trLiquidityBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Cuenta remunerada</p>
+      <!-- Trade Republic -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic</p>
+          <h3 id="trLiquidityBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">Cuenta remunerada</p>
+        </div>
+        <div class="mt-3">
+          <span id="trendTrLiq" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+        </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">TR (Bitcoin)</p>
-        <h3 id="trBtcBalance" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Criptomoneda BTC</p>
+      <!-- Bitcoin -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
+          <h3 id="trBtcBalance" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">Criptomoneda BTC</p>
+        </div>
+        <div class="mt-3">
+          <span id="trendTrBtc" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+        </div>
       </div>
+
     </section>
 
     <!-- Resumen de Flujo de Caja -->
@@ -176,6 +203,8 @@
           <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="Supermercado">🛒 Supermercado</option>
             <option value="Nomina">💼 Nómina / Ingreso</option>
+            <option value="Bizum">💸 Bizum</option>
+            <option value="Paga extra">💰 Paga extra</option>
             <option value="Ocio">🍿 Ocio / Restauración</option>
             <option value="Inversion">📈 Inversión / Ahorro</option>
             <option value="Vivienda">🏠 Vivienda / Recibos</option>
@@ -190,8 +219,8 @@
           <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="bbva">BBVA</option>
             <option value="myinvestor">MyInvestor</option>
-            <option value="trade_republic_liq">Trade Republic (Liquidez)</option>
-            <option value="trade_republic_btc">Trade Republic (Bitcoin)</option>
+            <option value="trade_republic_liq">Trade Republic</option>
+            <option value="trade_republic_btc">Bitcoin</option>
           </select>
         </div>
 
@@ -294,14 +323,14 @@
           <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">TR Liquidez (€)</label>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
           <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar TR Liquidez</button>
+          <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">TR Bitcoin (€)</label>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (€)</label>
           <input type="number" step="0.01" id="inputTRBtc" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar TR Bitcoin</button>
+          <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Bitcoin</button>
         </div>
       </div>
     </section>
@@ -317,8 +346,8 @@
               <th class="p-3">Periodo (Mes/Año)</th>
               <th class="p-3">BBVA</th>
               <th class="p-3">MyInvestor</th>
-              <th class="p-3">TR Liquidez</th>
-              <th class="p-3">TR Bitcoin</th>
+              <th class="p-3">Trade Republic</th>
+              <th class="p-3">Bitcoin</th>
               <th class="p-3 text-right">Patrimonio Total</th>
             </tr>
           </thead>
@@ -360,9 +389,7 @@
         }
       }
 
-      // Procesar parámetros automáticos enviados por URL (Atajos de iOS)
       processUrlShortcuts();
-
       updateYearFilterOptions();
       render();
     }
@@ -492,7 +519,7 @@
         backupText.className = 'text-xs text-amber-500 font-medium mt-1';
       }
 
-      updateMonthlyTrend(total);
+      updateAllTrends();
 
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
       const invPct = total > 0 ? Math.round((invested / total) * 100) : 0;
@@ -514,32 +541,47 @@
       updateCharts();
     }
 
-    function updateMonthlyTrend(currentTotal) {
-      const badge = document.getElementById('monthlyTrendBadge');
+    function updateAllTrends() {
       if (!state.monthlySnapshots) return;
 
       const keys = Object.keys(state.monthlySnapshots).sort().reverse();
       const nowKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
       
-      let prevTotal = null;
+      let prevSnap = null;
       for (let i = 0; i < keys.length; i++) {
         if (keys[i] !== nowKey) {
-          prevTotal = state.monthlySnapshots[keys[i]].total;
+          prevSnap = state.monthlySnapshots[keys[i]];
           break;
         }
       }
 
-      if (prevTotal !== null && prevTotal > 0) {
-        const diff = currentTotal - prevTotal;
-        const pct = ((diff / prevTotal) * 100).toFixed(1);
-        const sign = diff >= 0 ? '+' : '';
-        const color = diff >= 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
-        badge.className = 'inline-block text-[10px] font-bold px-2 py-0.5 rounded ' + color;
-        badge.innerText = sign + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € (' + sign + pct + '%) vs mes ant.';
-      } else {
-        badge.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500';
-        badge.innerText = 'Primer mes registrado';
+      function setTrendBadge(elementId, currentVal, prevVal) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        if (prevVal !== null && prevVal !== undefined && prevVal > 0) {
+          const diff = currentVal - prevVal;
+          const pct = ((diff / prevVal) * 100).toFixed(1);
+          const sign = diff >= 0 ? '+' : '';
+          const color = diff >= 0 
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+            : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+          
+          el.className = 'inline-block text-[10px] font-bold px-2 py-0.5 rounded ' + color;
+          el.innerText = sign + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € (' + sign + pct + '%)';
+        } else {
+          el.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500';
+          el.innerText = 'Primer mes';
+        }
       }
+
+      const totalCurrent = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+
+      setTrendBadge('trendTotal', totalCurrent, prevSnap ? prevSnap.total : null);
+      setTrendBadge('trendBbva', state.accounts.bbva, prevSnap ? prevSnap.bbva : null);
+      setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prevSnap ? prevSnap.myinvestor : null);
+      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prevSnap ? prevSnap.trade_republic_liq : null);
+      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null);
     }
 
     function updateGoal(val) {
@@ -598,8 +640,8 @@
         
         let accName = 'BBVA';
         if (tx.account === 'myinvestor') accName = 'MyInvestor';
-        if (tx.account === 'trade_republic_liq') accName = 'TR (Liquidez)';
-        if (tx.account === 'trade_republic_btc') accName = 'TR (Bitcoin)';
+        if (tx.account === 'trade_republic_liq') accName = 'Trade Republic';
+        if (tx.account === 'trade_republic_btc') accName = 'Bitcoin';
 
         const isIncome = tx.type === 'income';
         const amountColor = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-semibold';
@@ -754,7 +796,7 @@
       chartDist = new Chart(ctxDist, {
         type: 'doughnut',
         data: {
-          labels: ['BBVA', 'MyInvestor', 'TR Liquidez', 'TR Bitcoin'],
+          labels: ['BBVA', 'MyInvestor', 'Trade Republic', 'Bitcoin'],
           datasets: [{
             data: [state.accounts.bbva, state.accounts.myinvestor, state.accounts.trade_republic_liq, state.accounts.trade_republic_btc],
             backgroundColor: ['#3b82f6', '#6366f1', '#10b981', '#f59e0b']
@@ -825,7 +867,7 @@
         data: {
           labels: ['Mes -3', 'Mes -2', 'Mes -1', 'Actual'],
           datasets: [{
-            label: 'Patrimonio (€)',
+            label: 'Patrimonio Total (€)',
             data: [total * 0.90, total * 0.94, total * 0.97, total],
             borderColor: '#6366f1',
             tension: 0.3,
