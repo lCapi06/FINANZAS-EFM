@@ -360,7 +360,7 @@
         }
       }
 
-      // PASO 1: Procesar parámetros automáticos enviados por URL (Atajos de iOS)
+      // Procesar parámetros automáticos enviados por URL (Atajos de iOS)
       processUrlShortcuts();
 
       updateYearFilterOptions();
@@ -373,46 +373,51 @@
       const autoConcept = params.get('auto_concept');
       const autoAmount = parseFloat(params.get('auto_amount'));
       const autoAccount = params.get('auto_account');
+      const autoCategory = params.get('auto_category');
 
       if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
-        if (autoType === 'expense') {
-          state.accounts[autoAccount] -= autoAmount;
-        } else {
-          state.accounts[autoAccount] += autoAmount;
+        if (state.accounts[autoAccount] !== undefined) {
+          if (autoType === 'expense') {
+            state.accounts[autoAccount] -= autoAmount;
+          } else {
+            state.accounts[autoAccount] += autoAmount;
+          }
+
+          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : 'Otros');
+
+          state.transactions.push({
+            id: Date.now(),
+            date: new Date().toISOString(),
+            type: autoType,
+            concept: decodeURIComponent(autoConcept),
+            amount: autoAmount,
+            category: finalCategory,
+            account: autoAccount
+          });
+
+          const now = new Date();
+          const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+          const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+
+          if (!state.monthlySnapshots) state.monthlySnapshots = {};
+          state.monthlySnapshots[monthYearKey] = {
+            dateLabel: now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+            bbva: state.accounts.bbva,
+            myinvestor: state.accounts.myinvestor,
+            trade_republic_liq: state.accounts.trade_republic_liq,
+            trade_republic_btc: state.accounts.trade_republic_btc,
+            total: total
+          };
+
+          localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
         }
-
-        state.transactions.push({
-          id: Date.now(),
-          date: new Date().toISOString(),
-          type: autoType,
-          concept: decodeURIComponent(autoConcept),
-          amount: autoAmount,
-          category: autoType === 'income' ? 'Nomina' : 'Otros',
-          account: autoAccount
-        });
-
-        // Guardar cambios y limpiar la URL para que no duplique al recargar
-        const now = new Date();
-        const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-        const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
-
-        if (!state.monthlySnapshots) state.monthlySnapshots = {};
-        state.monthlySnapshots[monthYearKey] = {
-          dateLabel: now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
-          bbva: state.accounts.bbva,
-          myinvestor: state.accounts.myinvestor,
-          trade_republic_liq: state.accounts.trade_republic_liq,
-          trade_republic_btc: state.accounts.trade_republic_btc,
-          total: total
-        };
-
-        localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
     function updateYearFilterOptions() {
       const yearSelect = document.getElementById('filterYear');
+      if (!yearSelect) return;
       const yearsSet = new Set();
       
       const currentYear = new Date().getFullYear();
@@ -547,6 +552,7 @@
 
     function renderTransactions() {
       const tbody = document.getElementById('transactionsTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const monthVal = document.getElementById('filterMonth').value;
@@ -619,6 +625,7 @@
 
     function renderSnapshots() {
       const tbody = document.getElementById('balanceSnapshotsTable');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (!state.monthlySnapshots || Object.keys(state.monthlySnapshots).length === 0) {
