@@ -6,6 +6,10 @@
   <title>Finanzas Personales - Dashboard Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Meta tags para PWA / Pantalla completa en móviles -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -265,23 +269,35 @@
       </form>
     </section>
 
-    <!-- Suscripciones y Gastos Fijos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Suscripciones y Gastos Fijos</h3>
-        <button onclick="openSubModal()" class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition">+ Añadir Suscripción</button>
+    <!-- Presupuestos Mensuales y Suscripciones -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Presupuestos -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Presupuestos Mensuales</h3>
+          <button onclick="editBudget()" class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition">⚙️ Configurar Límite</button>
+        </div>
+        <div class="space-y-4" id="budgetsContainer">
+          <!-- Renderizado dinámico -->
+        </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="subscriptionsContainer">
-        <!-- Renderizado dinámico -->
+
+      <!-- Suscripciones -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Suscripciones y Gastos Fijos</h3>
+          <button onclick="openSubModal()" class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition">+ Añadir</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto max-h-48" id="subscriptionsContainer">
+          <!-- Renderizado dinámico -->
+        </div>
       </div>
     </section>
 
     <!-- Charts Section -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">Distribución por Entidad (%)</h3>
-        </div>
+        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
         <div class="h-56">
           <canvas id="distributionChart"></canvas>
         </div>
@@ -289,8 +305,8 @@
 
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">Gastos por Categoría (%)</h3>
-          <span id="activeCategoryIndicator" class="text-[10px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 px-2 py-0.5 rounded-full hidden">Filtrado por clic</span>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Gastos por Categoría</h3>
+          <span id="activeCategoryIndicator" class="text-[10px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 px-2 py-0.5 rounded-full hidden">Filtrado</span>
         </div>
         <div class="h-56">
           <canvas id="categoryChart"></canvas>
@@ -313,13 +329,64 @@
       </div>
     </section>
 
-    <!-- Historial de Movimientos (Con Buscador en Vivo) -->
+    <!-- Nuevo Gráfico: Ingresos vs Gastos Mensuales -->
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Comparativa de Flujo Mensual (Ingresos vs Gastos)</h3>
+      <div class="h-64">
+        <canvas id="incomeVsExpenseChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Simulador de Crecimiento a Largo Plazo (Interés Compuesto) -->
+    <section class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-6 rounded-2xl border border-indigo-500/30 shadow-lg">
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <div>
+          <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Simulador Financiero</span>
+          <h3 class="text-xl font-bold mt-2">Proyección de Crecimiento (Interés Compuesto)</h3>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-slate-300 mb-1">Aportación Mensual (€)</label>
+          <input type="number" id="simMonthly" value="300" oninput="calculateSimulator()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white font-semibold focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-300 mb-1">Rentabilidad Anual Estimada (%)</label>
+          <input type="number" step="0.1" id="simRate" value="7.0" oninput="calculateSimulator()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white font-semibold focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-300 mb-1">Plazo (Años)</label>
+          <select id="simYears" onchange="calculateSimulator()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white font-semibold focus:outline-none focus:border-indigo-500">
+            <option value="5">5 Años</option>
+            <option value="10" selected>10 Años</option>
+            <option value="15">15 Años</option>
+            <option value="20">20 Años</option>
+            <option value="30">30 Años</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+        <div>
+          <p class="text-xs text-slate-400">Patrimonio Inicial Actual</p>
+          <h4 id="simInitVal" class="text-lg font-bold text-slate-200 mt-1">0,00 €</h4>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">Total Aportado de tu Bolsillo</p>
+          <h4 id="simContributed" class="text-lg font-bold text-sky-400 mt-1">0,00 €</h4>
+        </div>
+        <div>
+          <p class="text-xs text-emerald-400 font-medium">Patrimonio Proyectado Final 🌟</p>
+          <h4 id="simFinalVal" class="text-2xl font-extrabold text-emerald-400 mt-1">0,00 €</h4>
+        </div>
+      </div>
+    </section>
+
+    <!-- Historial de Movimientos -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
         
         <div class="flex flex-wrap gap-2 items-center">
-          <!-- Buscador en tiempo real -->
           <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="🔍 Buscar concepto..." class="px-3 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none">
 
           <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -419,7 +486,6 @@
 
   </main>
 
-  <!-- Script Principal con toda la lógica e integraciones -->
   <script>
     let state = {
       goal: 40000,
@@ -430,7 +496,13 @@
         trade_republic_liq: 6000.00,
         trade_republic_btc: 2500.00
       },
-      btcUnits: 0.035, // Unidades de BTC aproximadas para API en vivo
+      btcUnits: 0.035,
+      budgets: {
+        'Supermercado': 300,
+        'Ocio': 150,
+        'Vivienda': 600,
+        'Transporte': 100
+      },
       subscriptions: [
         { id: 1, name: 'Netflix', amount: 12.99, day: 14, account: 'bbva' },
         { id: 2, name: 'Gimnasio', amount: 35.00, day: 5, account: 'bbva' }
@@ -442,12 +514,14 @@
 
     let currentTypeFilter = 'all';
     let selectedCategoryFilter = null;
+    let chartIncomeVsExpense = null;
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v4');
+      const saved = localStorage.getItem('mi_patrimonio_data_v5');
       if (saved) {
         try {
           state = JSON.parse(saved);
+          if (!state.budgets) state.budgets = { 'Supermercado': 300, 'Ocio': 150, 'Vivienda': 600 };
           if (!state.subscriptions) state.subscriptions = [];
         } catch (e) {
           console.error("Error al cargar localStorage", e);
@@ -485,7 +559,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v5', JSON.stringify(state));
       updateCharts();
     }
 
@@ -495,7 +569,6 @@
         const data = await res.json();
         if (data && data.bitcoin && data.bitcoin.eur) {
           const currentBtcEur = data.bitcoin.eur;
-          // Si no tenemos btcUnits definido, lo estimamos con el saldo actual y el precio
           if (!state.btcUnits || state.btcUnits === 0.035) {
             state.btcUnits = state.accounts.trade_republic_btc / (currentBtcEur > 0 ? currentBtcEur : 70000);
           }
@@ -539,7 +612,7 @@
           });
 
           saveSnapshotForDate(now);
-          localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+          localStorage.setItem('mi_patrimonio_data_v5', JSON.stringify(state));
         }
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -595,7 +668,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v5', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -629,6 +702,9 @@
 
       updateAllTrends();
       renderFinancialIndependence(invested);
+      renderBudgets();
+      renderSubscriptions();
+      calculateSimulator();
 
       document.getElementById('goalInput').value = state.goal || 40000;
       const target = state.goal || 40000;
@@ -640,19 +716,17 @@
 
       renderTransactions();
       renderSnapshots();
-      renderSubscriptions();
       updateCharts();
     }
 
     function renderFinancialIndependence(invested) {
-      // Cálculo basado en regla del 4%: Gasto anual estimado (ej. 12000€ o basado en transacciones)
       let annualExpenses = 12000; 
       let totalExpRecord = 0;
       state.transactions.filter(t => t.type === 'expense').forEach(t => totalExpRecord += t.amount);
       if (totalExpRecord > 0) {
-        annualExpenses = Math.max(totalExpRecord * 4, 12000); // Estimación anual
+        annualExpenses = Math.max(totalExpRecord * 4, 12000);
       }
-      const fiTarget = annualExpenses * 25; // Patrimonio necesario para independencia según regla 4%
+      const fiTarget = annualExpenses * 25;
       const fiPercent = Math.min(Math.max((invested / fiTarget) * 100, 0), 100);
 
       document.getElementById('fiProgressText').innerText = fiPercent.toFixed(1) + '%';
@@ -660,36 +734,119 @@
       document.getElementById('fiBar').style.width = fiPercent + '%';
     }
 
+    function renderBudgets() {
+      const container = document.getElementById('budgetsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      // Calcular gastos actuales del mes por categoría
+      const spentMap = {};
+      state.transactions.forEach(t => {
+        if (t.type === 'expense') {
+          const d = new Date(t.date);
+          if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            spentMap[t.category] = (spentMap[t.category] || 0) + t.amount;
+          }
+        }
+      });
+
+      const categories = Object.keys(state.budgets);
+      if (categories.length === 0) {
+        container.innerHTML = '<p class="text-xs text-slate-400">No hay presupuestos configurados.</p>';
+        return;
+      }
+
+      categories.forEach(cat => {
+        const limit = state.budgets[cat];
+        const spent = spentMap[cat] || 0;
+        const pct = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
+        
+        let barColor = 'bg-emerald-500';
+        let textColor = 'text-emerald-600 dark:text-emerald-400';
+        if (pct >= 90) {
+          barColor = 'bg-rose-500';
+          textColor = 'text-rose-600 dark:text-rose-400';
+        } else if (pct >= 70) {
+          barColor = 'bg-amber-500';
+          textColor = 'text-amber-600 dark:text-amber-400';
+        }
+
+        const div = document.createElement('div');
+        div.className = 'space-y-1';
+        div.innerHTML = `
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-slate-700 dark:text-slate-300">${cat}</span>
+            <span class="${textColor}">${spent.toLocaleString('es-ES', {minimumFractionDigits: 2})} € / ${limit.toLocaleString('es-ES')} € (${pct}%)</span>
+          </div>
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div class="${barColor} h-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function editBudget() {
+      const cat = prompt('Introduce la categoría a configurar (ej. Supermercado, Ocio, Vivienda, Transporte):');
+      if (!cat) return;
+      const limit = parseFloat(prompt(`Límite mensual en € para "${cat}":`));
+      if (isNaN(limit) || limit <= 0) return;
+
+      state.budgets[cat] = limit;
+      save();
+    }
+
+    function calculateSimulator() {
+      const monthly = parseFloat(document.getElementById('simMonthly').value) || 0;
+      const rate = (parseFloat(document.getElementById('simRate').value) || 0) / 100;
+      const years = parseInt(document.getElementById('simYears').value) || 10;
+      const totalInit = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+
+      let futureVal = totalInit;
+      let totalContributed = totalInit;
+      const months = years * 12;
+      const monthlyRate = rate / 12;
+
+      for (let i = 0; i < months; i++) {
+        futureVal = (futureVal + monthly) * (1 + monthlyRate);
+        totalContributed += monthly;
+      }
+
+      document.getElementById('simInitVal').innerText = totalInit.toLocaleString('es-ES', {maximumFractionDigits: 2}) + ' €';
+      document.getElementById('simContributed').innerText = totalContributed.toLocaleString('es-ES', {maximumFractionDigits: 2}) + ' €';
+      document.getElementById('simFinalVal').innerText = futureVal.toLocaleString('es-ES', {maximumFractionDigits: 2}) + ' €';
+    }
+
     function renderSubscriptions() {
       const container = document.getElementById('subscriptionsContainer');
       if (!container) return;
       container.innerHTML = '';
-
       const currentDay = new Date().getDate();
 
       if (!state.subscriptions || state.subscriptions.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-400 col-span-4">No hay suscripciones registradas.</p>';
+        container.innerHTML = '<p class="text-xs text-slate-400 col-span-2">No hay suscripciones.</p>';
         return;
       }
 
       state.subscriptions.forEach(sub => {
         const isPassed = currentDay >= sub.day;
         const badgeColor = isPassed ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
-        const badgeText = isPassed ? 'Cobrado este mes' : 'Próximo cobro';
+        const badgeText = isPassed ? 'Cobrado' : 'Próximo';
 
         const card = document.createElement('div');
-        card.className = 'p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col justify-between';
+        card.className = 'p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col justify-between';
         card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start">
-              <h4 class="font-bold text-sm text-slate-900 dark:text-white">${sub.name}</h4>
-              <button onclick="deleteSubscription(${sub.id})" class="text-xs text-rose-500 hover:underline">✕</button>
-            </div>
-            <p class="text-xs text-slate-500 mt-0.5">Día ${sub.day} de cada mes • ${sub.account.toUpperCase()}</p>
+          <div class="flex justify-between items-start">
+            <h4 class="font-bold text-xs text-slate-900 dark:text-white">${sub.name}</h4>
+            <button onclick="deleteSubscription(${sub.id})" class="text-xs text-rose-500 hover:underline">✕</button>
           </div>
-          <div class="flex justify-between items-end mt-4">
-            <span class="font-extrabold text-slate-800 dark:text-slate-100">${sub.amount.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</span>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColor}">${badgeText}</span>
+          <div class="flex justify-between items-end mt-2">
+            <span class="font-extrabold text-xs text-slate-800 dark:text-slate-100">${sub.amount.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</span>
+            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded ${badgeColor}">${badgeText}</span>
           </div>
         `;
         container.appendChild(card);
@@ -705,13 +862,7 @@
       if (isNaN(day) || day < 1 || day > 31) return;
 
       if (!state.subscriptions) state.subscriptions = [];
-      state.subscriptions.push({
-        id: Date.now(),
-        name,
-        amount,
-        day,
-        account: 'bbva'
-      });
+      state.subscriptions.push({ id: Date.now(), name, amount, day, account: 'bbva' });
       save();
     }
 
@@ -963,7 +1114,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v5', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
@@ -1064,7 +1215,6 @@
         options: { 
           responsive: true, 
           maintainAspectRatio: false,
-          // GRÁFICO INTERACTIVO: Al hacer clic en una categoría se filtra la tabla
           onClick: (event, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
@@ -1169,6 +1319,56 @@
               grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
               ticks: { color: textColor, font: { size: 10 } }
             }
+          }
+        }
+      });
+
+      // Gráfico de Ingresos vs Gastos Mensuales (Barras)
+      const ctxIncExp = document.getElementById('incomeVsExpenseChart').getContext('2d');
+      if (chartIncomeVsExpense) chartIncomeVsExpense.destroy();
+
+      const monthlyMap = {};
+      state.transactions.forEach(t => {
+        const d = new Date(t.date);
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (!monthlyMap[k]) monthlyMap[k] = { income: 0, expense: 0, label: d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) };
+        if (t.type === 'income') monthlyMap[k].income += t.amount;
+        if (t.type === 'expense') monthlyMap[k].expense += t.amount;
+      });
+
+      const sortedMonthKeys = Object.keys(monthlyMap).sort();
+      const barLabels = sortedMonthKeys.map(k => monthlyMap[k].label);
+      const incomeData = sortedMonthKeys.map(k => monthlyMap[k].income);
+      const expenseData = sortedMonthKeys.map(k => monthlyMap[k].expense);
+
+      chartIncomeVsExpense = new Chart(ctxIncExp, {
+        type: 'bar',
+        data: {
+          labels: barLabels.length ? barLabels : ['Sin datos'],
+          datasets: [
+            {
+              label: 'Ingresos',
+              data: incomeData.length ? incomeData : [0],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Gastos',
+              data: expenseData.length ? expenseData : [0],
+              backgroundColor: '#f43f5e',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor } },
+            y: { grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' }, ticks: { color: textColor } }
           }
         }
       });
