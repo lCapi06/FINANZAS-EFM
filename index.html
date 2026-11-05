@@ -1,40 +1,69 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Patrimonio Personal - Dashboard Avanzado</title>
+  <title>Finanzas Personales - Dashboard Avanzado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <style>
     body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    
+    @media (max-width: 768px) {
+      .mobile-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      .mobile-card-full {
+        grid-column: span 2 / span 2;
+      }
+      main {
+        padding-top: 1rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+      }
+      .card-title-mobile {
+        font-size: 1.25rem !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors pb-12">
 
   <!-- Header / Nav -->
-  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
     <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center gap-3">
-        <div class="bg-indigo-600 text-white p-2.5 rounded-xl font-bold shadow-md shadow-indigo-500/20">€</div>
+        <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
         <div>
-          <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Control de Patrimonio</h1>
+          <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin exportar</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Botón Modo Oscuro / Claro -->
+        <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+          <span id="themeIcon">☀️</span> <span id="themeText">Modo Claro</span>
+        </button>
         <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
-          💾 Exportar Backup
+          💾 Exportar
         </button>
         <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
-          📂 Importar Backup
+          📂 Importar
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
 
     <!-- Liquidez vs Inversión & Meta -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -65,7 +94,7 @@
       </div>
 
       <!-- Liquidez vs Inversiones -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center space-y-4">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center space-y-4 transition-colors">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Distribución Patrimonial</h3>
         <div class="space-y-4">
           <div>
@@ -91,15 +120,15 @@
 
     </section>
 
-    <!-- Summary Cards con Variación Mensual -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <!-- Summary Cards -->
+    <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       
       <!-- Patrimonio Total -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between">
+      <div class="mobile-card-full bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between transition-colors">
         <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
         <div>
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
-          <h2 id="totalBalance" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
+          <h2 id="totalBalance" class="card-title-mobile text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
         </div>
         <div class="mt-3">
           <span id="trendTotal" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes ant.</span>
@@ -107,11 +136,11 @@
       </div>
 
       <!-- BBVA -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
-          <h3 id="bbvaBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">Efectivo / Día a día</p>
+          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
+          <h3 id="bbvaBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Efectivo / Día a día</p>
         </div>
         <div class="mt-3">
           <span id="trendBbva" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
@@ -119,11 +148,11 @@
       </div>
 
       <!-- MyInvestor -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
-          <h3 id="myinvestorBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">Fondos indexados</p>
+          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
+          <h3 id="myinvestorBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Fondos indexados</p>
         </div>
         <div class="mt-3">
           <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
@@ -131,11 +160,11 @@
       </div>
 
       <!-- Trade Republic -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic</p>
-          <h3 id="trLiquidityBalance" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">Cuenta remunerada</p>
+          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic</p>
+          <h3 id="trLiquidityBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Cuenta remunerada</p>
         </div>
         <div class="mt-3">
           <span id="trendTrLiq" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
@@ -143,11 +172,11 @@
       </div>
 
       <!-- Bitcoin -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
-          <h3 id="trBtcBalance" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">Criptomoneda BTC</p>
+          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
+          <h3 id="trBtcBalance" class="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Criptomoneda BTC</p>
         </div>
         <div class="mt-3">
           <span id="trendTrBtc" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
@@ -157,7 +186,7 @@
     </section>
 
     <!-- Resumen de Flujo de Caja -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
@@ -176,7 +205,7 @@
     </section>
 
     <!-- Quick Action: Movimientos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento</h3>
       <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" onsubmit="addTransaction(event)">
         
@@ -234,30 +263,34 @@
 
     <!-- Charts Section -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
         <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
         <div class="h-56">
           <canvas id="distributionChart"></canvas>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
         <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Gastos por Categoría (%)</h3>
         <div class="h-56">
           <canvas id="categoryChart"></canvas>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1">
-        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Evolución del Patrimonio</h3>
-        <div class="h-56">
+      <!-- Gráfico de Evolución Profesional -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución del Patrimonio</h3>
+          <span class="text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">Histórico Real</span>
+        </div>
+        <div class="h-52">
           <canvas id="evolutionChart"></canvas>
         </div>
       </div>
     </section>
 
     <!-- Historial de Movimientos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
         
@@ -309,7 +342,7 @@
     </section>
 
     <!-- Ajuste Directo de Saldos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos (Separados)</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
@@ -336,7 +369,7 @@
     </section>
 
     <!-- Historial de Saldos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales (Foto de Cuentas)</h3>
       <p class="text-xs text-slate-500 mb-4">Registro histórico guardado cada vez que actualizas tus cuentas.</p>
       <div class="overflow-x-auto">
@@ -362,6 +395,7 @@
   <script>
     let state = {
       goal: 40000,
+      theme: 'dark',
       accounts: {
         bbva: 3500.00,
         myinvestor: 18200.00,
@@ -389,9 +423,36 @@
         }
       }
 
+      // Aplicar tema guardado
+      if (state.theme === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIcon').innerText = '🌙';
+        document.getElementById('themeText').innerText = 'Modo Oscuro';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').innerText = '☀️';
+        document.getElementById('themeText').innerText = 'Modo Claro';
+      }
+
       processUrlShortcuts();
       updateYearFilterOptions();
       render();
+    }
+
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        state.theme = 'light';
+        document.getElementById('themeIcon').innerText = '🌙';
+        document.getElementById('themeText').innerText = 'Modo Oscuro';
+      } else {
+        document.documentElement.classList.add('dark');
+        state.theme = 'dark';
+        document.getElementById('themeIcon').innerText = '☀️';
+        document.getElementById('themeText').innerText = 'Modo Claro';
+      }
+      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      updateCharts(); // Refrescar gráficos para adaptar colores si es necesario
     }
 
     function processUrlShortcuts() {
@@ -428,7 +489,7 @@
 
           if (!state.monthlySnapshots) state.monthlySnapshots = {};
           state.monthlySnapshots[monthYearKey] = {
-            dateLabel: now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+            dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
             bbva: state.accounts.bbva,
             myinvestor: state.accounts.myinvestor,
             trade_republic_liq: state.accounts.trade_republic_liq,
@@ -480,7 +541,7 @@
 
       if (!state.monthlySnapshots) state.monthlySnapshots = {};
       state.monthlySnapshots[monthYearKey] = {
-        dateLabel: now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+        dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
         bbva: state.accounts.bbva,
         myinvestor: state.accounts.myinvestor,
         trade_republic_liq: state.accounts.trade_republic_liq,
@@ -757,7 +818,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", 'patrimonio-backup-' + new Date().toISOString().slice(0,10) + '.json');
+      downloadAnchor.setAttribute("download", 'finanzas-personales-backup-' + new Date().toISOString().slice(0,10) + '.json');
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -790,7 +851,10 @@
 
     function updateCharts() {
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#64748b';
 
+      // Gráfico de Distribución
       const ctxDist = document.getElementById('distributionChart').getContext('2d');
       if (chartDist) chartDist.destroy();
       chartDist = new Chart(ctxDist, {
@@ -799,13 +863,16 @@
           labels: ['BBVA', 'MyInvestor', 'Trade Republic', 'Bitcoin'],
           datasets: [{
             data: [state.accounts.bbva, state.accounts.myinvestor, state.accounts.trade_republic_liq, state.accounts.trade_republic_btc],
-            backgroundColor: ['#3b82f6', '#6366f1', '#10b981', '#f59e0b']
+            backgroundColor: ['#3b82f6', '#6366f1', '#10b981', '#f59e0b'],
+            borderWidth: isDark ? 0 : 2,
+            borderColor: isDark ? 'transparent' : '#ffffff'
           }]
         },
         options: { 
           responsive: true, 
           maintainAspectRatio: false,
           plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
             tooltip: {
               callbacks: {
                 label: function(context) {
@@ -819,6 +886,7 @@
         }
       });
 
+      // Gráfico de Categorías de Gastos
       const ctxCat = document.getElementById('categoryChart').getContext('2d');
       if (chartCat) chartCat.destroy();
 
@@ -839,13 +907,16 @@
           labels: catLabels,
           datasets: [{
             data: catData,
-            backgroundColor: catColors
+            backgroundColor: catColors,
+            borderWidth: isDark ? 0 : 2,
+            borderColor: isDark ? 'transparent' : '#ffffff'
           }]
         },
         options: { 
           responsive: true, 
           maintainAspectRatio: false,
           plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
             tooltip: {
               callbacks: {
                 label: function(context) {
@@ -859,23 +930,74 @@
         }
       });
 
+      // Gráfico de Evolución Profesional basado en el Historial Real de Snapshots
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
       
+      let evolLabels = [];
+      let evolData = [];
+
+      if (state.monthlySnapshots && Object.keys(state.monthlySnapshots).length > 0) {
+        const sortedKeys = Object.keys(state.monthlySnapshots).sort();
+        sortedKeys.forEach(function(k) {
+          evolLabels.push(state.monthlySnapshots[k].dateLabel || k);
+          evolData.push(state.monthlySnapshots[k].total);
+        });
+      } else {
+        const now = new Date();
+        evolLabels.push(now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }));
+        evolData.push(total);
+      }
+
       chartEvol = new Chart(ctxEvol, {
         type: 'line',
         data: {
-          labels: ['Mes -3', 'Mes -2', 'Mes -1', 'Actual'],
+          labels: evolLabels,
           datasets: [{
-            label: 'Patrimonio Total (€)',
-            data: [total * 0.90, total * 0.94, total * 0.97, total],
+            label: 'Patrimonio Total',
+            data: evolData,
             borderColor: '#6366f1',
-            tension: 0.3,
+            backgroundColor: function(context) {
+              const chart = context.chart;
+              const {ctx, chartArea} = chart;
+              if (!chartArea) return null;
+              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+              gradient.addColorStop(0, 'rgba(99, 102, 241, 0.0)');
+              gradient.addColorStop(1, 'rgba(99, 102, 241, 0.25)');
+              return gradient;
+            },
+            borderWidth: 3,
+            tension: 0.35,
             fill: true,
-            backgroundColor: 'rgba(99, 102, 241, 0.08)'
+            pointBackgroundColor: '#6366f1',
+            pointRadius: 4,
+            pointHoverRadius: 6
           }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' Patrimonio: ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
       });
     }
 
