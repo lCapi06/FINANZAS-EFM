@@ -48,7 +48,6 @@
         </div>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
-        <!-- Botón Modo Oscuro / Claro -->
         <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
           <span id="themeIcon">☀️</span> <span id="themeText">Modo Claro</span>
         </button>
@@ -185,22 +184,35 @@
 
     </section>
 
-    <!-- Resumen de Flujo de Caja -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
-          <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
-          <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
+    <!-- Resumen de Flujo de Caja & Salud Financiera -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
+            <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
+            <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
+          </div>
+          <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
+            <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
+            <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
+          </div>
+          <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+            <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro</p>
+            <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+          </div>
         </div>
-        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
-          <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
-          <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
+      </div>
+
+      <!-- Indicador de Salud Financiera -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Salud Financiera</h3>
+        <div class="text-center my-auto py-2">
+          <div id="healthBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            <span>⚪</span> <span id="healthText">Calculando...</span>
+          </div>
         </div>
-        <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
-          <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro Neto</p>
-          <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
-        </div>
+        <p id="healthDesc" class="text-xs text-slate-500 text-center">Basado en tu tasa de ahorro neta del periodo.</p>
       </div>
     </section>
 
@@ -277,11 +289,15 @@
         </div>
       </div>
 
-      <!-- Gráfico de Evolución Profesional -->
+      <!-- Gráfico de Evolución con Selector de Rango -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors flex flex-col justify-between">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
           <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución del Patrimonio</h3>
-          <span class="text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">Histórico Real</span>
+          <select id="timeRangeSelect" onchange="updateCharts()" class="px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
+            <option value="all">Todo el Histórico</option>
+            <option value="6">Últimos 6 Meses</option>
+            <option value="3">Últimos 3 Meses</option>
+          </select>
         </div>
         <div class="h-52">
           <canvas id="evolutionChart"></canvas>
@@ -423,7 +439,6 @@
         }
       }
 
-      // Aplicar tema guardado
       if (state.theme === 'light') {
         document.documentElement.classList.remove('dark');
         document.getElementById('themeIcon').innerText = '🌙';
@@ -452,7 +467,7 @@
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
-      updateCharts(); // Refrescar gráficos para adaptar colores si es necesario
+      updateCharts();
     }
 
     function processUrlShortcuts() {
@@ -689,6 +704,35 @@
       savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
       savingsEl.className = 'text-xl font-bold mt-1 ' + (pSavings >= 0 ? 'text-indigo-700 dark:text-indigo-300' : 'text-rose-600 dark:text-rose-400');
 
+      // Actualizar Salud Financiera
+      const healthBadge = document.getElementById('healthBadge');
+      const healthText = document.getElementById('healthText');
+      const healthDesc = document.getElementById('healthDesc');
+      if (pInc > 0) {
+        const savingsRate = (pSavings / pInc) * 100;
+        if (savingsRate >= 30) {
+          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          healthText.innerText = 'Excelente (' + savingsRate.toFixed(0) + '% ahorro)';
+          healthDesc.innerText = 'Tasa de ahorro muy sólida este periodo.';
+        } else if (savingsRate >= 10) {
+          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
+          healthText.innerText = 'Saludable (' + savingsRate.toFixed(0) + '% ahorro)';
+          healthDesc.innerText = 'Buen margen de ahorro registrado.';
+        } else if (savingsRate >= 0) {
+          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          healthText.innerText = 'Precaución (Ahorro bajo)';
+          healthDesc.innerText = 'Los gastos se acercan peligrosamente a los ingresos.';
+        } else {
+          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+          healthText.innerText = 'Déficit (Gastos > Ingresos)';
+          healthDesc.innerText = 'Estás gastando más de lo que ingresas este mes.';
+        }
+      } else {
+        healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
+        healthText.innerText = 'Sin ingresos';
+        healthDesc.innerText = 'Registra ingresos para evaluar la salud financiera.';
+      }
+
       if (list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay movimientos registrados para este filtro.</td></tr>';
         return;
@@ -854,7 +898,6 @@
       const isDark = document.documentElement.classList.contains('dark');
       const textColor = isDark ? '#94a3b8' : '#64748b';
 
-      // Gráfico de Distribución
       const ctxDist = document.getElementById('distributionChart').getContext('2d');
       if (chartDist) chartDist.destroy();
       chartDist = new Chart(ctxDist, {
@@ -886,7 +929,6 @@
         }
       });
 
-      // Gráfico de Categorías de Gastos
       const ctxCat = document.getElementById('categoryChart').getContext('2d');
       if (chartCat) chartCat.destroy();
 
@@ -930,7 +972,7 @@
         }
       });
 
-      // Gráfico de Evolución Profesional basado en el Historial Real de Snapshots
+      // Gráfico de Evolución con Filtro de Rango Temporal Aplicado
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
       
@@ -938,7 +980,17 @@
       let evolData = [];
 
       if (state.monthlySnapshots && Object.keys(state.monthlySnapshots).length > 0) {
-        const sortedKeys = Object.keys(state.monthlySnapshots).sort();
+        let sortedKeys = Object.keys(state.monthlySnapshots).sort();
+        
+        // Aplicar filtro de selector temporal
+        const rangeVal = document.getElementById('timeRangeSelect').value;
+        if (rangeVal !== 'all') {
+          const limit = parseInt(rangeVal);
+          if (sortedKeys.length > limit) {
+            sortedKeys = sortedKeys.slice(sortedKeys.length - limit);
+          }
+        }
+
         sortedKeys.forEach(function(k) {
           evolLabels.push(state.monthlySnapshots[k].dateLabel || k);
           evolData.push(state.monthlySnapshots[k].total);
