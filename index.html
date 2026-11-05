@@ -550,7 +550,22 @@
     let chartSavingsRate = null;
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v9');
+      // Escuchar cambios de almacenamiento en tiempo real entre pestañas / PWA
+      window.addEventListener('storage', function(e) {
+        if (e.key && e.key.startsWith('mi_patrimonio_data_')) {
+          const saved = localStorage.getItem(e.key);
+          if (saved) {
+            try {
+              state = JSON.parse(saved);
+              render();
+            } catch (err) {
+              console.error("Error al sincronizar datos en tiempo real", err);
+            }
+          }
+        }
+      });
+
+      const saved = localStorage.getItem('mi_patrimonio_data_v10');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -609,7 +624,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v10', JSON.stringify(state));
       updateCharts();
     }
 
@@ -662,7 +677,7 @@
           });
 
           saveSnapshotForDate(now);
-          localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
+          localStorage.setItem('mi_patrimonio_data_v10', JSON.stringify(state));
         }
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -718,7 +733,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v10', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -780,7 +795,6 @@
       document.getElementById('fiSubtext').innerText = 'Patrimonio pasivo para cubrir ' + annualExpenses.toLocaleString('es-ES', {maximumFractionDigits:0}) + '€/año (Meta: ' + fiTarget.toLocaleString('es-ES') + '€).';
       document.getElementById('fiBar').style.width = fiPercent + '%';
 
-      // Cálculo dinámico de años estimados para alcanzar la libertad financiera
       const yearsEl = document.getElementById('fiYearsText');
       if (invested >= fiTarget) {
         yearsEl.innerText = '🎉 ¡Meta de libertad financiera alcanzada!';
@@ -1223,7 +1237,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v9', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v10', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
