@@ -95,7 +95,7 @@
         </div>
       </div>
 
-      <!-- Tarjeta de Libertad Financiera (Regla del 4%) -->
+      <!-- Tarjeta de Libertad Financiera (Regla del 4%) - Personalizable -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
         <div>
           <div class="flex justify-between items-center">
@@ -107,7 +107,11 @@
             <p id="fiSubtext" class="text-xs text-slate-500 mt-1">De tus gastos anuales cubiertos por pasivos.</p>
           </div>
         </div>
-        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-4">
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <label class="text-[11px] text-slate-500 font-medium">Gasto anual objetivo (€):</label>
+          <input type="number" id="fiAnnualExpenseInput" class="w-24 px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-xs text-right text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-indigo-500" value="12000" onchange="updateFiExpenses(this.value)">
+        </div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-3">
           <div id="fiBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
         </div>
       </div>
@@ -329,11 +333,25 @@
       </div>
     </section>
 
-    <!-- Gráfico: Ingresos vs Gastos Mensuales -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Comparativa de Flujo Mensual (Ingresos vs Gastos)</h3>
-      <div class="h-64">
-        <canvas id="incomeVsExpenseChart"></canvas>
+    <!-- Gráficos de Flujo de Caja & Tasa de Ahorro -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Gráfico: Ingresos vs Gastos Mensuales -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Flujo Mensual (Ingresos vs Gastos)</h3>
+        <div class="h-64">
+          <canvas id="incomeVsExpenseChart"></canvas>
+        </div>
+      </div>
+
+      <!-- NUEVO: Gráfico de Tasa de Ahorro Histórica (%) -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Tasa de Ahorro Mensual (%)</h3>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 border border-emerald-200 dark:border-emerald-800">Objetivo: ≥20%</span>
+        </div>
+        <div class="h-64">
+          <canvas id="savingsRateChart"></canvas>
+        </div>
       </div>
     </section>
 
@@ -361,6 +379,7 @@
             <option value="10" selected>10 Años</option>
             <option value="15">15 Años</option>
             <option value="20">20 Años</option>
+            <option value="25">25 Años</option>
             <option value="30">30 Años</option>
           </select>
         </div>
@@ -381,13 +400,22 @@
       </div>
     </section>
 
-    <!-- Historial de Movimientos -->
+    <!-- Historial de Movimientos (Con Buscador, Filtros de Mes/Año y Rango de Fechas) -->
     <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
         
         <div class="flex flex-wrap gap-2 items-center">
-          <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="🔍 Buscar concepto..." class="px-3 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none">
+          <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="🔍 Buscar..." class="px-3 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none">
+
+          <!-- NUEVO: Selector de Rango de Fechas Personalizado -->
+          <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
+            <span class="text-[10px] text-slate-400 pl-1">Desde:</span>
+            <input type="date" id="filterStartDate" onchange="renderTransactions()" class="bg-transparent text-slate-800 dark:text-slate-200 text-xs focus:outline-none">
+            <span class="text-[10px] text-slate-400">Hasta:</span>
+            <input type="date" id="filterEndDate" onchange="renderTransactions()" class="bg-transparent text-slate-800 dark:text-slate-200 text-xs focus:outline-none">
+            <button onclick="clearDateFilter()" title="Limpiar rango de fechas" class="text-[10px] text-slate-400 hover:text-rose-500 px-1">✕</button>
+          </div>
 
           <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
             <option value="all">Todos los Meses</option>
@@ -490,6 +518,7 @@
     let state = {
       goal: 40000,
       theme: 'dark',
+      annualExpenses: 12000,
       accounts: {
         bbva: 3500.00,
         myinvestor: 18200.00,
@@ -515,15 +544,17 @@
     let currentTypeFilter = 'all';
     let selectedCategoryFilter = null;
     let chartIncomeVsExpense = null;
+    let chartSavingsRate = null;
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v6');
+      const saved = localStorage.getItem('mi_patrimonio_data_v8');
       if (saved) {
         try {
           state = JSON.parse(saved);
           if (!state.budgets) state.budgets = { 'Supermercado': 300, 'Ocio': 150, 'Vivienda': 600 };
           if (!state.subscriptions) state.subscriptions = [];
           if (state.btcUnits === undefined) state.btcUnits = 0.035;
+          if (state.annualExpenses === undefined) state.annualExpenses = 12000;
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
@@ -561,7 +592,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v6', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
       updateCharts();
     }
 
@@ -614,7 +645,7 @@
           });
 
           saveSnapshotForDate(now);
-          localStorage.setItem('mi_patrimonio_data_v6', JSON.stringify(state));
+          localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
         }
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -670,7 +701,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v6', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -690,7 +721,7 @@
       document.getElementById('inputBBVA').value = state.accounts.bbva;
       document.getElementById('inputMyInvestor').value = state.accounts.myinvestor;
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
-      document.getElementById('inputTRBtc').value = state.btcUnits || 0; // Se actualiza con las unidades de BTC
+      document.getElementById('inputTRBtc').value = state.btcUnits || 0;
 
       const backupText = document.getElementById('backupStatusText');
       if (state.lastBackupDate) {
@@ -722,18 +753,23 @@
     }
 
     function renderFinancialIndependence(invested) {
-      let annualExpenses = 12000; 
-      let totalExpRecord = 0;
-      state.transactions.filter(t => t.type === 'expense').forEach(t => totalExpRecord += t.amount);
-      if (totalExpRecord > 0) {
-        annualExpenses = Math.max(totalExpRecord * 4, 12000);
-      }
+      const annualExpenses = state.annualExpenses || 12000;
+      document.getElementById('fiAnnualExpenseInput').value = annualExpenses;
+      
       const fiTarget = annualExpenses * 25;
       const fiPercent = Math.min(Math.max((invested / fiTarget) * 100, 0), 100);
 
       document.getElementById('fiProgressText').innerText = fiPercent.toFixed(1) + '%';
-      document.getElementById('fiSubtext').innerText = 'Patrimonio pasivo para cubrir ' + annualExpenses.toLocaleString('es-ES', {maximumFractionDigits:0}) + '€/año.';
+      document.getElementById('fiSubtext').innerText = 'Patrimonio pasivo para cubrir ' + annualExpenses.toLocaleString('es-ES', {maximumFractionDigits:0}) + '€/año (Meta: ' + fiTarget.toLocaleString('es-ES') + '€).';
       document.getElementById('fiBar').style.width = fiPercent + '%';
+    }
+
+    function updateFiExpenses(val) {
+      const num = parseFloat(val);
+      if (!isNaN(num) && num > 0) {
+        state.annualExpenses = num;
+        save();
+      }
     }
 
     function renderBudgets() {
@@ -806,7 +842,6 @@
       const rate = (parseFloat(document.getElementById('simRate').value) || 0) / 100;
       const years = parseInt(document.getElementById('simYears').value) || 10;
       
-      // MODIFICACIÓN SOLICITADA: Se toma solamente MyInvestor como patrimonio inicial
       const totalInit = state.accounts.myinvestor;
 
       let futureVal = totalInit;
@@ -921,6 +956,12 @@
       }
     }
 
+    function clearDateFilter() {
+      document.getElementById('filterStartDate').value = '';
+      document.getElementById('filterEndDate').value = '';
+      renderTransactions();
+    }
+
     function renderTransactions() {
       const tbody = document.getElementById('transactionsTableBody');
       if (!tbody) return;
@@ -929,6 +970,8 @@
       const monthVal = document.getElementById('filterMonth').value;
       const yearVal = document.getElementById('filterYear').value;
       const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const startDateVal = document.getElementById('filterStartDate').value;
+      const endDateVal = document.getElementById('filterEndDate').value;
 
       let list = state.transactions;
 
@@ -942,10 +985,21 @@
 
       list = list.filter(function(t) {
         const d = new Date(t.date);
+        
+        // Filtro por Rango de Fechas Personalizado
+        let matchRange = true;
+        if (startDateVal) {
+          matchRange = matchRange && (d >= new Date(startDateVal + 'T00:00:00'));
+        }
+        if (endDateVal) {
+          matchRange = matchRange && (d <= new Date(endDateVal + 'T23:59:59'));
+        }
+
         const matchMonth = (monthVal === 'all') || (d.getMonth() === parseInt(monthVal));
         const matchYear = (yearVal === 'all') || (d.getFullYear() === parseInt(yearVal));
         const matchSearch = !searchText || t.concept.toLowerCase().includes(searchText) || t.category.toLowerCase().includes(searchText);
-        return matchMonth && matchYear && matchSearch;
+        
+        return matchRange && matchMonth && matchYear && matchSearch;
       });
 
       let pInc = 0;
@@ -1107,7 +1161,6 @@
         const units = parseFloat(document.getElementById('inputTRBtc').value);
         if (!isNaN(units) && units >= 0) {
           state.btcUnits = units;
-          // Calcular valor en euros usando el precio implícito actual por BTC (o 70000 por defecto)
           let currentBtcEur = (state.btcUnits > 0 && state.accounts.trade_republic_btc > 0) ? (state.accounts.trade_republic_btc / state.btcUnits) : 70000;
           state.accounts.trade_republic_btc = Math.round(state.btcUnits * currentBtcEur * 100) / 100;
           save();
@@ -1128,7 +1181,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v6', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v8', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
@@ -1383,6 +1436,58 @@
           scales: {
             x: { grid: { display: false }, ticks: { color: textColor } },
             y: { grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' }, ticks: { color: textColor } }
+          }
+        }
+      });
+
+      // NUEVO: Gráfico de Tasa de Ahorro Histórica (%)
+      const ctxSavings = document.getElementById('savingsRateChart').getContext('2d');
+      if (chartSavingsRate) chartSavingsRate.destroy();
+
+      const savingsRateData = sortedMonthKeys.map(k => {
+        const inc = monthlyMap[k].income;
+        const exp = monthlyMap[k].expense;
+        if (inc > 0) {
+          const rate = ((inc - exp) / inc) * 100;
+          return Math.round(rate * 10) / 10;
+        }
+        return 0;
+      });
+
+      chartSavingsRate = new Chart(ctxSavings, {
+        type: 'line',
+        data: {
+          labels: barLabels.length ? barLabels : ['Sin datos'],
+          datasets: [{
+            label: 'Tasa de Ahorro (%)',
+            data: savingsRateData.length ? savingsRateData : [0],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#10b981'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' Tasa de ahorro: ' + context.raw + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor } },
+            y: { 
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' }, 
+              ticks: { color: textColor, callback: value => value + '%' } 
+            }
           }
         }
       });
