@@ -10,18 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Finanzas%20Personales%20Pro%22%2C%22short_name%22%3A%22Finanzas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%5D%7D">
-  
-  <!-- OneSignal Web Push SDK -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "a42f900d-16d6-44f2-9733-57ad6482eb55",
-        notifyButton: { enable: false }
-      });
-    });
-  </script>
 
   <script>
     tailwind.config = { darkMode: 'class' }
@@ -635,9 +623,9 @@
       },
       btcUnits: 0.035,
       funds: {
-        sp500: 12740.00,       // 70% Fidelity S&P 500
-        emerging: 2730.00,     // 15% Vanguard Emergentes
-        smallCaps: 2730.00     // 15% Vanguard Small Caps Globales
+        sp500: 12740.00,
+        emerging: 2730.00,
+        smallCaps: 2730.00
       },
       expenseCategories: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Inversión', 'Otros'],
       incomeCategories: ['Nomina', 'Bizum', 'Paga extra', 'Otros Ingresos'],
@@ -665,16 +653,14 @@
     let chartIncomeVsExpense = null;
     let chartSavingsRate = null;
 
-    // Función auxiliar para emitir notificaciones con OneSignal
+    // Función de notificación nativa segura
     function sendPushNotification(title, message) {
-      if (window.OneSignalDeferred) {
-        window.OneSignalDeferred.push(function(OneSignal) {
-          OneSignal.postNotification({
-            contents: { "es": message, "en": message },
-            headings: { "es": title, "en": title },
-            included_segments: ["Subscribed Users"]
-          });
-        });
+      if (window.Notification && Notification.permission === "granted") {
+        try {
+          new Notification(title, { body: message, icon: '💵' });
+        } catch (e) {
+          console.log("Aviso de notificación no disponible", e);
+        }
       }
     }
 
@@ -765,6 +751,7 @@
 
       const nowIso = new Date().toISOString();
 
+      if (!state.transactions) state.transactions = [];
       state.transactions.push({
         id: Date.now(),
         date: nowIso,
@@ -898,6 +885,7 @@
       const conceptInput = document.getElementById('txConcept').value.toLowerCase().trim();
       if (!conceptInput) return;
 
+      if (!state.transactions) state.transactions = [];
       const found = state.transactions.slice().reverse().find(t => t.type === type && (t.concept.toLowerCase().includes(conceptInput) || conceptInput.includes(t.concept.toLowerCase())));
       if (found && found.category) {
         const list = (type === 'income') ? state.incomeCategories : state.expenseCategories;
@@ -968,21 +956,30 @@
       if (saved) {
         try {
           state = JSON.parse(saved);
-          if (!state.funds) {
-            state.funds = { sp500: state.accounts.myinvestor * 0.70, emerging: state.accounts.myinvestor * 0.15, smallCaps: state.accounts.myinvestor * 0.15 };
-          }
-          if (!state.expenseCategories) {
-            state.expenseCategories = ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Inversión', 'Otros'];
-          }
-          if (!state.incomeCategories) {
-            state.incomeCategories = ['Nomina', 'Bizum', 'Paga extra', 'Otros Ingresos'];
-          }
-          if (!state.budgets) state.budgets = { 'Supermercado': 300, 'Ocio': 150, 'Vivienda': 600 };
-          if (!state.subscriptions) state.subscriptions = [];
-          state.subscriptions.forEach(s => { if(!s.frequency) s.frequency = 'monthly'; });
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
+      }
+
+      // Blindaje de propiedades para evitar nulos o indefinidos
+      if (!state.transactions) state.transactions = [];
+      if (!state.funds) {
+        state.funds = { sp500: state.accounts.myinvestor * 0.70, emerging: state.accounts.myinvestor * 0.15, smallCaps: state.accounts.myinvestor * 0.15 };
+      }
+      if (!state.expenseCategories) {
+        state.expenseCategories = ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Inversión', 'Otros'];
+      }
+      if (!state.incomeCategories) {
+        state.incomeCategories = ['Nomina', 'Bizum', 'Paga extra', 'Otros Ingresos'];
+      }
+      if (!state.budgets) state.budgets = { 'Supermercado': 300, 'Ocio': 150, 'Vivienda': 600 };
+      if (!state.subscriptions) state.subscriptions = [];
+      if (!state.monthlySnapshots) state.monthlySnapshots = {};
+      state.subscriptions.forEach(s => { if(!s.frequency) s.frequency = 'monthly'; });
+
+      // Solicitar permisos de notificación nativa del navegador
+      if (window.Notification && Notification.permission === "default") {
+        Notification.requestPermission();
       }
 
       const today = new Date().toISOString().split('T')[0];
@@ -1062,6 +1059,7 @@
       const currentYear = new Date().getFullYear();
       yearsSet.add(currentYear);
 
+      if (!state.transactions) state.transactions = [];
       state.transactions.forEach(t => {
         const y = new Date(t.date).getFullYear();
         if (y >= 2024) yearsSet.add(y);
@@ -1226,6 +1224,7 @@
       const dayOfMonth = now.getDate();
 
       let monthExpenses = 0;
+      if (!state.transactions) state.transactions = [];
       state.transactions.forEach(t => {
         if (t.type === 'expense') {
           const d = new Date(t.date);
@@ -1300,6 +1299,7 @@
       const currentYear = now.getFullYear();
 
       const spentMap = {};
+      if (!state.transactions) state.transactions = [];
       state.transactions.forEach(t => {
         if (t.type === 'expense') {
           const d = new Date(t.date);
@@ -1466,6 +1466,7 @@
       const categoryVal = document.getElementById('filterCategory')?.value || 'all';
       const amountVal = parseFloat(document.getElementById('filterAmount')?.value);
 
+      if (!state.transactions) state.transactions = [];
       let list = state.transactions;
       if (currentTypeFilter !== 'all') list = list.filter(t => t.type === currentTypeFilter);
       if (selectedCategoryFilter) list = list.filter(t => t.category === selectedCategoryFilter);
@@ -1612,6 +1613,7 @@
         state.accounts[destAccount] += amount;
       }
 
+      if (!state.transactions) state.transactions = [];
       const txDateObj = new Date(dateVal + 'T12:00:00');
       state.transactions.push({
         id: Date.now(),
@@ -1624,7 +1626,7 @@
         destAccount: type === 'transfer' ? destAccount : null
       });
 
-      // Disparar Notificación Push en los gastos
+      // Disparar Notificación Push local nativa en los gastos
       if (type === 'expense') {
         sendPushNotification(
           "💸 Nuevo Gasto Registrado",
@@ -1638,6 +1640,7 @@
     }
 
     function deleteTransaction(id) {
+      if (!state.transactions) state.transactions = [];
       const txIndex = state.transactions.findIndex(t => t.id === id);
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
@@ -1762,6 +1765,7 @@
 
       const catTotals = {};
       let totalGastos = 0;
+      if (!state.transactions) state.transactions = [];
       state.transactions.filter(t => t.type === 'expense').forEach(t => {
         catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
         totalGastos += t.amount;
@@ -1874,6 +1878,7 @@
       if (chartIncomeVsExpense) chartIncomeVsExpense.destroy();
 
       const monthlyMap = {};
+      if (!state.transactions) state.transactions = [];
       state.transactions.forEach(t => {
         const d = new Date(t.date);
         const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
