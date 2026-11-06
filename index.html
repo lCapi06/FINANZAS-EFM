@@ -182,7 +182,10 @@
             </div>
             <p class="text-xs text-slate-500">Cartera de inversión indexada a largo plazo.</p>
           </div>
-          <div class="flex gap-2 w-full sm:w-auto">
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            <button onclick="openInvestModal()" class="flex-1 sm:flex-none px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition flex items-center justify-center gap-1 shadow-sm">
+              ➕ Invertir Aportación
+            </button>
             <button onclick="syncIndexFunds()" class="flex-1 sm:flex-none px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold hover:bg-indigo-100 transition flex items-center justify-center gap-1">
               🔄 Sincronizar Índices
             </button>
@@ -388,7 +391,7 @@
               <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">MyInvestor (€)</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">MyInvestor (Total Fondos) (€)</label>
               <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
               <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
             </div>
@@ -619,11 +622,11 @@
       },
       btcUnits: 0.035,
       funds: {
-        sp500: 10500.00,       // Fidelity S&P 500
-        emerging: 4500.00,     // Vanguard Mercados Emergentes
-        smallCaps: 3200.00     // Vanguard Small Caps Globales
+        sp500: 12740.00,       // 70% Fidelity S&P 500
+        emerging: 2730.00,     // 15% Vanguard Emergentes
+        smallCaps: 2730.00     // 15% Vanguard Small Caps Globales
       },
-      expenseCategories: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+      expenseCategories: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Inversión', 'Otros'],
       incomeCategories: ['Nomina', 'Bizum', 'Paga extra', 'Otros Ingresos'],
       budgets: {
         'Supermercado': 300,
@@ -692,18 +695,98 @@
       save();
     }
 
+    // Asistente avanzado de aportación con origen, importe y porcentajes personalizables
+    function openInvestModal() {
+      const sourceInput = prompt('¿Desde qué cuenta sale el dinero? (escribe "bbva" o "tr" para Trade Republic):', 'bbva');
+      if (!sourceInput) return;
+      const sourceKey = sourceInput.toLowerCase().includes('tr') ? 'trade_republic_liq' : 'bbva';
+      const sourceName = sourceKey === 'bbva' ? 'BBVA' : 'Trade Republic';
+
+      const amountInput = prompt(`¿Qué cantidad total vas a invertir desde ${sourceName} (€)?`, '1000');
+      if (!amountInput) return;
+      const totalInvest = parseFloat(amountInput);
+      if (isNaN(totalInvest) || totalInvest <= 0) return;
+
+      if (state.accounts[sourceKey] < totalInvest) {
+        if (!confirm(`Atención: Tienes ${state.accounts[sourceKey].toFixed(2)} € en ${sourceName} y vas a invertir ${totalInvest} €. ¿Continuar de todos modos?`)) return;
+      }
+
+      // Preguntar % de distribución con valores por defecto 70 / 15 / 15
+      const pctSp500 = parseFloat(prompt('Porcentaje para Fidelity S&P 500 (%):', '70'));
+      const pctEmerging = parseFloat(prompt('Porcentaje para Vanguard Mercados Emergentes (%):', '15'));
+      const pctSmall = parseFloat(prompt('Porcentaje para Vanguard Small Caps Globales (%):', '15'));
+
+      if (isNaN(pctSp500) || isNaN(pctEmerging) || isNaN(pctSmall)) {
+        alert('Porcentajes no válidos. Operación cancelada.');
+        return;
+      }
+
+      const sumPct = pctSp500 + pctEmerging + pctSmall;
+      if (Math.abs(sumPct - 100) > 0.1) {
+        alert(`La suma de los porcentajes es ${sumPct}%. Debe sumar exactamente 100%. Operación cancelada.`);
+        return;
+      }
+
+      // 1. Descontar efectivo de la cuenta origen
+      state.accounts[sourceKey] -= totalInvest;
+
+      // 2. Calcular importes por fondo
+      const addSp500 = totalInvest * (pctSp500 / 100);
+      const addEmerging = totalInvest * (pctEmerging / 100);
+      const addSmallCaps = totalInvest * (pctSmall / 100);
+
+      state.funds.sp500 += addSp500;
+      state.funds.emerging += addEmerging;
+      state.funds.smallCaps += addSmallCaps;
+
+      // El total de MyInvestor se actualiza con la suma de los fondos (el efectivo interno no se duplica)
+      state.accounts.myinvestor = state.funds.sp500 + state.funds.emerging + state.funds.smallCaps;
+
+      // 3. Crear los dos registros en el historial exactamente como pediste:
+      const nowIso = new Date().toISOString();
+
+      // Registro A: Traspaso entre cuentas
+      state.transactions.push({
+        id: Date.now(),
+        date: nowIso,
+        type: 'transfer',
+        concept: `Traspaso a MyInvestor (${totalInvest.toLocaleString('es-ES')} €)`,
+        amount: totalInvest,
+        category: 'Traspaso',
+        account: sourceKey,
+        destAccount: 'myinvestor'
+      });
+
+      // Registro B: Entrada adicional de concepto "Fondos" y categoría "Inversión"
+      if (!state.expenseCategories.includes('Inversión')) {
+        state.expenseCategories.push('Inversión');
+      }
+
+      state.transactions.push({
+        id: Date.now() + 1,
+        date: nowIso,
+        type: 'expense', // Registrado como gasto/inversión realizada
+        concept: 'Fondos',
+        amount: totalInvest,
+        category: 'Inversión',
+        account: 'myinvestor',
+        destAccount: null
+      });
+
+      save();
+      alert(`✅ ¡Aportación de ${totalInvest.toLocaleString('es-ES')} € registrada con éxito!\n\n• S&P 500 (${pctSp500}%): +${addSp500.toFixed(2)} €\n• Emergentes (${pctEmerging}%): +${addEmerging.toFixed(2)} €\n• Small Caps (${pctSmall}%): +${addSmallCaps.toFixed(2)} €\n\nSe han generado el traspaso y el movimiento de inversión en el historial.`);
+    }
+
     async function syncIndexFunds() {
       try {
-        // Sincronización real con la variación diaria de los índices mundiales mediante API financiera pública (Yahoo Finance / Stooq)
         const responses = await Promise.all([
-          fetch('https://stooq.com/q/l/?s=^spx&f=sd2t2ohlcv&h&e=csv'), // S&P 500
-          fetch('https://stooq.com/q/l/?s=eem.us&f=sd2t2ohlcv&h&e=csv')  // Vanguard Emerging Markets ETF como proxy de emergentes
+          fetch('https://stooq.com/q/l/?s=^spx&f=sd2t2ohlcv&h&e=csv'), 
+          fetch('https://stooq.com/q/l/?s=eem.us&f=sd2t2ohlcv&h&e=csv')  
         ]);
 
-        let sp500Change = 0.004; // Valor por defecto estimado en caso de intermitencia
+        let sp500Change = 0.004; 
         let emergingChange = 0.005;
 
-        // Intentar parsear cotizaciones reales si están accesibles
         try {
           const spData = await responses[0].text();
           const lines = spData.split('\n');
@@ -717,7 +800,6 @@
           }
         } catch(e) {}
 
-        // Variación realista complementaria para Small Caps Globales
         const smallCapsChange = sp500Change * (0.8 + Math.random() * 0.4);
 
         state.funds.sp500 = Math.round(state.funds.sp500 * (1 + sp500Change) * 100) / 100;
@@ -728,7 +810,6 @@
         save();
         alert('📈 ¡Fondos indexados actualizados con el comportamiento diario de sus índices!\n\n• S&P 500: ' + (sp500Change >= 0 ? '+' : '') + (sp500Change * 100).toFixed(2) + '%\n• Emergentes (Vanguard): ' + (emergingChange >= 0 ? '+' : '') + (emergingChange * 100).toFixed(2) + '%\n• Small Caps (Vanguard): ' + (smallCapsChange >= 0 ? '+' : '') + (smallCapsChange * 100).toFixed(2) + '%');
       } catch (err) {
-        // Fallback robusto de mercado
         state.funds.sp500 = Math.round(state.funds.sp500 * 1.0045 * 100) / 100;
         state.funds.emerging = Math.round(state.funds.emerging * 1.0032 * 100) / 100;
         state.funds.smallCaps = Math.round(state.funds.smallCaps * 1.0051 * 100) / 100;
@@ -810,7 +891,8 @@
         'netflix': 'Suscripciones', 'disney': 'Suscripciones', 'spotify': 'Suscripciones', 'gym': 'Suscripciones', 'gimnasio': 'Suscripciones',
         'alquiler': 'Vivienda', 'luz': 'Vivienda', 'agua': 'Vivienda', 'gas': 'Vivienda', 'internet': 'Vivienda',
         'gasolina': 'Transporte', 'renfe': 'Transporte', 'metro': 'Transporte', 'parking': 'Transporte', 'uber': 'Transporte',
-        'cine': 'Ocio', 'cena': 'Ocio', 'restaurante': 'Ocio', 'copas': 'Ocio', 'bar': 'Ocio'
+        'cine': 'Ocio', 'cena': 'Ocio', 'restaurante': 'Ocio', 'copas': 'Ocio', 'bar': 'Ocio',
+        'fondos': 'Inversión', 'inversion': 'Inversión'
       };
 
       const list = (type === 'income') ? state.incomeCategories : state.expenseCategories;
@@ -860,15 +942,15 @@
     }
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v24');
+      const saved = localStorage.getItem('mi_patrimonio_data_v26');
       if (saved) {
         try {
           state = JSON.parse(saved);
           if (!state.funds) {
-            state.funds = { sp500: state.accounts.myinvestor * 0.6, emerging: state.accounts.myinvestor * 0.25, smallCaps: state.accounts.myinvestor * 0.15 };
+            state.funds = { sp500: state.accounts.myinvestor * 0.70, emerging: state.accounts.myinvestor * 0.15, smallCaps: state.accounts.myinvestor * 0.15 };
           }
           if (!state.expenseCategories) {
-            state.expenseCategories = ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'];
+            state.expenseCategories = ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Inversión', 'Otros'];
           }
           if (!state.incomeCategories) {
             state.incomeCategories = ['Nomina', 'Bizum', 'Paga extra', 'Otros Ingresos'];
@@ -976,7 +1058,7 @@
     function save(selectedDate) {
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
-      localStorage.setItem('mi_patrimonio_data_v24', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v26', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -1038,7 +1120,6 @@
     }
 
     function render() {
-      // Sincronizar total MyInvestor con la suma de sus tres fondos
       state.accounts.myinvestor = (state.funds.sp500 || 0) + (state.funds.emerging || 0) + (state.funds.smallCaps || 0);
 
       const liquid = state.accounts.bbva + state.accounts.trade_republic_liq;
@@ -1052,7 +1133,6 @@
       document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('btcUnitsText').innerText = (state.btcUnits || 0).toFixed(4) + ' BTC';
 
-      // Renderizar desglose de fondos en el acordeón
       document.getElementById('fundSp500Val').innerText = state.funds.sp500.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('fundEmergingVal').innerText = state.funds.emerging.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('fundSmallCapsVal').innerText = state.funds.smallCaps.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -1566,7 +1646,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v24', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v26', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
