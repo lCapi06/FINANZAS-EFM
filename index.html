@@ -653,17 +653,6 @@
     let chartIncomeVsExpense = null;
     let chartSavingsRate = null;
 
-    // Función de notificación nativa segura
-    function sendPushNotification(title, message) {
-      if (window.Notification && Notification.permission === "granted") {
-        try {
-          new Notification(title, { body: message, icon: '💵' });
-        } catch (e) {
-          console.log("Aviso de notificación no disponible", e);
-        }
-      }
-    }
-
     function switchTab(tabName) {
       const tabs = ['principal', 'resumen', 'saldos', 'libertad'];
       tabs.forEach(t => {
@@ -779,10 +768,6 @@
       });
 
       save();
-      sendPushNotification(
-        "🚀 Nueva Inversión Registrada",
-        `Aportación de ${totalInvest.toLocaleString('es-ES')} € realizada a Fondos MyInvestor.`
-      );
       alert(`✅ ¡Aportación de ${totalInvest.toLocaleString('es-ES')} € registrada con éxito!\n\n• S&P 500 (${pctSp500}%): +${addSp500.toFixed(2)} €\n• Emergentes (${pctEmerging}%): +${addEmerging.toFixed(2)} €\n• Small Caps (${pctSmall}%): +${addSmallCaps.toFixed(2)} €`);
     }
 
@@ -961,7 +946,6 @@
         }
       }
 
-      // Blindaje de propiedades para evitar nulos o indefinidos
       if (!state.transactions) state.transactions = [];
       if (!state.funds) {
         state.funds = { sp500: state.accounts.myinvestor * 0.70, emerging: state.accounts.myinvestor * 0.15, smallCaps: state.accounts.myinvestor * 0.15 };
@@ -976,11 +960,6 @@
       if (!state.subscriptions) state.subscriptions = [];
       if (!state.monthlySnapshots) state.monthlySnapshots = {};
       state.subscriptions.forEach(s => { if(!s.frequency) s.frequency = 'monthly'; });
-
-      // Solicitar permisos de notificación nativa del navegador
-      if (window.Notification && Notification.permission === "default") {
-        Notification.requestPermission();
-      }
 
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('txDate');
@@ -1625,14 +1604,6 @@
         account: account,
         destAccount: type === 'transfer' ? destAccount : null
       });
-
-      // Disparar Notificación Push local nativa en los gastos
-      if (type === 'expense') {
-        sendPushNotification(
-          "💸 Nuevo Gasto Registrado",
-          `Has registrado un gasto de ${amount.toFixed(2)} € en '${category}' (${concept}).`
-        );
-      }
 
       document.getElementById('txConcept').value = '';
       document.getElementById('txAmount').value = '';
