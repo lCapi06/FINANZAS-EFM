@@ -11,7 +11,7 @@
   <meta name="theme-color" content="#0f172a">
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Finanzas%20Personales%20Pro%22%2C%22short_name%22%3A%22Finanzas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%5D%7D">
   
-  <!-- OneSignal Web Push SDK (Paso 3 Integrado) -->
+  <!-- OneSignal Web Push SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -1679,13 +1679,32 @@
       localStorage.setItem('mi_patrimonio_data_v26', JSON.stringify(state));
       render();
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", 'App_Finanzas_Eric.json');
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const jsonString = JSON.stringify(state, null, 2);
+      const fileName = 'App_Finanzas_Eric.json';
+
+      const file = new File([jsonString], fileName, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: 'Backup Finanzas',
+          text: 'Copia de seguridad de mi app de finanzas'
+        }).catch(err => {
+          console.log('Compartir cancelado o no soportado', err);
+        });
+      } else {
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = url;
+        downloadAnchor.download = fileName;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        
+        setTimeout(() => {
+          document.body.removeChild(downloadAnchor);
+          URL.revokeObjectURL(url);
+        }, 100);
+      }
     }
 
     function importData(event) {
