@@ -773,7 +773,6 @@
 
     async function syncIndexFunds() {
       try {
-        // Consulta independiente para cada índice real correspondiente
         const [resSp, resEm, resSc] = await Promise.all([
           fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ESPX?interval=1d&range=2d').catch(() => null),
           fetch('https://query1.finance.yahoo.com/v8/finance/chart/EEM?interval=1d&range=2d').catch(() => null),
@@ -791,7 +790,6 @@
               return (current - prev) / prev;
             }
           } catch(e) {}
-          // Variación real típica de mercado si no hay conexión (-1.2% a +1.5%)
           return (Math.random() * 0.027) - 0.012;
         }
 
@@ -935,24 +933,36 @@
     }
 
     function init() {
-      // 1. Detectar datos recibidos desde un Atajo de iPhone por URL
+      // 1. Cargar estado previo de localStorage primero para que existan las cuentas
+      const saved = localStorage.getItem('mi_patrimonio_data_v26');
+      if (saved) {
+        try {
+          state = JSON.parse(saved);
+        } catch (e) {
+          console.error("Error al cargar localStorage", e);
+        }
+      }
+
+      // 2. Receptor robusto para Atajos de iPhone (Gastos, Ingresos y Traspasos)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('concepto')) {
-        const concept = urlParams.get('concepto');
+      if (urlParams.has('concepto') || urlParams.has('importe')) {
+        const concept = urlParams.get('concepto') || 'Movimiento rápido';
         const amount = parseFloat(urlParams.get('importe')) || 0;
         const type = urlParams.get('tipo') || 'expense';
-        const category = urlParams.get('categoria') || (type === 'income' ? 'Nomina' : 'Otros');
+        const category = urlParams.get('categoria') || (type === 'income' ? 'Nomina' : (type === 'transfer' ? 'Traspaso' : 'Otros'));
         const account = urlParams.get('cuenta') || 'bbva';
+        const destAccount = urlParams.get('cuentaDestino') || 'myinvestor';
         const dateVal = urlParams.get('fecha') || new Date().toISOString().split('T')[0];
 
         if (amount > 0) {
-          const savedData = localStorage.getItem('mi_patrimonio_data_v26');
-          if (savedData) {
-            try { state = JSON.parse(savedData); } catch (e) {}
+          if (type === 'expense') {
+            state.accounts[account] = (state.accounts[account] || 0) - amount;
+          } else if (type === 'income') {
+            state.accounts[account] = (state.accounts[account] || 0) + amount;
+          } else if (type === 'transfer') {
+            if (state.accounts[account] !== undefined) state.accounts[account] -= amount;
+            if (state.accounts[destAccount] !== undefined) state.accounts[destAccount] += amount;
           }
-
-          if (type === 'expense') state.accounts[account] -= amount;
-          else if (type === 'income') state.accounts[account] += amount;
 
           if (!state.transactions) state.transactions = [];
           state.transactions.push({
@@ -963,13 +973,13 @@
             amount: amount,
             category: category,
             account: account,
-            destAccount: null
+            destAccount: type === 'transfer' ? destAccount : null
           });
 
-          // Guardar directamente en localStorage
           const d = new Date(dateVal);
           const monthYearKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-          const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+          const total = (state.accounts.bbva || 0) + (state.accounts.myinvestor || 0) + (state.accounts.trade_republic_liq || 0) + (state.accounts.trade_republic_btc || 0);
+          
           if (!state.monthlySnapshots) state.monthlySnapshots = {};
           state.monthlySnapshots[monthYearKey] = {
             dateLabel: d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
@@ -982,15 +992,6 @@
 
           localStorage.setItem('mi_patrimonio_data_v26', JSON.stringify(state));
           window.history.replaceState({}, document.title, window.location.pathname);
-        }
-      }
-
-      const saved = localStorage.getItem('mi_patrimonio_data_v26');
-      if (saved) {
-        try {
-          state = JSON.parse(saved);
-        } catch (e) {
-          console.error("Error al cargar localStorage", e);
         }
       }
 
