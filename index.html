@@ -67,14 +67,20 @@
     </div>
   </header>
 
-  <!-- Barra de Pestañas -->
+  <!-- Barra de Pestañas (Orden estricto solicitado) -->
   <nav class="max-w-7xl mx-auto px-4 mt-6">
-    <div class="flex gap-2 bg-slate-200/75 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/50 dark:border-slate-800 max-w-fit">
-      <button id="btnTabPrincipal" onclick="switchTab('principal')" class="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm">
+    <div class="flex gap-2 bg-slate-200/75 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/50 dark:border-slate-800 max-w-fit overflow-x-auto">
+      <button id="btnTabPrincipal" onclick="switchTab('principal')" class="px-3 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm whitespace-nowrap">
         📊 Panel Principal
       </button>
-      <button id="btnTabLibertad" onclick="switchTab('libertad')" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
-        🚀 Libertad Financiera y Proyecciones
+      <button id="btnTabResumen" onclick="switchTab('resumen')" class="px-3 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
+        📋 Resumen financiero
+      </button>
+      <button id="btnTabSaldos" onclick="switchTab('saldos')" class="px-3 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
+        💳 Gestión de saldos
+      </button>
+      <button id="btnTabLibertad" onclick="switchTab('libertad')" class="px-3 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
+        🚀 Libertad Financiera
       </button>
     </div>
   </nav>
@@ -82,11 +88,11 @@
   <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
     <!-- ================================================= -->
-    <!-- PESTAÑA 1: PANEL PRINCIPAL                        -->
+    <!-- PESTAÑA 2.1: PANEL PRINCIPAL                      -->
     <!-- ================================================= -->
     <div id="tabPrincipal" class="space-y-6">
 
-      <!-- Meta de Patrimonio (Escalonada y Bidireccional) -->
+      <!-- Meta de Patrimonio (Escalonada desde 0€) -->
       <section class="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div>
@@ -108,7 +114,7 @@
           <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
             <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
-          <p class="text-[11px] text-slate-400 mt-1 italic" id="goalSubProgress">Punto de partida: 30.000 € ➔ Siguiente meta: 50.000 €</p>
+          <p class="text-[11px] text-slate-400 mt-1 italic" id="goalSubProgress">Punto de partida: 0 € ➔ Siguiente meta: 50.000 €</p>
         </div>
       </section>
 
@@ -177,6 +183,14 @@
           </div>
         </div>
       </section>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PESTAÑA 2.2: RESUMEN FINANCIERO                   -->
+    <!-- ================================================= -->
+    <div id="tabResumen" class="space-y-6 hidden">
 
       <!-- Resumen de Flujo de Caja & Salud Financiera -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -376,8 +390,16 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos & Historial Mensual -->
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PESTAÑA 2.3: GESTIÓN DE SALDOS                    -->
+    <!-- ================================================= -->
+    <div id="tabSaldos" class="space-y-6 hidden">
+
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Ajuste Directo de Saldos -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -404,8 +426,9 @@
           </div>
         </div>
 
+        <!-- Historial de Saldos Mensuales -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales</h3>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Ajuste de Saldos Mensuales</h3>
           <p class="text-xs text-slate-500 mb-4">Foto de tus cuentas guardada al actualizar.</p>
           <div class="overflow-x-auto max-h-56 overflow-y-auto">
             <table class="w-full text-left text-sm">
@@ -426,7 +449,7 @@
 
 
     <!-- ================================================= -->
-    <!-- PESTAÑA 2: LIBERTAD FINANCIERA Y PROYECCIONES     -->
+    <!-- PESTAÑA 2.4: LIBERTAD FINANCIERA                  -->
     <!-- ================================================= -->
     <div id="tabLibertad" class="space-y-6 hidden">
 
@@ -575,24 +598,19 @@
     let chartSavingsRate = null;
 
     function switchTab(tabName) {
-      const tabPrincipal = document.getElementById('tabPrincipal');
-      const tabLibertad = document.getElementById('tabLibertad');
-      const btnPrincipal = document.getElementById('btnTabPrincipal');
-      const btnLibertad = document.getElementById('btnTabLibertad');
-
-      if (tabName === 'principal') {
-        tabPrincipal.classList.remove('hidden');
-        tabLibertad.classList.add('hidden');
-        btnPrincipal.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm';
-        btnLibertad.className = 'px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
-        setTimeout(() => { updateCharts(); }, 50);
-      } else {
-        tabLibertad.classList.remove('hidden');
-        tabPrincipal.classList.add('hidden');
-        btnLibertad.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm';
-        btnPrincipal.className = 'px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
-        setTimeout(() => { updateCharts(); }, 50);
-      }
+      const tabs = ['principal', 'resumen', 'saldos', 'libertad'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+        const btn = document.getElementById('btnTab' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === tabName) {
+          el.classList.remove('hidden');
+          btn.className = 'px-3 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm whitespace-nowrap';
+        } else {
+          el.classList.add('hidden');
+          btn.className = 'px-3 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap';
+        }
+      });
+      setTimeout(() => { updateCharts(); }, 50);
     }
 
     function handleTxTypeChange() {
@@ -627,7 +645,7 @@
         }
       });
 
-      const saved = localStorage.getItem('mi_patrimonio_data_v14');
+      const saved = localStorage.getItem('mi_patrimonio_data_v16');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -685,7 +703,7 @@
         document.getElementById('themeIcon').innerText = '☀️';
         document.getElementById('themeText').innerText = 'Modo Claro';
       }
-      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v16', JSON.stringify(state));
       updateCharts();
     }
 
@@ -744,7 +762,7 @@
         });
 
         saveSnapshotForDate(now);
-        localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
+        localStorage.setItem('mi_patrimonio_data_v16', JSON.stringify(state));
       }
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -799,7 +817,7 @@
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
 
-      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v16', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -837,25 +855,14 @@
       renderSubscriptions();
       calculateSimulator();
 
-      // Cálculo de Meta Escalonada Bidireccional (Partiendo de 30k, escalones de 50k)
-      const baseStart = 30000;
+      // Cálculo de Meta Escalonada Bidireccional desde 0 (tramos de 50k)
       const step = 50000;
-      
-      let currentTarget = baseStart;
-      let prevTarget = 0;
+      const multiplier = Math.floor(total / step);
+      const currentTarget = (multiplier + 1) * step;
+      const prevTarget = multiplier * step;
 
-      if (total >= baseStart) {
-        const diff = total - baseStart;
-        const multiplier = Math.floor(diff / step) + 1;
-        currentTarget = baseStart + (multiplier * step);
-        prevTarget = currentTarget - step;
-      } else {
-        currentTarget = baseStart;
-        prevTarget = 0;
-      }
-
-      const spanInThisTier = Math.max(0, total - prevTarget);
-      const tierSize = currentTarget - prevTarget;
+      const spanInThisTier = total - prevTarget;
+      const tierSize = step;
       const percent = Math.min(Math.max(Math.round((spanInThisTier / tierSize) * 100), 0), 100);
 
       document.getElementById('goalTitle').innerText = 'Objetivo: ' + currentTarget.toLocaleString('es-ES') + ' €';
@@ -867,15 +874,15 @@
       const subProgress = document.getElementById('goalSubProgress');
       const motivationText = document.getElementById('goalMotivationText');
 
-      if (total >= currentTarget) {
+      if (multiplier > 0 && total >= currentTarget) {
         motivationText.innerText = '🎉 ¡Objetivo de ' + currentTarget.toLocaleString('es-ES') + ' € superado con éxito!';
         subProgress.innerText = '¡Imparable! Avanzando hacia el siguiente hito.';
-      } else if (prevTarget > 0 && total >= prevTarget) {
-        motivationText.innerText = '🌟 ¡Has conseguido el objetivo de ' + prevTarget.toLocaleString('es-ES') + ' €!';
-        subProgress.innerText = 'Tramo superado. Partiendo desde ' + prevTarget.toLocaleString('es-ES') + ' € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
+      } else if (multiplier > 0) {
+        motivationText.innerText = '🌟 ¡Has conseguido el objetivo anterior de ' + prevTarget.toLocaleString('es-ES') + ' €!';
+        subProgress.innerText = 'Tramo activo: ' + prevTarget.toLocaleString('es-ES') + ' € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
       } else {
         motivationText.innerText = '🚀 ¡A por el primer gran escalón!';
-        subProgress.innerText = 'Punto de partida: ' + baseStart.toLocaleString('es-ES') + ' € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
+        subProgress.innerText = 'Punto de partida: 0 € ➔ Siguiente meta: ' + currentTarget.toLocaleString('es-ES') + ' €';
       }
 
       renderTransactions();
@@ -1356,7 +1363,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v14', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v16', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
