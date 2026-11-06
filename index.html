@@ -25,25 +25,25 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors pb-12">
 
-  <!-- Header / Nav -->
-  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs transition-colors">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-      <div class="flex items-center gap-2.5">
-        <div class="text-xl p-1.5 bg-indigo-50 dark:bg-indigo-950/60 rounded-xl">💵</div>
-        <div>
-          <h1 class="text-base sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">Finanzas Personales</h1>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400" id="backupStatusText">Última copia: Sin exportar</p>
+  <!-- Header / Nav (Optimizado 100% en una sola línea) -->
+  <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs transition-colors">
+    <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex justify-between items-center gap-2 flex-nowrap">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="text-base sm:text-xl p-1 bg-indigo-50 dark:bg-indigo-950/60 rounded-xl shrink-0">💵</div>
+        <div class="min-w-0">
+          <h1 class="text-xs sm:text-lg font-bold text-slate-900 dark:text-white truncate leading-tight">Finanzas</h1>
+          <p class="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate" id="backupStatusText">Sin exportar</p>
         </div>
       </div>
-      <div class="flex items-center gap-1.5 flex-wrap">
-        <button onclick="toggleTheme()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1">
-          <span id="themeIcon">☀️</span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
+      <div class="flex items-center gap-1 shrink-0 flex-nowrap">
+        <button onclick="toggleTheme()" class="px-2 py-1 text-[10px] sm:text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1">
+          <span id="themeIcon">☀️</span> <span id="themeText" class="hidden md:inline">Modo Claro</span>
         </button>
-        <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition" title="Exportar / Backup">
-          💾 <span class="hidden sm:inline">Exportar</span>
+        <button onclick="exportData()" class="px-2 py-1 text-[10px] sm:text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1" title="Exportar / Backup">
+          💾 <span class="hidden md:inline">Exportar</span>
         </button>
-        <label for="importFile" class="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
-          📂 <span class="hidden sm:inline">Importar</span>
+        <label for="importFile" class="px-2 py-1 text-[10px] sm:text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition flex items-center gap-1">
+          📂 <span class="hidden md:inline">Importar</span>
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
       </div>
@@ -51,7 +51,7 @@
   </header>
 
   <!-- Barra de Pestañas (Estilo App Nativa) -->
-  <nav class="max-w-7xl mx-auto px-4 mt-4">
+  <nav class="max-w-7xl mx-auto px-4 mt-3">
     <div class="flex gap-1.5 bg-slate-200/80 dark:bg-slate-900 p-1 rounded-2xl border border-slate-300/40 dark:border-slate-800 overflow-x-auto no-scrollbar">
       <button id="btnTabPrincipal" onclick="switchTab('principal')" class="px-3 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition shadow-sm whitespace-nowrap flex-1 text-center">
         📊 Panel
@@ -104,7 +104,7 @@
         </div>
       </section>
 
-      <!-- Tarjetas de Cuentas (Visuales y Organizadas en Móvil) -->
+      <!-- Tarjetas de Cuentas -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         <div class="mobile-card-full bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between transition-colors">
           <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
@@ -412,12 +412,11 @@
         </form>
       </section>
 
-      <!-- Historial de Movimientos con Filtros Adaptados a Móvil -->
+      <!-- Historial de Movimientos -->
       <section class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 mb-4">
           <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
           
-          <!-- Filtros Organizados en Grid para Móvil -->
           <div class="grid grid-cols-2 sm:flex flex-wrap gap-2 items-center w-full lg:w-auto">
             <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="🔍 Buscar concepto..." class="col-span-2 sm:col-span-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none">
             
@@ -721,7 +720,7 @@
     }
 
     function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v22');
+      const saved = localStorage.getItem('mi_patrimonio_data_v23');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -834,7 +833,7 @@
     function save(selectedDate) {
       const d = selectedDate ? new Date(selectedDate) : new Date();
       saveSnapshotForDate(d);
-      localStorage.setItem('mi_patrimonio_data_v22', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v23', JSON.stringify(state));
       updateYearFilterOptions();
       render();
     }
@@ -915,11 +914,11 @@
       const backupText = document.getElementById('backupStatusText');
       if (state.lastBackupDate) {
         const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' });
-        backupText.innerText = 'Última copia: ' + bDate;
-        backupText.className = 'text-[11px] text-emerald-600 dark:text-emerald-400 font-medium';
+        backupText.innerText = 'Copia: ' + bDate;
+        backupText.className = 'text-[9px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-medium';
       } else {
-        backupText.innerText = 'Última copia: Pendiente';
-        backupText.className = 'text-[11px] text-amber-500 font-medium';
+        backupText.innerText = 'Sin exportar';
+        backupText.className = 'text-[9px] sm:text-[11px] text-amber-500 font-medium';
       }
 
       updateAllTrends();
@@ -1407,7 +1406,7 @@
 
     function exportData() {
       state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v22', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v23', JSON.stringify(state));
       render();
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
