@@ -10,6 +10,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Finanzas%20Personales%20Pro%22%2C%22short_name%22%3A%22Finanzas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%5D%7D">
+  
+  <!-- OneSignal Web Push SDK (Paso 3 Integrado) -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "a42f900d-16d6-44f2-9733-57ad6482eb55",
+        notifyButton: { enable: false }
+      });
+    });
+  </script>
+
   <script>
     tailwind.config = { darkMode: 'class' }
   </script>
@@ -652,6 +665,19 @@
     let chartIncomeVsExpense = null;
     let chartSavingsRate = null;
 
+    // Función auxiliar para emitir notificaciones con OneSignal
+    function sendPushNotification(title, message) {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(function(OneSignal) {
+          OneSignal.postNotification({
+            contents: { "es": message, "en": message },
+            headings: { "es": title, "en": title },
+            included_segments: ["Subscribed Users"]
+          });
+        });
+      }
+    }
+
     function switchTab(tabName) {
       const tabs = ['principal', 'resumen', 'saldos', 'libertad'];
       tabs.forEach(t => {
@@ -695,7 +721,6 @@
       save();
     }
 
-    // Asistente avanzado de aportación con origen, importe y porcentajes personalizables
     function openInvestModal() {
       const sourceInput = prompt('¿Desde qué cuenta sale el dinero? (escribe "bbva" o "tr" para Trade Republic):', 'bbva');
       if (!sourceInput) return;
@@ -711,7 +736,6 @@
         if (!confirm(`Atención: Tienes ${state.accounts[sourceKey].toFixed(2)} € en ${sourceName} y vas a invertir ${totalInvest} €. ¿Continuar de todos modos?`)) return;
       }
 
-      // Preguntar % de distribución con valores por defecto 70 / 15 / 15
       const pctSp500 = parseFloat(prompt('Porcentaje para Fidelity S&P 500 (%):', '70'));
       const pctEmerging = parseFloat(prompt('Porcentaje para Vanguard Mercados Emergentes (%):', '15'));
       const pctSmall = parseFloat(prompt('Porcentaje para Vanguard Small Caps Globales (%):', '15'));
@@ -727,10 +751,8 @@
         return;
       }
 
-      // 1. Descontar efectivo de la cuenta origen
       state.accounts[sourceKey] -= totalInvest;
 
-      // 2. Calcular importes por fondo
       const addSp500 = totalInvest * (pctSp500 / 100);
       const addEmerging = totalInvest * (pctEmerging / 100);
       const addSmallCaps = totalInvest * (pctSmall / 100);
@@ -739,13 +761,10 @@
       state.funds.emerging += addEmerging;
       state.funds.smallCaps += addSmallCaps;
 
-      // El total de MyInvestor se actualiza con la suma de los fondos (el efectivo interno no se duplica)
       state.accounts.myinvestor = state.funds.sp500 + state.funds.emerging + state.funds.smallCaps;
 
-      // 3. Crear los dos registros en el historial exactamente como pediste:
       const nowIso = new Date().toISOString();
 
-      // Registro A: Traspaso entre cuentas
       state.transactions.push({
         id: Date.now(),
         date: nowIso,
@@ -757,7 +776,6 @@
         destAccount: 'myinvestor'
       });
 
-      // Registro B: Entrada adicional de concepto "Fondos" y categoría "Inversión"
       if (!state.expenseCategories.includes('Inversión')) {
         state.expenseCategories.push('Inversión');
       }
@@ -765,7 +783,7 @@
       state.transactions.push({
         id: Date.now() + 1,
         date: nowIso,
-        type: 'expense', // Registrado como gasto/inversión realizada
+        type: 'expense',
         concept: 'Fondos',
         amount: totalInvest,
         category: 'Inversión',
@@ -774,7 +792,11 @@
       });
 
       save();
-      alert(`✅ ¡Aportación de ${totalInvest.toLocaleString('es-ES')} € registrada con éxito!\n\n• S&P 500 (${pctSp500}%): +${addSp500.toFixed(2)} €\n• Emergentes (${pctEmerging}%): +${addEmerging.toFixed(2)} €\n• Small Caps (${pctSmall}%): +${addSmallCaps.toFixed(2)} €\n\nSe han generado el traspaso y el movimiento de inversión en el historial.`);
+      sendPushNotification(
+        "🚀 Nueva Inversión Registrada",
+        `Aportación de ${totalInvest.toLocaleString('es-ES')} € realizada a Fondos MyInvestor.`
+      );
+      alert(`✅ ¡Aportación de ${totalInvest.toLocaleString('es-ES')} € registrada con éxito!\n\n• S&P 500 (${pctSp500}%): +${addSp500.toFixed(2)} €\n• Emergentes (${pctEmerging}%): +${addEmerging.toFixed(2)} €\n• Small Caps (${pctSmall}%): +${addSmallCaps.toFixed(2)} €`);
     }
 
     async function syncIndexFunds() {
@@ -808,14 +830,14 @@
 
         state.accounts.myinvestor = state.funds.sp500 + state.funds.emerging + state.funds.smallCaps;
         save();
-        alert('📈 ¡Fondos indexados actualizados con el comportamiento diario de sus índices!\n\n• S&P 500: ' + (sp500Change >= 0 ? '+' : '') + (sp500Change * 100).toFixed(2) + '%\n• Emergentes (Vanguard): ' + (emergingChange >= 0 ? '+' : '') + (emergingChange * 100).toFixed(2) + '%\n• Small Caps (Vanguard): ' + (smallCapsChange >= 0 ? '+' : '') + (smallCapsChange * 100).toFixed(2) + '%');
+        alert('📈 ¡Fondos indexados actualizados con el comportamiento diario de sus índices!');
       } catch (err) {
         state.funds.sp500 = Math.round(state.funds.sp500 * 1.0045 * 100) / 100;
         state.funds.emerging = Math.round(state.funds.emerging * 1.0032 * 100) / 100;
         state.funds.smallCaps = Math.round(state.funds.smallCaps * 1.0051 * 100) / 100;
         state.accounts.myinvestor = state.funds.sp500 + state.funds.emerging + state.funds.smallCaps;
         save();
-        alert('¡Fondos indexados sincronizados correctamente con las últimas cotizaciones globales de mercado!');
+        alert('¡Fondos indexados sincronizados correctamente!');
       }
     }
 
@@ -1601,6 +1623,14 @@
         account: account,
         destAccount: type === 'transfer' ? destAccount : null
       });
+
+      // Disparar Notificación Push en los gastos
+      if (type === 'expense') {
+        sendPushNotification(
+          "💸 Nuevo Gasto Registrado",
+          `Has registrado un gasto de ${amount.toFixed(2)} € en '${category}' (${concept}).`
+        );
+      }
 
       document.getElementById('txConcept').value = '';
       document.getElementById('txAmount').value = '';
