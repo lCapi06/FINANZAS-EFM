@@ -2,32 +2,21 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 2500,
-    "myinvestor": 19200,
+    "bbva": 3500,
+    "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
   },
-  "transactions": [
-    {
-      "id": 1794095298505,
-      "date": "2026-11-07T23:48:18.505Z",
-      "type": "transfer",
-      "concept": "Inversión top ",
-      "amount": 1000,
-      "category": "myinvestor",
-      "account": "bbva",
-      "destination": "myinvestor"
-    }
-  ],
+  "transactions": [],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 2500,
-      "myinvestor": 19200,
+      "bbva": 3500,
+      "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
       "total": 30200
     }
   },
-  "lastCloudSync": "2026-11-07T23:48:18.536Z"
+  "lastCloudSync": "2026-11-07T23:48:39.299Z"
 }
