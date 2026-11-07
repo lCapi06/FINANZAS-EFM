@@ -54,6 +54,9 @@
         <button onclick="saveToFile()" class="px-3 py-2 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
           💾 Guardar
         </button>
+        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
+          📥 Exportar
+        </button>
         <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
           📂 Importar
         </label>
@@ -646,6 +649,20 @@
       downloadAnchor.remove();
       URL.revokeObjectURL(url);
       alert('¡Copia de seguridad guardada con éxito!');
+    }
+
+    function exportData() {
+      state.lastBackupDate = new Date().toISOString();
+      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      render();
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", 'finanzas-personales-backup-' + new Date().toISOString().slice(0,10) + '.json');
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
     function render() {
