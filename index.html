@@ -44,7 +44,7 @@
         <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
         <div>
           <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin guardar</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin exportar</p>
         </div>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
@@ -354,7 +354,7 @@
               <th class="p-3">Fecha</th>
               <th class="p-3">Concepto</th>
               <th class="p-3">Detalle / Categoría</th>
-              <th class="p-3">Cuenta (Origen)</th>
+              <th class="p-3">Cuenta (Origen / Ruta)</th>
               <th class="p-3 text-right">Importe</th>
               <th class="p-3 text-center">Acción</th>
             </tr>
@@ -428,7 +428,7 @@
       },
       transactions: [],
       monthlySnapshots: {},
-      lastBackupDate: null
+      lastExportDate: null
     };
 
     let currentTypeFilter = 'all';
@@ -602,11 +602,9 @@
       render();
     }
 
-    // Función auxiliar para compartir archivo en iOS o descargar en escritorio
     async function shareOrDownloadFile(dataString, fileName) {
       const file = new File([dataString], fileName, { type: 'application/json' });
 
-      // Si el navegador soporta compartir archivos (iOS Safari / Móviles)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
@@ -620,7 +618,6 @@
         }
       }
 
-      // Fallback para navegadores sin Web Share API para archivos
       const blob = new Blob([dataString], { type: 'application/json;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const downloadAnchor = document.createElement('a');
@@ -633,9 +630,8 @@
       return true;
     }
 
-    // Botón único Exportar: Menú Compartir en iOS o Guardar como en PC con fecha
     async function exportData() {
-      state.lastBackupDate = new Date().toISOString();
+      state.lastExportDate = new Date().toISOString();
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
       render();
 
@@ -681,13 +677,13 @@
       document.getElementById('inputTRBtc').value = state.accounts.trade_republic_btc;
 
       const backupText = document.getElementById('backupStatusText');
-      if (state.lastBackupDate) {
-        const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        backupText.innerText = 'Última copia: ' + bDate;
+      if (state.lastExportDate) {
+        const bDate = new Date(state.lastExportDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        backupText.innerText = 'Última exportación: ' + bDate;
         backupText.className = 'text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1';
       } else {
-        backupText.innerText = 'Última copia: Pendiente';
-        backupText.className = 'text-xs text-amber-500 font-medium mt-1';
+        backupText.innerText = 'Última exportación: Sin exportar';
+        backupText.className = 'text-xs text-slate-500 dark:text-slate-400 mt-1';
       }
 
       updateAllTrends();
@@ -846,7 +842,7 @@
           return accKey || 'BBVA';
         }
 
-        const accName = getAccountName(tx.account);
+        let accountDisplay = '';
         let amountColor = 'text-slate-700 dark:text-slate-200 font-semibold';
         let prefix = '';
         let detailText = '';
@@ -854,23 +850,27 @@
         if (tx.type === 'income') {
           amountColor = 'text-emerald-600 dark:text-emerald-400 font-bold';
           prefix = '+';
+          accountDisplay = getAccountName(tx.account);
           detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
         } else if (tx.type === 'expense') {
           amountColor = 'text-rose-600 dark:text-rose-400 font-semibold';
           prefix = '-';
+          accountDisplay = getAccountName(tx.account);
           detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
         } else if (tx.type === 'transfer') {
           amountColor = 'text-sky-600 dark:text-sky-400 font-bold';
           prefix = '🔄 ';
+          const originName = getAccountName(tx.account);
           const destName = getAccountName(tx.destination);
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300">Destino: ' + destName + '</span>';
+          accountDisplay = '<span class="font-semibold text-slate-800 dark:text-slate-200">' + originName + '</span> <span class="text-indigo-500 font-bold">➔</span> <span class="font-semibold text-slate-800 dark:text-slate-200">' + destName + '</span>';
+          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300">Traspaso</span>';
         }
 
         tr.innerHTML = 
           '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + dateStr + '</td>' +
           '<td class="p-3 font-medium text-slate-900 dark:text-white">' + tx.concept + '</td>' +
           '<td class="p-3">' + detailText + '</td>' +
-          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + accName + '</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300 text-xs">' + accountDisplay + '</td>' +
           '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
           '<td class="p-3 text-center">' +
             '<button onclick="deleteTransaction(' + tx.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>' +
@@ -995,7 +995,7 @@
           if (importedState && importedState.accounts) {
             state = importedState;
             save();
-            alert('¡Copia de seguridad cargada correctamente!');
+            alert('¡Copia de seguridad importada correctamente!');
           } else {
             alert('El archivo no contiene un formato válido.');
           }
