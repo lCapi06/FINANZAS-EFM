@@ -1,0 +1,12 @@
+{
+  "goal": 40000,
+  "theme": "dark",
+  "accounts": {
+    "bbva": 3500.00,
+    "myinvestor": 18200.00,
+    "trade_republic_liq": 6000.00,
+    "trade_republic_btc": 2500.00
+  },
+  "transactions": [],
+  "monthlySnapshots": {}
+}
