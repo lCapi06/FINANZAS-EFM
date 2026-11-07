@@ -606,18 +606,51 @@
       render();
     }
 
+    // Función auxiliar para compartir archivo en iOS o descargar en escritorio
+    async function shareOrDownloadFile(dataString, fileName) {
+      const file = new File([dataString], fileName, { type: 'application/json' });
+
+      // Si el navegador soporta compartir archivos (iOS Safari / Móviles)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Copia de Seguridad Finanzas'
+          });
+          return true;
+        } catch (err) {
+          if (err.name === 'AbortError') return false;
+          console.warn('Error al compartir, usando descarga:', err);
+        }
+      }
+
+      // Fallback para navegadores sin Web Share API para archivos
+      const blob = new Blob([dataString], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = fileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
+      return true;
+    }
+
+    // Botón Guardar: Usa File System API en PC o Menú Compartir en iOS con nombre fijo para reemplazar
     async function saveToFile() {
       state.lastBackupDate = new Date().toISOString();
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
       render();
 
       const dataString = JSON.stringify(state, null, 2);
+      const fixedFileName = 'finanzas-personales-backup.json';
 
       if ('showSaveFilePicker' in window) {
         try {
           if (!fileHandle) {
             const options = {
-              suggestedName: 'finanzas-personales-backup.json',
+              suggestedName: fixedFileName,
               types: [{
                 description: 'Archivos JSON',
                 accept: { 'application/json': ['.json'] },
@@ -634,35 +667,42 @@
           return;
         } catch (err) {
           if (err.name === 'AbortError') return;
-          console.warn('File System API falló, usando descarga estándar:', err);
+          console.warn('File System API falló, usando alternativa:', err);
         }
       }
 
-      // Fallback
-      const blob = new Blob([dataString], { type: 'text/json;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.href = url;
-      downloadAnchor.download = 'finanzas-personales-backup.json';
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      URL.revokeObjectURL(url);
-      alert('¡Copia de seguridad guardada con éxito!');
+      await shareOrDownloadFile(dataString, fixedFileName);
     }
 
-    function exportData() {
+    // Botón Exportar: Usa Menú Compartir en iOS o Guardar como en PC con fecha para elegir dónde guardar
+    async function exportData() {
       state.lastBackupDate = new Date().toISOString();
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
       render();
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", 'finanzas-personales-backup-' + new Date().toISOString().slice(0,10) + '.json');
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const dataString = JSON.stringify(state, null, 2);
+      const datedFileName = 'finanzas-personales-backup-' + new Date().toISOString().slice(0,10) + '.json';
+
+      if ('showSaveFilePicker' in window) {
+        try {
+          const options = {
+            suggestedName: datedFileName,
+            types: [{
+              description: 'Archivos JSON',
+              accept: { 'application/json': ['.json'] },
+            }],
+          };
+          const handle = await window.showSaveFilePicker(options);
+          const writableStream = await handle.createWritable();
+          await writableStream.write(dataString);
+          await writableStream.close();
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      await shareOrDownloadFile(dataString, datedFileName);
     }
 
     function render() {
