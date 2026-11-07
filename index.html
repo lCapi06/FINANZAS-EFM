@@ -943,16 +943,16 @@
         }
       }
 
-      // 2. Receptor robusto para Atajos de iPhone (Gastos, Ingresos y Traspasos)
+      // 2. Receptor robusto para Atajos de iOS (Soporte en Inglés y Español)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('concepto') || urlParams.has('importe')) {
-        const concept = urlParams.get('concepto') || 'Movimiento rápido';
-        const amount = parseFloat(urlParams.get('importe')) || 0;
-        const type = urlParams.get('tipo') || 'expense';
-        const category = urlParams.get('categoria') || (type === 'income' ? 'Nomina' : (type === 'transfer' ? 'Traspaso' : 'Otros'));
-        const account = urlParams.get('cuenta') || 'bbva';
-        const destAccount = urlParams.get('cuentaDestino') || 'myinvestor';
-        const dateVal = urlParams.get('fecha') || new Date().toISOString().split('T')[0];
+      if (urlParams.has('concept') || urlParams.has('concepto') || urlParams.has('amount') || urlParams.has('importe')) {
+        const concept = urlParams.get('concept') || urlParams.get('concepto') || 'Quick transaction';
+        const amount = parseFloat(urlParams.get('amount') || urlParams.get('importe')) || 0;
+        const type = urlParams.get('type') || urlParams.get('tipo') || 'expense';
+        const category = urlParams.get('category') || urlParams.get('categoria') || (type === 'income' ? 'Nomina' : (type === 'transfer' ? 'Traspaso' : 'Otros'));
+        const account = urlParams.get('account') || urlParams.get('cuenta') || 'bbva';
+        const destAccount = urlParams.get('destAccount') || urlParams.get('cuentaDestino') || 'myinvestor';
+        const dateVal = urlParams.get('date') || urlParams.get('fecha') || new Date().toISOString().split('T')[0];
 
         if (amount > 0) {
           if (type === 'expense') {
