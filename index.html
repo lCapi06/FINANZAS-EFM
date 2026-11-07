@@ -44,18 +44,15 @@
         <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
         <div>
           <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin guardar</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin exportar</p>
         </div>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
         <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
           <span id="themeIcon">☀️</span> <span id="themeText">Modo Claro</span>
         </button>
-        <button onclick="saveToFile()" class="px-3 py-2 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
-          💾 Guardar
-        </button>
         <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
-          📥 Exportar
+          💾 Exportar
         </button>
         <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
           📂 Importar
@@ -435,7 +432,6 @@
     };
 
     let currentTypeFilter = 'all';
-    let fileHandle = null;
 
     function init() {
       const saved = localStorage.getItem('mi_patrimonio_data_v3');
@@ -606,75 +602,7 @@
       render();
     }
 
-    // Función auxiliar para compartir archivo en iOS o descargar en escritorio
-    async function shareOrDownloadFile(dataString, fileName) {
-      const file = new File([dataString], fileName, { type: 'application/json' });
-
-      // Si el navegador soporta compartir archivos (iOS Safari / Móviles)
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'Copia de Seguridad Finanzas'
-          });
-          return true;
-        } catch (err) {
-          if (err.name === 'AbortError') return false;
-          console.warn('Error al compartir, usando descarga:', err);
-        }
-      }
-
-      // Fallback para navegadores sin Web Share API para archivos
-      const blob = new Blob([dataString], { type: 'application/json;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.href = url;
-      downloadAnchor.download = fileName;
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      URL.revokeObjectURL(url);
-      return true;
-    }
-
-    // Botón Guardar: Usa File System API en PC o Menú Compartir en iOS con nombre fijo para reemplazar
-    async function saveToFile() {
-      state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
-      render();
-
-      const dataString = JSON.stringify(state, null, 2);
-      const fixedFileName = 'finanzas-personales-backup.json';
-
-      if ('showSaveFilePicker' in window) {
-        try {
-          if (!fileHandle) {
-            const options = {
-              suggestedName: fixedFileName,
-              types: [{
-                description: 'Archivos JSON',
-                accept: { 'application/json': ['.json'] },
-              }],
-            };
-            fileHandle = await window.showSaveFilePicker(options);
-          }
-
-          const writableStream = await fileHandle.createWritable();
-          await writableStream.write(dataString);
-          await writableStream.close();
-          
-          alert('¡Archivo guardado y sobrescrito con éxito!');
-          return;
-        } catch (err) {
-          if (err.name === 'AbortError') return;
-          console.warn('File System API falló, usando alternativa:', err);
-        }
-      }
-
-      await shareOrDownloadFile(dataString, fixedFileName);
-    }
-
-    // Botón Exportar: Usa Menú Compartir en iOS o Guardar como en PC con fecha para elegir dónde guardar
+    // Botón único Exportar: con fecha en el nombre. Usa Menú Compartir en iOS o selector de carpeta en PC
     async function exportData() {
       state.lastBackupDate = new Date().toISOString();
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
@@ -702,7 +630,28 @@
         }
       }
 
-      await shareOrDownloadFile(dataString, datedFileName);
+      const file = new File([dataString], datedFileName, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Copia de Seguridad Finanzas'
+          });
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      const blob = new Blob([dataString], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = datedFileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
     }
 
     function render() {
@@ -897,322 +846,4 @@
           prefix = '+';
           detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
         } else if (tx.type === 'expense') {
-          amountColor = 'text-rose-600 dark:text-rose-400 font-semibold';
-          prefix = '-';
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
-        } else if (tx.type === 'transfer') {
-          amountColor = 'text-sky-600 dark:text-sky-400 font-bold';
-          prefix = '🔄 ';
-          const destName = getAccountName(tx.destination);
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300">Destino: ' + destName + '</span>';
-        }
-
-        tr.innerHTML = 
-          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + dateStr + '</td>' +
-          '<td class="p-3 font-medium text-slate-900 dark:text-white">' + tx.concept + '</td>' +
-          '<td class="p-3">' + detailText + '</td>' +
-          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + accName + '</td>' +
-          '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
-          '<td class="p-3 text-center">' +
-            '<button onclick="deleteTransaction(' + tx.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>' +
-          '</td>';
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filterType(type) {
-      currentTypeFilter = type;
-      renderTransactions();
-    }
-
-    function renderSnapshots() {
-      const tbody = document.getElementById('balanceSnapshotsTable');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      if (!state.monthlySnapshots || Object.keys(state.monthlySnapshots).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Se guardará al ajustar saldos.</td></tr>';
-        return;
-      }
-
-      const sortedKeys = Object.keys(state.monthlySnapshots).sort().reverse();
-      sortedKeys.forEach(function(key) {
-        const snap = state.monthlySnapshots[key];
-        const tr = document.createElement('tr');
-        tr.innerHTML = 
-          '<td class="p-3 font-semibold text-slate-900 dark:text-white capitalize">' + (snap.dateLabel || key) + '</td>' +
-          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.bbva||0).toLocaleString('es-ES') + ' €</td>' +
-          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.myinvestor||0).toLocaleString('es-ES') + ' €</td>' +
-          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.trade_republic_liq||0).toLocaleString('es-ES') + ' €</td>' +
-          '<td class="p-3 text-amber-600 dark:text-amber-400">' + (snap.trade_republic_btc||0).toLocaleString('es-ES') + ' €</td>' +
-          '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €</td>';
-        tbody.appendChild(tr);
-      });
-    }
-
-    function addTransaction(e) {
-      e.preventDefault();
-      const type = document.getElementById('txType').value;
-      const concept = document.getElementById('txConcept').value;
-      const amount = parseFloat(document.getElementById('txAmount').value);
-      const account = document.getElementById('txAccount').value;
-      
-      let category = null;
-      let destination = null;
-
-      if (type === 'transfer') {
-        destination = document.getElementById('txDestination').value;
-        if (account === destination) {
-          alert('La cuenta origen y destino no pueden ser la misma.');
-          return;
-        }
-      } else {
-        category = document.getElementById('txCategory').value;
-      }
-
-      if (!amount || amount <= 0) return;
-
-      if (type === 'expense') {
-        state.accounts[account] -= amount;
-      } else if (type === 'income') {
-        state.accounts[account] += amount;
-      } else if (type === 'transfer') {
-        state.accounts[account] -= amount;
-        state.accounts[destination] += amount;
-      }
-
-      state.transactions.push({
-        id: Date.now(),
-        date: new Date().toISOString(),
-        type: type,
-        concept: concept,
-        amount: amount,
-        category: category,
-        account: account,
-        destination: destination
-      });
-
-      document.getElementById('txConcept').value = '';
-      document.getElementById('txAmount').value = '';
-
-      save();
-    }
-
-    function deleteTransaction(id) {
-      const txIndex = state.transactions.findIndex(function(t) { return t.id === id; });
-      if (txIndex !== -1) {
-        const tx = state.transactions[txIndex];
-        if (tx.type === 'expense') {
-          state.accounts[tx.account] += tx.amount;
-        } else if (tx.type === 'income') {
-          state.accounts[tx.account] -= tx.amount;
-        } else if (tx.type === 'transfer') {
-          state.accounts[tx.account] += tx.amount;
-          state.accounts[tx.destination] -= tx.amount;
-        }
-        state.transactions.splice(txIndex, 1);
-        save();
-      }
-    }
-
-    function updateAccountBalance(acc) {
-      let val = 0;
-      if (acc === 'bbva') val = parseFloat(document.getElementById('inputBBVA').value);
-      if (acc === 'myinvestor') val = parseFloat(document.getElementById('inputMyInvestor').value);
-      if (acc === 'trade_republic_liq') val = parseFloat(document.getElementById('inputTRLiq').value);
-      if (acc === 'trade_republic_btc') val = parseFloat(document.getElementById('inputTRBtc').value);
-
-      if (!isNaN(val)) {
-        state.accounts[acc] = val;
-        save();
-      }
-    }
-
-    function importData(event) {
-      const fileReader = new FileReader();
-      fileReader.onload = function(e) {
-        try {
-          const importedState = JSON.parse(e.target.result);
-          if (importedState && importedState.accounts) {
-            state = importedState;
-            save();
-            alert('¡Copia de seguridad cargada correctamente!');
-          } else {
-            alert('El archivo no contiene un formato válido.');
-          }
-        } catch (err) {
-          alert('Error al leer el archivo JSON.');
-        }
-      };
-      if (event.target.files[0]) {
-        fileReader.readAsText(event.target.files[0]);
-      }
-    }
-
-    let chartDist = null;
-    let chartCat = null;
-    let chartEvol = null;
-
-    function updateCharts() {
-      const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
-      const isDark = document.documentElement.classList.contains('dark');
-      const textColor = isDark ? '#94a3b8' : '#64748b';
-
-      const ctxDist = document.getElementById('distributionChart').getContext('2d');
-      if (chartDist) chartDist.destroy();
-      chartDist = new Chart(ctxDist, {
-        type: 'doughnut',
-        data: {
-          labels: ['BBVA', 'MyInvestor', 'Trade Republic', 'Bitcoin'],
-          datasets: [{
-            data: [state.accounts.bbva, state.accounts.myinvestor, state.accounts.trade_republic_liq, state.accounts.trade_republic_btc],
-            backgroundColor: ['#3b82f6', '#6366f1', '#10b981', '#f59e0b'],
-            borderWidth: isDark ? 0 : 2,
-            borderColor: isDark ? 'transparent' : '#ffffff'
-          }]
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: textColor, boxWidth: 12 } },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const val = context.raw || 0;
-                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
-                }
-              }
-            }
-          }
-        }
-      });
-
-      const ctxCat = document.getElementById('categoryChart').getContext('2d');
-      if (chartCat) chartCat.destroy();
-
-      const catTotals = {};
-      let totalGastos = 0;
-      state.transactions.filter(function(t) { return t.type === 'expense'; }).forEach(function(t) {
-        catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
-        totalGastos += t.amount;
-      });
-
-      const catLabels = Object.keys(catTotals).length ? Object.keys(catTotals) : ['Sin Gastos'];
-      const catData = Object.keys(catTotals).length ? Object.values(catTotals) : [1];
-      const catColors = ['#f43f5e', '#8b5cf6', '#ec4899', '#f59e0b', '#06b6d4', '#84cc16', '#64748b'];
-
-      chartCat = new Chart(ctxCat, {
-        type: 'pie',
-        data: {
-          labels: catLabels,
-          datasets: [{
-            data: catData,
-            backgroundColor: catColors,
-            borderWidth: isDark ? 0 : 2,
-            borderColor: isDark ? 'transparent' : '#ffffff'
-          }]
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: textColor, boxWidth: 12 } },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const val = context.raw || 0;
-                  const pct = totalGastos > 0 ? ((val / totalGastos) * 100).toFixed(1) : 0;
-                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
-                }
-              }
-            }
-          }
-        }
-      });
-
-      // Gráfico de Evolución con Filtro de Rango Temporal Aplicado
-      const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
-      if (chartEvol) chartEvol.destroy();
-      
-      let evolLabels = [];
-      let evolData = [];
-
-      if (state.monthlySnapshots && Object.keys(state.monthlySnapshots).length > 0) {
-        let sortedKeys = Object.keys(state.monthlySnapshots).sort();
-        
-        const rangeVal = document.getElementById('timeRangeSelect').value;
-        if (rangeVal !== 'all') {
-          const limit = parseInt(rangeVal);
-          if (sortedKeys.length > limit) {
-            sortedKeys = sortedKeys.slice(sortedKeys.length - limit);
-          }
-        }
-
-        sortedKeys.forEach(function(k) {
-          evolLabels.push(state.monthlySnapshots[k].dateLabel || k);
-          evolData.push(state.monthlySnapshots[k].total);
-        });
-      } else {
-        const now = new Date();
-        evolLabels.push(now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }));
-        evolData.push(total);
-      }
-
-      chartEvol = new Chart(ctxEvol, {
-        type: 'line',
-        data: {
-          labels: evolLabels,
-          datasets: [{
-            label: 'Patrimonio Total',
-            data: evolData,
-            borderColor: '#6366f1',
-            backgroundColor: function(context) {
-              const chart = context.chart;
-              const {ctx, chartArea} = chart;
-              if (!chartArea) return null;
-              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-              gradient.addColorStop(0, 'rgba(99, 102, 241, 0.0)');
-              gradient.addColorStop(1, 'rgba(99, 102, 241, 0.25)');
-              return gradient;
-            },
-            borderWidth: 3,
-            tension: 0.35,
-            fill: true,
-            pointBackgroundColor: '#6366f1',
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return ' Patrimonio: ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: textColor, font: { size: 10 } }
-            },
-            y: {
-              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
-              ticks: { color: textColor, font: { size: 10 } }
-            }
-          }
-        }
-      });
-    }
-
-    init();
-  </script>
-</body>
-</html>
+          amount
