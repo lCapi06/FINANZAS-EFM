@@ -44,15 +44,15 @@
         <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
         <div>
           <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin exportar</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="backupStatusText">Última copia: Sin guardar</p>
         </div>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
         <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
           <span id="themeIcon">☀️</span> <span id="themeText">Modo Claro</span>
         </button>
-        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
-          💾 Exportar
+        <button onclick="saveToFile()" class="px-3 py-2 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
+          💾 Guardar
         </button>
         <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
           📂 Importar
@@ -223,15 +223,16 @@
         
         <div>
           <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
-          <select id="txType" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
+          <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
             <option value="expense">➖ Gasto</option>
             <option value="income">➕ Ingreso</option>
+            <option value="transfer">🔄 Traspaso</option>
           </select>
         </div>
 
         <div>
           <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
-          <input type="text" id="txConcept" placeholder="Ej: Compra..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          <input type="text" id="txConcept" placeholder="Ej: Compra o Traspaso..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
         </div>
 
         <div>
@@ -240,7 +241,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Categoría</label>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelCategoryOrDest">Categoría</label>
           <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="Supermercado">🛒 Supermercado</option>
             <option value="Nomina">💼 Nómina / Ingreso</option>
@@ -253,10 +254,16 @@
             <option value="Suscripciones">📱 Suscripciones</option>
             <option value="Otros">📦 Otros</option>
           </select>
+          <select id="txDestination" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white hidden">
+            <option value="bbva">BBVA</option>
+            <option value="myinvestor">MyInvestor</option>
+            <option value="trade_republic_liq">Trade Republic</option>
+            <option value="trade_republic_btc">Bitcoin</option>
+          </select>
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Cuenta</label>
+          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelAccount">Cuenta</label>
           <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
             <option value="bbva">BBVA</option>
             <option value="myinvestor">MyInvestor</option>
@@ -335,6 +342,7 @@
             <button onclick="filterType('all')" class="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200">Todos</button>
             <button onclick="filterType('expense')" class="px-2 py-1 text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-100">Gastos</button>
             <button onclick="filterType('income')" class="px-2 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded hover:bg-emerald-100">Ingresos</button>
+            <button onclick="filterType('transfer')" class="px-2 py-1 text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 rounded hover:bg-sky-100">Traspasos</button>
           </div>
         </div>
       </div>
@@ -345,8 +353,8 @@
             <tr>
               <th class="p-3">Fecha</th>
               <th class="p-3">Concepto</th>
-              <th class="p-3">Categoría</th>
-              <th class="p-3">Cuenta</th>
+              <th class="p-3">Detalle / Categoría</th>
+              <th class="p-3">Cuenta (Origen)</th>
               <th class="p-3 text-right">Importe</th>
               <th class="p-3 text-center">Acción</th>
             </tr>
@@ -424,6 +432,7 @@
     };
 
     let currentTypeFilter = 'all';
+    let fileHandle = null;
 
     function init() {
       const saved = localStorage.getItem('mi_patrimonio_data_v3');
@@ -470,6 +479,26 @@
       updateCharts();
     }
 
+    function handleTypeChange() {
+      const type = document.getElementById('txType').value;
+      const catSelect = document.getElementById('txCategory');
+      const destSelect = document.getElementById('txDestination');
+      const labelCatDest = document.getElementById('labelCategoryOrDest');
+      const labelAccount = document.getElementById('labelAccount');
+
+      if (type === 'transfer') {
+        catSelect.classList.add('hidden');
+        destSelect.classList.remove('hidden');
+        labelCatDest.innerText = 'Cuenta Destino';
+        labelAccount.innerText = 'Cuenta Origen';
+      } else {
+        catSelect.classList.remove('hidden');
+        destSelect.classList.add('hidden');
+        labelCatDest.innerText = 'Categoría';
+        labelAccount.innerText = 'Cuenta';
+      }
+    }
+
     function processUrlShortcuts() {
       const params = new URLSearchParams(window.location.search);
       const autoType = params.get('auto_type');
@@ -477,16 +506,20 @@
       const autoAmount = parseFloat(params.get('auto_amount'));
       const autoAccount = params.get('auto_account');
       const autoCategory = params.get('auto_category');
+      const autoDestination = params.get('auto_destination');
 
       if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
         if (state.accounts[autoAccount] !== undefined) {
           if (autoType === 'expense') {
             state.accounts[autoAccount] -= autoAmount;
-          } else {
+          } else if (autoType === 'income') {
             state.accounts[autoAccount] += autoAmount;
+          } else if (autoType === 'transfer' && autoDestination && state.accounts[autoDestination] !== undefined) {
+            state.accounts[autoAccount] -= autoAmount;
+            state.accounts[autoDestination] += autoAmount;
           }
 
-          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : 'Otros');
+          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : (autoType === 'transfer' ? autoDestination : 'Otros'));
 
           state.transactions.push({
             id: Date.now(),
@@ -495,7 +528,8 @@
             concept: decodeURIComponent(autoConcept),
             amount: autoAmount,
             category: finalCategory,
-            account: autoAccount
+            account: autoAccount,
+            destination: autoType === 'transfer' ? autoDestination : null
           });
 
           const now = new Date();
@@ -569,6 +603,51 @@
       render();
     }
 
+    async function saveToFile() {
+      state.lastBackupDate = new Date().toISOString();
+      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      render();
+
+      const dataString = JSON.stringify(state, null, 2);
+
+      if ('showSaveFilePicker' in window) {
+        try {
+          if (!fileHandle) {
+            const options = {
+              suggestedName: 'finanzas-personales-backup.json',
+              types: [{
+                description: 'Archivos JSON',
+                accept: { 'application/json': ['.json'] },
+              }],
+            };
+            fileHandle = await window.showSaveFilePicker(options);
+          }
+
+          const writableStream = await fileHandle.createWritable();
+          await writableStream.write(dataString);
+          await writableStream.close();
+          
+          alert('¡Archivo guardado y sobrescrito con éxito!');
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.warn('File System API falló, usando descarga estándar:', err);
+        }
+      }
+
+      // Fallback
+      const blob = new Blob([dataString], { type: 'text/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = 'finanzas-personales-backup.json';
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
+      alert('¡Copia de seguridad guardada con éxito!');
+    }
+
     function render() {
       const liquid = state.accounts.bbva + state.accounts.trade_republic_liq;
       const invested = state.accounts.myinvestor + state.accounts.trade_republic_btc;
@@ -587,7 +666,7 @@
 
       const backupText = document.getElementById('backupStatusText');
       if (state.lastBackupDate) {
-        const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        const bDate = new Date(state.lastBackupDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         backupText.innerText = 'Última copia: ' + bDate;
         backupText.className = 'text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1';
       } else {
@@ -743,19 +822,38 @@
         const tr = document.createElement('tr');
         const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
         
-        let accName = 'BBVA';
-        if (tx.account === 'myinvestor') accName = 'MyInvestor';
-        if (tx.account === 'trade_republic_liq') accName = 'Trade Republic';
-        if (tx.account === 'trade_republic_btc') accName = 'Bitcoin';
+        function getAccountName(accKey) {
+          if (accKey === 'bbva') return 'BBVA';
+          if (accKey === 'myinvestor') return 'MyInvestor';
+          if (accKey === 'trade_republic_liq') return 'Trade Republic';
+          if (accKey === 'trade_republic_btc') return 'Bitcoin';
+          return accKey || 'BBVA';
+        }
 
-        const isIncome = tx.type === 'income';
-        const amountColor = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-semibold';
-        const prefix = isIncome ? '+' : '-';
+        const accName = getAccountName(tx.account);
+        let amountColor = 'text-slate-700 dark:text-slate-200 font-semibold';
+        let prefix = '';
+        let detailText = '';
+
+        if (tx.type === 'income') {
+          amountColor = 'text-emerald-600 dark:text-emerald-400 font-bold';
+          prefix = '+';
+          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
+        } else if (tx.type === 'expense') {
+          amountColor = 'text-rose-600 dark:text-rose-400 font-semibold';
+          prefix = '-';
+          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
+        } else if (tx.type === 'transfer') {
+          amountColor = 'text-sky-600 dark:text-sky-400 font-bold';
+          prefix = '🔄 ';
+          const destName = getAccountName(tx.destination);
+          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300">Destino: ' + destName + '</span>';
+        }
 
         tr.innerHTML = 
           '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + dateStr + '</td>' +
           '<td class="p-3 font-medium text-slate-900 dark:text-white">' + tx.concept + '</td>' +
-          '<td class="p-3"><span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span></td>' +
+          '<td class="p-3">' + detailText + '</td>' +
           '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + accName + '</td>' +
           '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
           '<td class="p-3 text-center">' +
@@ -800,15 +898,30 @@
       const type = document.getElementById('txType').value;
       const concept = document.getElementById('txConcept').value;
       const amount = parseFloat(document.getElementById('txAmount').value);
-      const category = document.getElementById('txCategory').value;
       const account = document.getElementById('txAccount').value;
+      
+      let category = null;
+      let destination = null;
+
+      if (type === 'transfer') {
+        destination = document.getElementById('txDestination').value;
+        if (account === destination) {
+          alert('La cuenta origen y destino no pueden ser la misma.');
+          return;
+        }
+      } else {
+        category = document.getElementById('txCategory').value;
+      }
 
       if (!amount || amount <= 0) return;
 
       if (type === 'expense') {
         state.accounts[account] -= amount;
-      } else {
+      } else if (type === 'income') {
         state.accounts[account] += amount;
+      } else if (type === 'transfer') {
+        state.accounts[account] -= amount;
+        state.accounts[destination] += amount;
       }
 
       state.transactions.push({
@@ -818,7 +931,8 @@
         concept: concept,
         amount: amount,
         category: category,
-        account: account
+        account: account,
+        destination: destination
       });
 
       document.getElementById('txConcept').value = '';
@@ -833,8 +947,11 @@
         const tx = state.transactions[txIndex];
         if (tx.type === 'expense') {
           state.accounts[tx.account] += tx.amount;
-        } else {
+        } else if (tx.type === 'income') {
           state.accounts[tx.account] -= tx.amount;
+        } else if (tx.type === 'transfer') {
+          state.accounts[tx.account] += tx.amount;
+          state.accounts[tx.destination] -= tx.amount;
         }
         state.transactions.splice(txIndex, 1);
         save();
@@ -852,20 +969,6 @@
         state.accounts[acc] = val;
         save();
       }
-    }
-
-    function exportData() {
-      state.lastBackupDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
-      render();
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", 'finanzas-personales-backup-' + new Date().toISOString().slice(0,10) + '.json');
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
     }
 
     function importData(event) {
@@ -982,7 +1085,6 @@
       if (state.monthlySnapshots && Object.keys(state.monthlySnapshots).length > 0) {
         let sortedKeys = Object.keys(state.monthlySnapshots).sort();
         
-        // Aplicar filtro de selector temporal
         const rangeVal = document.getElementById('timeRangeSelect').value;
         if (rangeVal !== 'all') {
           const limit = parseInt(rangeVal);
@@ -1057,4 +1159,3 @@
   </script>
 </body>
 </html>
-
