@@ -2,21 +2,32 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3500,
+    "bbva": 5500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794168223884,
+      "date": "2026-11-08T20:03:43.884Z",
+      "type": "income",
+      "concept": "Nómina ",
+      "amount": 2000,
+      "category": "Nómina",
+      "account": "bbva",
+      "destination": null
+    }
+  ],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 3500,
+      "bbva": 5500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 30200
+      "total": 32200
     }
   },
-  "lastCloudSync": "2026-11-08T19:29:59.881Z"
+  "lastCloudSync": "2026-11-08T20:03:43.899Z"
 }
