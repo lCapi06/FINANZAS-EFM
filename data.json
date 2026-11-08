@@ -8,17 +8,36 @@
     "trade_republic_btc": 730.0738706
   },
   "transactions": [],
-  "monthlySnapshots": {
-    "2026-11": {
-      "dateLabel": "nov 2026",
+  "monthlySnapshots": [
+    {
+      "id": 1794176031267,
+      "date": "2026-11-08T22:13:51.267Z",
+      "dateLabel": "nov 2026, 23:13",
       "bbva": 3500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 730.0738706,
       "total": 28430.0738706
     }
-  },
-  "lastCloudSync": "2026-11-08T21:24:02.400Z",
+  ],
+  "lastCloudSync": "2026-11-08T22:13:51.296Z",
   "btcUnits": 0.010744,
-  "btcPrice": 67951.775
+  "btcPrice": 67951.775,
+  "categories": {
+    "expense": [
+      "Supermercado",
+      "Ocio",
+      "Vivienda",
+      "Transporte",
+      "Suscripciones",
+      "Otros",
+      "Regalos"
+    ],
+    "income": [
+      "Nomina",
+      "Bizum",
+      "Paga extra",
+      "Otros"
+    ]
+  }
 }
