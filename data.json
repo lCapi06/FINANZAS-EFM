@@ -2,34 +2,23 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 2500,
+    "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 730.0738706
   },
-  "transactions": [
-    {
-      "id": 1794173030295,
-      "date": "2026-11-08T21:23:50.295Z",
-      "type": "expense",
-      "concept": "Prueba 1",
-      "amount": 1000,
-      "category": "Transporte",
-      "account": "bbva",
-      "destination": null
-    }
-  ],
+  "transactions": [],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 2500,
+      "bbva": 3500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 730.0738706,
-      "total": 27430.0738706
+      "total": 28430.0738706
     }
   },
-  "lastCloudSync": "2026-11-08T21:23:50.307Z",
+  "lastCloudSync": "2026-11-08T21:23:59.304Z",
   "btcUnits": 0.010744,
   "btcPrice": 67951.775
 }
