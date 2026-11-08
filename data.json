@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3372,
+    "bbva": 3422,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
@@ -17,27 +17,17 @@
       "category": "Ocio",
       "account": "bbva",
       "destination": null
-    },
-    {
-      "id": 1794161043312,
-      "date": "2026-11-08T18:04:03.312Z",
-      "type": "expense",
-      "concept": "Comida",
-      "amount": 50,
-      "category": "Supermercado",
-      "account": "bbva",
-      "destination": null
     }
   ],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 3372,
+      "bbva": 3422,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 30072
+      "total": 30122
     }
   },
-  "lastCloudSync": "2026-11-08T18:04:03.323Z"
+  "lastCloudSync": "2026-11-08T18:04:31.109Z"
 }
