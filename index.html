@@ -290,69 +290,91 @@
     <!-- ==================== PESTAÑA 3: MOVIMIENTOS ==================== -->
     <div id="tab-movimientos" class="tab-content hidden space-y-6">
 
-      <!-- Quick Action: Movimientos -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento</h3>
-        <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" onsubmit="addTransaction(event)">
-          
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
-            <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
-              <option value="expense">➖ Gasto</option>
-              <option value="income">➕ Ingreso</option>
-              <option value="transfer">🔄 Traspaso</option>
-            </select>
-          </div>
+      <!-- Quick Action: Movimientos y Gestión de Categorías -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Registrar Movimiento -->
+        <section class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4" id="formTitle">Registrar Movimiento</h3>
+          <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4" onsubmit="handleTxSubmit(event)">
+            <input type="hidden" id="editTxId" value="">
+            
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
+              <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
+                <option value="expense">➖ Gasto</option>
+                <option value="income">➕ Ingreso</option>
+                <option value="transfer">🔄 Traspaso</option>
+              </select>
+            </div>
 
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
-            <input type="text" id="txConcept" placeholder="Ej: Compra o Traspaso..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-          </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
+              <input type="text" id="txConcept" placeholder="Ej: Compra o Traspaso..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+            </div>
 
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
-            <input type="number" step="0.01" id="txAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-          </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
+              <input type="number" step="0.01" id="txAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+            </div>
 
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelCategoryOrDest">Categoría</label>
-            <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-              <option value="Supermercado">🛒 Supermercado</option>
-              <option value="Nomina">💼 Nómina / Ingreso</option>
-              <option value="Bizum">💸 Bizum</option>
-              <option value="Paga extra">💰 Paga extra</option>
-              <option value="Ocio">🍿 Ocio / Restauración</option>
-              <option value="Inversion">📈 Inversión / Ahorro</option>
-              <option value="Vivienda">🏠 Vivienda / Recibos</option>
-              <option value="Transporte">🚗 Transporte / Gasolina</option>
-              <option value="Suscripciones">📱 Suscripciones</option>
-              <option value="Otros">📦 Otros</option>
-            </select>
-            <select id="txDestination" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white hidden">
-              <option value="bbva">BBVA</option>
-              <option value="myinvestor">MyInvestor</option>
-              <option value="trade_republic_liq">Trade Republic</option>
-              <option value="trade_republic_btc">Bitcoin</option>
-            </select>
-          </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelCategoryOrDest">Categoría</label>
+              <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+                <!-- Se rellena dinámicamente -->
+              </select>
+              <select id="txDestination" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white hidden">
+                <option value="bbva">BBVA</option>
+                <option value="myinvestor">MyInvestor</option>
+                <option value="trade_republic_liq">Trade Republic</option>
+                <option value="trade_republic_btc">Bitcoin</option>
+              </select>
+            </div>
 
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelAccount">Cuenta</label>
-            <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-              <option value="bbva">BBVA</option>
-              <option value="myinvestor">MyInvestor</option>
-              <option value="trade_republic_liq">Trade Republic</option>
-              <option value="trade_republic_btc">Bitcoin</option>
-            </select>
-          </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelAccount">Cuenta</label>
+              <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+                <option value="bbva">BBVA</option>
+                <option value="myinvestor">MyInvestor</option>
+                <option value="trade_republic_liq">Trade Republic</option>
+                <option value="trade_republic_btc">Bitcoin</option>
+              </select>
+            </div>
 
-          <div class="flex items-end">
-            <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
-              Guardar
-            </button>
+            <div class="sm:col-span-2 flex gap-2 pt-2">
+              <button type="submit" id="txSubmitBtn" class="flex-1 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
+                Guardar Movimiento
+              </button>
+              <button type="button" id="txCancelBtn" onclick="resetTxForm()" class="hidden px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm rounded-lg hover:bg-slate-300 transition">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Crear Nueva Categoría -->
+        <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Crear Categoría</h3>
+            <p class="text-xs text-slate-500 mb-4">Añade etiquetas personalizadas para tus gastos o ingresos.</p>
+            <form onsubmit="addNewCategory(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Nombre de la Categoría</label>
+                <input type="text" id="newCatName" placeholder="Ej: Viajes, Regalos..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo de Categoría</label>
+                <select id="newCatType" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none">
+                  <option value="expense">➖ Gasto</option>
+                  <option value="income">➕ Ingreso</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-semibold text-sm rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                Añadir Categoría
+              </button>
+            </form>
           </div>
-        </form>
-      </section>
+        </section>
+      </div>
 
       <!-- Historial de Movimientos -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
@@ -398,21 +420,11 @@
             </select>
           </div>
 
-          <!-- Filtro Categoría -->
+          <!-- Filtro Categoría (Dinámico según Tipo) -->
           <div>
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Categoría</label>
             <select id="filterCategory" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
               <option value="all">Todas las Categorías</option>
-              <option value="Supermercado">Supermercado</option>
-              <option value="Nomina">Nómina / Ingreso</option>
-              <option value="Bizum">Bizum</option>
-              <option value="Paga extra">Paga extra</option>
-              <option value="Ocio">Ocio / Restauración</option>
-              <option value="Inversion">Inversión / Ahorro</option>
-              <option value="Vivienda">Vivienda / Recibos</option>
-              <option value="Transporte">Transporte / Gasolina</option>
-              <option value="Suscripciones">Suscripciones</option>
-              <option value="Otros">Otros</option>
             </select>
           </div>
 
@@ -428,7 +440,7 @@
             </select>
           </div>
 
-          <!-- Buscador por Concepto (Ocupa dos columnas en móvil para mayor comodidad) -->
+          <!-- Buscador por Concepto -->
           <div class="col-span-2 sm:col-span-2 lg:col-span-4">
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Buscar por concepto</label>
             <input type="text" id="filterConcept" oninput="renderTransactions()" placeholder="Escribe para buscar concepto..." class="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -444,7 +456,7 @@
                 <th class="p-3">Detalle / Categoría</th>
                 <th class="p-3">Cuenta (Origen / Ruta)</th>
                 <th class="p-3 text-right">Importe</th>
-                <th class="p-3 text-center">Acción</th>
+                <th class="p-3 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -482,13 +494,13 @@
 
       <!-- Historial de Saldos -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales (Foto de Cuentas)</h3>
-        <p class="text-xs text-slate-500 mb-4">Registro histórico guardado cada vez que actualizas tus cuentas.</p>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos (Instantáneas)</h3>
+        <p class="text-xs text-slate-500 mb-4">Registro cronológico guardado cada vez que actualizas tus cuentas.</p>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
               <tr>
-                <th class="p-3">Periodo (Mes/Año)</th>
+                <th class="p-3">Fecha y Hora</th>
                 <th class="p-3">BBVA</th>
                 <th class="p-3">MyInvestor</th>
                 <th class="p-3">Trade Republic</th>
@@ -662,7 +674,7 @@
     }
 
     let currentFileSha = null;
-    let fireSource = 'invested'; // 'invested' o 'total'
+    let fireSource = 'invested'; 
 
     let state = {
       goal: 40000,
@@ -675,8 +687,12 @@
         trade_republic_liq: 6000.00,
         trade_republic_btc: 2500.00
       },
+      categories: {
+        expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+        income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
+      },
       transactions: [],
-      monthlySnapshots: {},
+      monthlySnapshots: [], // Array de snapshots históricos para no sobrescribir
       lastExportDate: null,
       lastCloudSync: null
     };
@@ -700,7 +716,7 @@
           if (units > 0) {
             state.accounts.trade_republic_btc = units * priceEur;
           }
-          save();
+          saveSnapshotAndSync();
           
           if (isManual) {
             alert('Has actualizado el precio de Bitcoin a ' + priceEur.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
@@ -714,7 +730,74 @@
       }
     }
 
-    // ==================== NAVEGACIÓN POR PESTAÑAS ====================
+    // ==================== GESTIÓN DE CATEGORÍAS ====================
+    function populateCategoryDropdowns() {
+      const txType = document.getElementById('txType').value;
+      const txCatSelect = document.getElementById('txCategory');
+      txCatSelect.innerHTML = '';
+
+      const cats = state.categories[txType] || [];
+      cats.forEach(function(c) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        txCatSelect.appendChild(opt);
+      });
+
+      updateFilterCategoryOptions();
+    }
+
+    function updateFilterCategoryOptions() {
+      const filterCatSelect = document.getElementById('filterCategory');
+      if (!filterCatSelect) return;
+      const currentSelected = filterCatSelect.value;
+
+      filterCatSelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+      
+      let availableCats = new Set();
+      if (currentTypeFilter === 'all') {
+        (state.categories.expense || []).forEach(function(c) { availableCats.add(c); });
+        (state.categories.income || []).forEach(function(c) { availableCats.add(c); });
+      } else if (currentTypeFilter === 'expense') {
+        (state.categories.expense || []).forEach(function(c) { availableCats.add(c); });
+      } else if (currentTypeFilter === 'income') {
+        (state.categories.income || []).forEach(function(c) { availableCats.add(c); });
+      } else if (currentTypeFilter === 'transfer') {
+        availableCats.add('Inversion');
+      }
+
+      availableCats.forEach(function(c) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        filterCatSelect.appendChild(opt);
+      });
+
+      filterCatSelect.value = availableCats.has(currentSelected) ? currentSelected : 'all';
+    }
+
+    function addNewCategory(e) {
+      e.preventDefault();
+      const name = document.getElementById('newCatName').value.trim();
+      const type = document.getElementById('newCatType').value;
+
+      if (!name) return;
+
+      if (!state.categories) state.categories = { expense: [], income: [] };
+      if (!state.categories[type]) state.categories[type] = [];
+
+      if (!state.categories[type].includes(name)) {
+        state.categories[type].push(name);
+        document.getElementById('newCatName').value = '';
+        saveSnapshotAndSync();
+        populateCategoryDropdowns();
+        alert('¡Categoría "' + name + '" añadida correctamente!');
+      } else {
+        alert('Esta categoría ya existe.');
+      }
+    }
+
+    // ==================== NAVEGACIÓN Y CONFIGURACIÓN ====================
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.add('hidden');
@@ -773,9 +856,7 @@
           cache: 'no-store'
         });
 
-        if (!response.ok) {
-          throw new Error('Error HTTP: ' + response.status);
-        }
+        if (!response.ok) throw new Error('Error HTTP: ' + response.status);
 
         const data = await response.json();
         currentFileSha = data.sha;
@@ -785,9 +866,16 @@
 
         if (cloudState && cloudState.accounts) {
           state = cloudState;
-          if (state.btcUnits === undefined) state.btcUnits = 0;
-          if (state.btcPrice === undefined) state.btcPrice = 0;
-          localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+          if (!state.categories) {
+            state.categories = {
+              expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+              income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
+            };
+          }
+          if (!Array.isArray(state.monthlySnapshots)) {
+            state.monthlySnapshots = [];
+          }
+          localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
           const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
           setSyncStatus('☁️ Sincronizado (' + syncDate + ')', 'ok');
           return true;
@@ -827,7 +915,7 @@
         }
 
         state.lastCloudSync = new Date().toISOString();
-        localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+        localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
 
         const jsonString = JSON.stringify(state, null, 2);
         const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
@@ -837,9 +925,7 @@
           message: 'Actualización automática desde Finanzas App',
           content: base64Content
         };
-        if (currentFileSha) {
-          bodyData.sha = currentFileSha;
-        }
+        if (currentFileSha) bodyData.sha = currentFileSha;
 
         const putRes = await fetch(putUrl, {
           method: 'PUT',
@@ -851,10 +937,7 @@
           body: JSON.stringify(bodyData)
         });
 
-        if (!putRes.ok) {
-          const errText = await putRes.text();
-          throw new Error('Error al subir: ' + putRes.status + ' ' + errText);
-        }
+        if (!putRes.ok) throw new Error('Error al subir: ' + putRes.status);
 
         const putData = await putRes.json();
         currentFileSha = putData.content.sha;
@@ -872,7 +955,7 @@
     }
 
     async function init() {
-      const saved = localStorage.getItem('mi_patrimonio_data_v3');
+      const saved = localStorage.getItem('mi_patrimonio_data_v4') || localStorage.getItem('mi_patrimonio_data_v3');
       if (saved) {
         try {
           state = JSON.parse(saved);
@@ -880,8 +963,15 @@
             state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
             state.accounts.trade_republic_btc = 2500.00;
           }
-          if (state.btcUnits === undefined) state.btcUnits = 0;
-          if (state.btcPrice === undefined) state.btcPrice = 0;
+          if (!state.categories) {
+            state.categories = {
+              expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+              income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
+            };
+          }
+          if (!Array.isArray(state.monthlySnapshots)) {
+            state.monthlySnapshots = [];
+          }
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
@@ -889,6 +979,7 @@
 
       applyTheme();
       updateYearFilterOptions();
+      populateCategoryDropdowns();
       render();
       fillCompoundWith('invested');
 
@@ -896,18 +987,11 @@
         await syncFromGitHub();
         applyTheme();
         updateYearFilterOptions();
+        populateCategoryDropdowns();
         render();
         fillCompoundWith('invested');
       } else {
         setSyncStatus('⚠️ Configura Token', 'error');
-      }
-
-      const addedFromShortcut = processUrlShortcuts();
-      if (addedFromShortcut) {
-        updateYearFilterOptions();
-        render();
-        fillCompoundWith('invested');
-        await syncToGitHub(false);
       }
     }
 
@@ -931,7 +1015,7 @@
         state.theme = 'dark';
         document.getElementById('themeIcon').innerText = '☀️';
       }
-      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
       updateCharts();
       calculateCompound();
     }
@@ -953,63 +1037,8 @@
         destSelect.classList.add('hidden');
         labelCatDest.innerText = 'Categoría';
         labelAccount.innerText = 'Cuenta';
+        populateCategoryDropdowns();
       }
-    }
-
-    function processUrlShortcuts() {
-      const params = new URLSearchParams(window.location.search);
-      const autoType = params.get('auto_type');
-      const autoConcept = params.get('auto_concept');
-      const autoAmount = parseFloat(params.get('auto_amount'));
-      const autoAccount = params.get('auto_account');
-      const autoCategory = params.get('auto_category');
-      const autoDestination = params.get('auto_destination');
-
-      if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
-        if (state.accounts[autoAccount] !== undefined) {
-          if (autoType === 'expense') {
-            state.accounts[autoAccount] -= autoAmount;
-          } else if (autoType === 'income') {
-            state.accounts[autoAccount] += autoAmount;
-          } else if (autoType === 'transfer' && autoDestination && state.accounts[autoDestination] !== undefined) {
-            state.accounts[autoAccount] -= autoAmount;
-            state.accounts[autoDestination] += autoAmount;
-          }
-
-          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : (autoType === 'transfer' ? autoDestination : 'Otros'));
-
-          state.transactions.push({
-            id: Date.now(),
-            date: new Date().toISOString(),
-            type: autoType,
-            concept: decodeURIComponent(autoConcept),
-            amount: autoAmount,
-            category: finalCategory,
-            account: autoAccount,
-            destination: autoType === 'transfer' ? autoDestination : null
-          });
-
-          const now = new Date();
-          const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-          const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
-
-          if (!state.monthlySnapshots) state.monthlySnapshots = {};
-          state.monthlySnapshots[monthYearKey] = {
-            dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
-            bbva: state.accounts.bbva,
-            myinvestor: state.accounts.myinvestor,
-            trade_republic_liq: state.accounts.trade_republic_liq,
-            trade_republic_btc: state.accounts.trade_republic_btc,
-            total: total
-          };
-
-          localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
-          window.history.replaceState({}, document.title, window.location.pathname);
-          return true;
-        }
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-      return false;
     }
 
     function updateYearFilterOptions() {
@@ -1025,9 +1054,9 @@
         if (y >= 2026) yearsSet.add(y);
       });
 
-      if (state.monthlySnapshots) {
-        Object.keys(state.monthlySnapshots).forEach(function(k) {
-          const y = parseInt(k.split('-')[0]);
+      if (Array.isArray(state.monthlySnapshots)) {
+        state.monthlySnapshots.forEach(function(s) {
+          const y = new Date(s.date).getFullYear();
           if (y >= 2026) yearsSet.add(y);
         });
       }
@@ -1043,22 +1072,25 @@
       });
     }
 
-    function save() {
+    function saveSnapshotAndSync() {
       const now = new Date();
-      const monthYearKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
 
-      if (!state.monthlySnapshots) state.monthlySnapshots = {};
-      state.monthlySnapshots[monthYearKey] = {
-        dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+      if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+
+      // Añadimos snapshot cronológico independiente para no sobrescribir el mes
+      state.monthlySnapshots.push({
+        id: Date.now(),
+        date: now.toISOString(),
+        dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
         bbva: state.accounts.bbva,
         myinvestor: state.accounts.myinvestor,
         trade_republic_liq: state.accounts.trade_republic_liq,
         trade_republic_btc: state.accounts.trade_republic_btc,
         total: total
-      };
+      });
 
-      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
       updateYearFilterOptions();
       render();
       syncToGitHub(false);
@@ -1093,7 +1125,7 @@
 
     async function exportData() {
       state.lastExportDate = new Date().toISOString();
-      localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
+      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
       render();
 
       const dataString = JSON.stringify(state, null, 2);
@@ -1103,10 +1135,7 @@
         try {
           const options = {
             suggestedName: datedFileName,
-            types: [{
-              description: 'Archivos JSON',
-              accept: { 'application/json': ['.json'] },
-            }],
+            types: [{ description: 'Archivos JSON', accept: { 'application/json': ['.json'] } }],
           };
           const handle = await window.showSaveFilePicker(options);
           const writableStream = await handle.createWritable();
@@ -1182,31 +1211,19 @@
     }
 
     function updateAllTrends() {
-      if (!state.monthlySnapshots) return;
+      if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) return;
 
-      const keys = Object.keys(state.monthlySnapshots).sort().reverse();
-      const nowKey = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
-      
-      let prevSnap = null;
-      for (let i = 0; i < keys.length; i++) {
-        if (keys[i] !== nowKey) {
-          prevSnap = state.monthlySnapshots[keys[i]];
-          break;
-        }
-      }
+      const sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      const latest = sorted[0];
+      let prev = sorted.length > 1 ? sorted[1] : null;
 
-      function setTrendBadge(elementId, currentVal, prevVal, prevField) {
+      function setTrendBadge(elementId, currentVal, prevVal) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        let pVal = prevVal;
-        if (prevSnap && prevField) {
-          pVal = prevSnap[prevField];
-        }
-
-        if (pVal !== null && pVal !== undefined && pVal > 0) {
-          const diff = currentVal - pVal;
-          const pct = ((diff / pVal) * 100).toFixed(1);
+        if (prevVal !== null && prevVal !== undefined && prevVal > 0) {
+          const diff = currentVal - prevVal;
+          const pct = ((diff / prevVal) * 100).toFixed(1);
           const sign = diff >= 0 ? '+' : '';
           const color = diff >= 0 
             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
@@ -1216,17 +1233,17 @@
           el.innerText = sign + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € (' + sign + pct + '%)';
         } else {
           el.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500';
-          el.innerText = 'Primer mes';
+          el.innerText = 'Primer registro';
         }
       }
 
       const totalCurrent = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
 
-      setTrendBadge('trendTotal', totalCurrent, prevSnap ? prevSnap.total : null, 'total');
-      setTrendBadge('trendBbva', state.accounts.bbva, prevSnap ? prevSnap.bbva : null, 'bbva');
-      setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prevSnap ? prevSnap.myinvestor : null, 'myinvestor');
-      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prevSnap ? prevSnap.trade_republic_liq : null, 'trade_republic_liq');
-      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null, 'trade_republic_btc');
+      setTrendBadge('trendTotal', totalCurrent, prev ? prev.total : null);
+      setTrendBadge('trendBbva', state.accounts.bbva, prev ? prev.bbva : null);
+      setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prev ? prev.myinvestor : null);
+      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prev ? prev.trade_republic_liq : null);
+      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prev ? prev.trade_republic_btc : null);
     }
 
     function renderTransactions() {
@@ -1349,7 +1366,8 @@
           '<td class="p-3">' + detailText + '</td>' +
           '<td class="p-3 text-slate-600 dark:text-slate-300 text-xs">' + accountDisplay + '</td>' +
           '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
-          '<td class="p-3 text-center">' +
+          '<td class="p-3 text-center space-x-1">' +
+            '<button onclick="editTransaction(' + tx.id + ')" class="text-xs text-sky-500 hover:text-sky-700 font-medium px-2 py-1 bg-sky-50 dark:bg-sky-950/40 rounded">Editar</button>' +
             '<button onclick="deleteTransaction(' + tx.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>' +
           '</td>';
         tbody.appendChild(tr);
@@ -1367,6 +1385,7 @@
           btn.className = 'px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition';
         }
       });
+      updateFilterCategoryOptions();
       renderTransactions();
     }
 
@@ -1375,17 +1394,16 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      if (!state.monthlySnapshots || Object.keys(state.monthlySnapshots).length === 0) {
+      if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Se guardará al ajustar saldos.</td></tr>';
         return;
       }
 
-      const sortedKeys = Object.keys(state.monthlySnapshots).sort().reverse();
-      sortedKeys.forEach(function(key) {
-        const snap = state.monthlySnapshots[key];
+      const sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      sorted.forEach(function(snap) {
         const tr = document.createElement('tr');
         tr.innerHTML = 
-          '<td class="p-3 font-semibold text-slate-900 dark:text-white capitalize">' + (snap.dateLabel || key) + '</td>' +
+          '<td class="p-3 font-semibold text-slate-900 dark:text-white capitalize">' + (snap.dateLabel || snap.date) + '</td>' +
           '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.bbva||0).toLocaleString('es-ES') + ' €</td>' +
           '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.myinvestor||0).toLocaleString('es-ES') + ' €</td>' +
           '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.trade_republic_liq||0).toLocaleString('es-ES') + ' €</td>' +
@@ -1395,8 +1413,17 @@
       });
     }
 
-    function addTransaction(e) {
+    function handleTxSubmit(e) {
       e.preventDefault();
+      const editId = document.getElementById('editTxId').value;
+      if (editId) {
+        updateTransaction(parseInt(editId));
+      } else {
+        addTransaction(e);
+      }
+    }
+
+    function addTransaction(e) {
       const type = document.getElementById('txType').value;
       const concept = document.getElementById('txConcept').value;
       const amount = parseFloat(document.getElementById('txAmount').value);
@@ -1416,6 +1443,14 @@
       }
 
       if (!amount || amount <= 0) return;
+
+      // Validación de saldos negativos
+      if (type === 'expense' && state.accounts[account] < amount) {
+        if (!confirm('Atención: Esta cuenta se quedará con saldo negativo. ¿Deseas continuar?')) return;
+      }
+      if (type === 'transfer' && state.accounts[account] < amount) {
+        if (!confirm('Atención: La cuenta origen se quedará con saldo negativo tras el traspaso. ¿Deseas continuar?')) return;
+      }
 
       if (type === 'expense') {
         state.accounts[account] -= amount;
@@ -1437,13 +1472,110 @@
         destination: destination
       });
 
-      document.getElementById('txConcept').value = '';
-      document.getElementById('txAmount').value = '';
+      resetTxForm();
+      saveSnapshotAndSync();
+    }
 
-      save();
+    function editTransaction(id) {
+      const tx = state.transactions.find(function(t) { return t.id === id; });
+      if (!tx) return;
+
+      document.getElementById('editTxId').value = tx.id;
+      document.getElementById('txType').value = tx.type;
+      handleTypeChange();
+
+      document.getElementById('txConcept').value = tx.concept;
+      document.getElementById('txAmount').value = tx.amount;
+      document.getElementById('txAccount').value = tx.account;
+
+      if (tx.type === 'transfer') {
+        document.getElementById('txDestination').value = tx.destination;
+      } else {
+        document.getElementById('txCategory').value = tx.category;
+      }
+
+      document.getElementById('formTitle').innerText = 'Editar Movimiento';
+      document.getElementById('txSubmitBtn').innerText = 'Actualizar Movimiento';
+      document.getElementById('txCancelBtn').classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateTransaction(id) {
+      const idx = state.transactions.findIndex(function(t) { return t.id === id; });
+      if (idx === -1) return;
+
+      const oldTx = state.transactions[idx];
+
+      // Revertir efecto anterior
+      if (oldTx.type === 'expense') state.accounts[oldTx.account] += oldTx.amount;
+      else if (oldTx.type === 'income') state.accounts[oldTx.account] -= oldTx.amount;
+      else if (oldTx.type === 'transfer') {
+        state.accounts[oldTx.account] += oldTx.amount;
+        state.accounts[oldTx.destination] -= oldTx.amount;
+      }
+
+      const type = document.getElementById('txType').value;
+      const concept = document.getElementById('txConcept').value;
+      const amount = parseFloat(document.getElementById('txAmount').value);
+      const account = document.getElementById('txAccount').value;
+      
+      let category = null;
+      let destination = null;
+
+      if (type === 'transfer') {
+        destination = document.getElementById('txDestination').value;
+        if (account === destination) {
+          alert('La cuenta origen y destino no pueden ser la misma.');
+          // Restaurar efecto anterior si falla
+          if (oldTx.type === 'expense') state.accounts[oldTx.account] -= oldTx.amount;
+          else if (oldTx.type === 'income') state.accounts[oldTx.account] += oldTx.amount;
+          else if (oldTx.type === 'transfer') {
+            state.accounts[oldTx.account] -= oldTx.amount;
+            state.accounts[oldTx.destination] += oldTx.amount;
+          }
+          return;
+        }
+      } else {
+        category = document.getElementById('txCategory').value;
+      }
+
+      // Aplicar nuevo efecto
+      if (type === 'expense') state.accounts[account] -= amount;
+      else if (type === 'income') state.accounts[account] += amount;
+      else if (type === 'transfer') {
+        state.accounts[account] -= amount;
+        state.accounts[destination] += amount;
+      }
+
+      state.transactions[idx] = {
+        id: oldTx.id,
+        date: oldTx.date,
+        type: type,
+        concept: concept,
+        amount: amount,
+        category: category,
+        account: account,
+        destination: destination
+      };
+
+      resetTxForm();
+      saveSnapshotAndSync();
+      alert('¡Movimiento actualizado correctamente!');
+    }
+
+    function resetTxForm() {
+      document.getElementById('editTxId').value = '';
+      document.getElementById('txForm').reset();
+      document.getElementById('formTitle').innerText = 'Registrar Movimiento';
+      document.getElementById('txSubmitBtn').innerText = 'Guardar Movimiento';
+      document.getElementById('txCancelBtn').classList.add('hidden');
+      handleTypeChange();
     }
 
     function deleteTransaction(id) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este movimiento?')) return;
+
       const txIndex = state.transactions.findIndex(function(t) { return t.id === id; });
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
@@ -1456,7 +1588,7 @@
           state.accounts[tx.destination] -= tx.amount;
         }
         state.transactions.splice(txIndex, 1);
-        save();
+        saveSnapshotAndSync();
       }
     }
 
@@ -1485,7 +1617,7 @@
 
       if (!isNaN(val)) {
         state.accounts[acc] = val;
-        save();
+        saveSnapshotAndSync();
         alert('Has actualizado el saldo de la cuenta ' + accountDisplayName);
       }
     }
@@ -1497,7 +1629,15 @@
           const importedState = JSON.parse(e.target.result);
           if (importedState && importedState.accounts) {
             state = importedState;
-            save();
+            if (!state.categories) {
+              state.categories = {
+                expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+                income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
+              };
+            }
+            if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+            saveSnapshotAndSync();
+            populateCategoryDropdowns();
             alert('¡Copia de seguridad importada y sincronizada con la nube!');
           } else {
             alert('El archivo no contiene un formato válido.');
@@ -1743,20 +1883,20 @@
       let evolLabels = [];
       let evolData = [];
 
-      if (state.monthlySnapshots && Object.keys(state.monthlySnapshots).length > 0) {
-        let sortedKeys = Object.keys(state.monthlySnapshots).sort();
+      if (Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0) {
+        let sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
         
         const rangeVal = document.getElementById('timeRangeSelect').value;
         if (rangeVal !== 'all') {
           const limit = parseInt(rangeVal);
-          if (sortedKeys.length > limit) {
-            sortedKeys = sortedKeys.slice(sortedKeys.length - limit);
+          if (sorted.length > limit) {
+            sorted = sorted.slice(sorted.length - limit);
           }
         }
 
-        sortedKeys.forEach(function(k) {
-          evolLabels.push(state.monthlySnapshots[k].dateLabel || k);
-          evolData.push(state.monthlySnapshots[k].total);
+        sorted.forEach(function(s) {
+          evolLabels.push(s.dateLabel || s.date);
+          evolData.push(s.total);
         });
       } else {
         const now = new Date();
