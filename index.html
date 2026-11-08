@@ -536,7 +536,7 @@
             <button onclick="fillCompoundWith('invested')" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
               📥 Usar Solo Inversiones
             </button>
-            <button onclick="fillCompoundWith('total')" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 transition">
+            <button onclick="fillCompoundWith('total')" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-emerald-100 transition">
               📥 Usar Patrimonio Total
             </button>
           </div>
@@ -637,16 +637,16 @@
 
     let currentTypeFilter = 'all';
 
-    // ==================== ACTUALIZACIÓN PRECIO BITCOIN EN VIVO ====================
+    // ==================== ACTUALIZACIÓN PRECIO BITCOIN EN VIVO (COINBASE API) ====================
     async function fetchBtcPrice(isManual = false) {
       const btn = document.getElementById('btnRefreshBtc');
       if (btn) btn.innerText = '⏳';
 
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
-        if (!res.ok) throw new Error('Error API CoinGecko');
+        const res = await fetch('https://api.coinbase.com/v2/prices/BTC-EUR/spot');
+        if (!res.ok) throw new Error('Error API Coinbase');
         const data = await res.json();
-        const priceEur = data.bitcoin.eur;
+        const priceEur = parseFloat(data.data.amount);
 
         if (priceEur && priceEur > 0) {
           state.btcPrice = priceEur;
@@ -662,7 +662,7 @@
         }
       } catch (err) {
         console.error('Error al obtener precio de BTC:', err);
-        if (isManual) alert('No se pudo conectar con CoinGecko para obtener el precio de Bitcoin.');
+        if (isManual) alert('No se pudo conectar con el servidor de precios para obtener el Bitcoin.');
       } finally {
         if (btn) btn.innerText = '🔄';
       }
