@@ -355,12 +355,25 @@
       </section>
 
       <!-- Historial de Movimientos -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
           
-          <div class="flex flex-wrap gap-2 items-center">
-            <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
+          <!-- Botones de Tipo de Transacción (Todos / Gastos / Ingresos / Traspasos) -->
+          <div class="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+            <button onclick="filterType('all')" id="filterType-all" class="px-2.5 py-1 text-xs font-bold bg-indigo-600 text-white rounded-lg transition">Todos</button>
+            <button onclick="filterType('expense')" id="filterType-expense" class="px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">Gastos</button>
+            <button onclick="filterType('income')" id="filterType-income" class="px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">Ingresos</button>
+            <button onclick="filterType('transfer')" id="filterType-transfer" class="px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">Traspasos</button>
+          </div>
+        </div>
+
+        <!-- Filtros Avanzados Optimizados para Móvil -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
+          <!-- Filtro Mes -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mes</label>
+            <select id="filterMonth" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
               <option value="all">Todos los Meses</option>
               <option value="0">Enero</option>
               <option value="1">Febrero</option>
@@ -375,17 +388,50 @@
               <option value="10">Noviembre</option>
               <option value="11">Diciembre</option>
             </select>
+          </div>
 
-            <select id="filterYear" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
+          <!-- Filtro Año -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Año</label>
+            <select id="filterYear" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
               <option value="all">Todos los Años</option>
             </select>
+          </div>
 
-            <div class="flex gap-1 border-l border-slate-200 dark:border-slate-700 pl-2">
-              <button onclick="filterType('all')" class="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200">Todos</button>
-              <button onclick="filterType('expense')" class="px-2 py-1 text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-100">Gastos</button>
-              <button onclick="filterType('income')" class="px-2 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded hover:bg-emerald-100">Ingresos</button>
-              <button onclick="filterType('transfer')" class="px-2 py-1 text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 rounded hover:bg-sky-100">Traspasos</button>
-            </div>
+          <!-- Filtro Categoría -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Categoría</label>
+            <select id="filterCategory" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+              <option value="all">Todas las Categorías</option>
+              <option value="Supermercado">Supermercado</option>
+              <option value="Nomina">Nómina / Ingreso</option>
+              <option value="Bizum">Bizum</option>
+              <option value="Paga extra">Paga extra</option>
+              <option value="Ocio">Ocio / Restauración</option>
+              <option value="Inversion">Inversión / Ahorro</option>
+              <option value="Vivienda">Vivienda / Recibos</option>
+              <option value="Transporte">Transporte / Gasolina</option>
+              <option value="Suscripciones">Suscripciones</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <!-- Filtro Cuenta -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Cuenta</label>
+            <select id="filterAccount" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+              <option value="all">Todas las Cuentas</option>
+              <option value="bbva">BBVA</option>
+              <option value="myinvestor">MyInvestor</option>
+              <option value="trade_republic_liq">Trade Republic</option>
+              <option value="trade_republic_btc">Bitcoin</option>
+            </select>
+          </div>
+
+          <!-- Buscador por Concepto (Ocupa dos columnas en móvil para mayor comodidad) -->
+          <div class="col-span-2 sm:col-span-2 lg:col-span-4">
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Buscar por concepto</label>
+            <input type="text" id="filterConcept" oninput="renderTransactions()" placeholder="Escribe para buscar concepto..." class="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
         </div>
 
@@ -536,7 +582,7 @@
             <button onclick="fillCompoundWith('invested')" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
               📥 Usar Solo Inversiones
             </button>
-            <button onclick="fillCompoundWith('total')" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-emerald-100 transition">
+            <button onclick="fillCompoundWith('total')" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 transition">
               📥 Usar Patrimonio Total
             </button>
           </div>
@@ -1149,13 +1195,18 @@
         }
       }
 
-      function setTrendBadge(elementId, currentVal, prevVal) {
+      function setTrendBadge(elementId, currentVal, prevVal, prevField) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        if (prevVal !== null && prevVal !== undefined && prevVal > 0) {
-          const diff = currentVal - prevVal;
-          const pct = ((diff / prevVal) * 100).toFixed(1);
+        let pVal = prevVal;
+        if (prevSnap && prevField) {
+          pVal = prevSnap[prevField];
+        }
+
+        if (pVal !== null && pVal !== undefined && pVal > 0) {
+          const diff = currentVal - pVal;
+          const pct = ((diff / pVal) * 100).toFixed(1);
           const sign = diff >= 0 ? '+' : '';
           const color = diff >= 0 
             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
@@ -1171,11 +1222,11 @@
 
       const totalCurrent = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
 
-      setTrendBadge('trendTotal', totalCurrent, prevSnap ? prevSnap.total : null);
-      setTrendBadge('trendBbva', state.accounts.bbva, prevSnap ? prevSnap.bbva : null);
-      setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prevSnap ? prevSnap.myinvestor : null);
-      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prevSnap ? prevSnap.trade_republic_liq : null);
-      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null);
+      setTrendBadge('trendTotal', totalCurrent, prevSnap ? prevSnap.total : null, 'total');
+      setTrendBadge('trendBbva', state.accounts.bbva, prevSnap ? prevSnap.bbva : null, 'bbva');
+      setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prevSnap ? prevSnap.myinvestor : null, 'myinvestor');
+      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prevSnap ? prevSnap.trade_republic_liq : null, 'trade_republic_liq');
+      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null, 'trade_republic_btc');
     }
 
     function renderTransactions() {
@@ -1185,6 +1236,9 @@
 
       const monthVal = document.getElementById('filterMonth').value;
       const yearVal = document.getElementById('filterYear').value;
+      const catVal = document.getElementById('filterCategory').value;
+      const accVal = document.getElementById('filterAccount').value;
+      const conceptSearch = document.getElementById('filterConcept').value.toLowerCase().trim();
 
       let list = state.transactions;
 
@@ -1196,7 +1250,12 @@
         const d = new Date(t.date);
         const matchMonth = (monthVal === 'all') || (d.getMonth() === parseInt(monthVal));
         const matchYear = (yearVal === 'all') || (d.getFullYear() === parseInt(yearVal));
-        return matchMonth && matchYear;
+        
+        const matchCategory = (catVal === 'all') || (t.category === catVal) || (t.type === 'transfer' && catVal === 'Inversion');
+        const matchAccount = (accVal === 'all') || (t.account === accVal) || (t.destination === accVal);
+        const matchConcept = (!conceptSearch) || (t.concept && t.concept.toLowerCase().includes(conceptSearch));
+
+        return matchMonth && matchYear && matchCategory && matchAccount && matchConcept;
       });
 
       let pInc = 0;
@@ -1299,6 +1358,15 @@
 
     function filterType(type) {
       currentTypeFilter = type;
+      ['all', 'expense', 'income', 'transfer'].forEach(function(t) {
+        const btn = document.getElementById('filterType-' + t);
+        if (!btn) return;
+        if (t === type) {
+          btn.className = 'px-2.5 py-1 text-xs font-bold bg-indigo-600 text-white rounded-lg transition';
+        } else {
+          btn.className = 'px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition';
+        }
+      });
       renderTransactions();
     }
 
