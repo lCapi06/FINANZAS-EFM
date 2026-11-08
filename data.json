@@ -5,7 +5,7 @@
     "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
-    "trade_republic_btc": 2500
+    "trade_republic_btc": 729.990336
   },
   "transactions": [],
   "monthlySnapshots": {
@@ -14,9 +14,11 @@
       "bbva": 3500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
-      "trade_republic_btc": 2500,
-      "total": 30200
+      "trade_republic_btc": 729.990336,
+      "total": 28429.990336
     }
   },
-  "lastCloudSync": "2026-11-08T20:05:38.747Z"
+  "lastCloudSync": "2026-11-08T20:59:05.170Z",
+  "btcUnits": 0.010744,
+  "btcPrice": 67944
 }
