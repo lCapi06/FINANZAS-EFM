@@ -50,6 +50,9 @@
       
       <!-- Botones de Acción Ultra Compactos para Móvil -->
       <div class="flex items-center gap-1 shrink-0">
+        <button onclick="refreshFinancials()" class="p-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 transition" title="Refrescar Datos y Porcentajes">
+          🔄
+        </button>
         <button onclick="toggleTheme()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
         </button>
@@ -290,7 +293,7 @@
     <!-- ==================== PESTAÑA 3: MOVIMIENTOS ==================== -->
     <div id="tab-movimientos" class="tab-content hidden space-y-6">
 
-      <!-- Quick Action: Movimientos y Gestión de Categorías -->
+      <!-- Quick Action: Movimientos y Gestión de Categorías Visual -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Registrar Movimiento -->
         <section class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -351,32 +354,38 @@
           </form>
         </section>
 
-        <!-- Crear Nueva Categoría -->
-        <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+        <!-- Crear y Ordenar Categorías (Más Visual) -->
+        <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between space-y-4">
           <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Crear Categoría</h3>
-            <p class="text-xs text-slate-500 mb-4">Añade etiquetas personalizadas para tus gastos o ingresos.</p>
-            <form onsubmit="addNewCategory(event)" class="space-y-4">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Gestión de Categorías</h3>
+            <p class="text-xs text-slate-500 mb-3">Añade o reordena tus etiquetas visualmente.</p>
+            <form onsubmit="addNewCategory(event)" class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Nombre de la Categoría</label>
-                <input type="text" id="newCatName" placeholder="Ej: Viajes, Regalos..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="newCatName" placeholder="Nombre nueva categoría..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
-              <div>
-                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo de Categoría</label>
-                <select id="newCatType" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none">
+              <div class="flex gap-2">
+                <select id="newCatType" class="flex-1 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none">
                   <option value="expense">➖ Gasto</option>
                   <option value="income">➕ Ingreso</option>
                 </select>
+                <button type="submit" class="px-4 py-1.5 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                  Añadir
+                </button>
               </div>
-              <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-semibold text-sm rounded-lg hover:bg-emerald-700 transition shadow-sm">
-                Añadir Categoría
-              </button>
             </form>
+          </div>
+
+          <!-- Listado Visual y Ordenable -->
+          <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+            <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Orden y Listado</h4>
+            <div id="categoryManagerList" class="space-y-2 max-h-44 overflow-y-auto pr-1 no-scrollbar">
+              <!-- Se rellena dinámicamente -->
+            </div>
           </div>
         </section>
       </div>
 
-      <!-- Historial de Movimientos -->
+      <!-- Historial de Movimientos (Con Scroll Vertical de aprox 5 filas) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
@@ -447,16 +456,17 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Contenedor con altura máxima equivalente a ~5 registros y scroll vertical -->
+        <div class="max-h-[320px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl relative">
           <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs sticky top-0 z-10 shadow-sm">
               <tr>
-                <th class="p-3">Fecha</th>
-                <th class="p-3">Concepto</th>
-                <th class="p-3">Detalle / Categoría</th>
-                <th class="p-3">Cuenta (Origen / Ruta)</th>
-                <th class="p-3 text-right">Importe</th>
-                <th class="p-3 text-center">Acciones</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Fecha</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Concepto</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Detalle / Categoría</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Cuenta (Origen / Ruta)</th>
+                <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">Importe</th>
+                <th class="p-3 text-center bg-slate-50 dark:bg-slate-800">Acciones</th>
               </tr>
             </thead>
             <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -492,20 +502,20 @@
         </div>
       </section>
 
-      <!-- Historial de Saldos -->
+      <!-- Historial de Saldos (Con Scroll Vertical de aprox 5 filas) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos (Instantáneas)</h3>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Historial de Saldos (Instantáneas)</h3>
         <p class="text-xs text-slate-500 mb-4">Registro cronológico guardado cada vez que actualizas tus cuentas.</p>
-        <div class="overflow-x-auto">
+        <div class="max-h-[320px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl relative">
           <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs sticky top-0 z-10 shadow-sm">
               <tr>
-                <th class="p-3">Fecha y Hora</th>
-                <th class="p-3">BBVA</th>
-                <th class="p-3">MyInvestor</th>
-                <th class="p-3">Trade Republic</th>
-                <th class="p-3">Bitcoin</th>
-                <th class="p-3 text-right">Patrimonio Total</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Fecha y Hora</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">BBVA</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">MyInvestor</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Trade Republic</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Bitcoin</th>
+                <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">Patrimonio Total</th>
               </tr>
             </thead>
             <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -692,7 +702,7 @@
         income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
       },
       transactions: [],
-      monthlySnapshots: [], // Array de snapshots históricos para no sobrescribir
+      monthlySnapshots: [],
       lastExportDate: null,
       lastCloudSync: null
     };
@@ -730,7 +740,7 @@
       }
     }
 
-    // ==================== GESTIÓN DE CATEGORÍAS ====================
+    // ==================== GESTIÓN VISUAL Y ORDENABLE DE CATEGORÍAS ====================
     function populateCategoryDropdowns() {
       const txType = document.getElementById('txType').value;
       const txCatSelect = document.getElementById('txCategory');
@@ -745,6 +755,7 @@
       });
 
       updateFilterCategoryOptions();
+      renderCategoryManagerList();
     }
 
     function updateFilterCategoryOptions() {
@@ -776,6 +787,80 @@
       filterCatSelect.value = availableCats.has(currentSelected) ? currentSelected : 'all';
     }
 
+    function renderCategoryManagerList() {
+      const container = document.getElementById('categoryManagerList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      function buildSection(type, title, badgeColor) {
+        const list = state.categories[type] || [];
+        if (list.length === 0) return;
+
+        const header = document.createElement('div');
+        header.className = 'text-[11px] font-bold text-slate-400 mt-2 mb-1 uppercase';
+        header.textContent = title;
+        container.appendChild(header);
+
+        list.forEach(function(cat, idx) {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs';
+
+          const span = document.createElement('span');
+          span.className = 'font-medium text-slate-800 dark:text-slate-200 truncate pr-2';
+          span.textContent = cat;
+
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'flex items-center gap-1 shrink-0';
+
+          // Botón Subir
+          const btnUp = document.createElement('button');
+          btnUp.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
+          btnUp.textContent = '▲';
+          btnUp.title = 'Subir';
+          btnUp.onclick = function() { moveCategory(type, idx, -1); };
+          if (idx === 0) btnUp.disabled = true;
+
+          // Botón Bajar
+          const btnDown = document.createElement('button');
+          btnDown.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
+          btnDown.textContent = '▼';
+          btnDown.title = 'Bajar';
+          btnDown.onclick = function() { moveCategory(type, idx, 1); };
+          if (idx === list.length - 1) btnDown.disabled = true;
+
+          // Botón Borrar
+          const btnDel = document.createElement('button');
+          btnDel.className = 'p-1 bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-600 hover:text-white transition text-[10px]';
+          btnDel.textContent = '✕';
+          btnDel.title = 'Eliminar categoría';
+          btnDel.onclick = function() { deleteCategory(type, idx); };
+
+          btnGroup.appendChild(btnUp);
+          btnGroup.appendChild(btnDown);
+          btnGroup.appendChild(btnDel);
+
+          row.appendChild(span);
+          row.appendChild(btnGroup);
+          container.appendChild(row);
+        });
+      }
+
+      buildSection('expense', 'Gastos', 'rose');
+      buildSection('income', 'Ingresos', 'emerald');
+    }
+
+    function moveCategory(type, index, direction) {
+      const list = state.categories[type];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= list.length) return;
+
+      const item = list.splice(index, 1)[0];
+      list.splice(targetIndex, 0, item);
+
+      saveSnapshotAndSync();
+      populateCategoryDropdowns();
+    }
+
     function addNewCategory(e) {
       e.preventDefault();
       const name = document.getElementById('newCatName').value.trim();
@@ -795,6 +880,15 @@
       } else {
         alert('Esta categoría ya existe.');
       }
+    }
+
+    function deleteCategory(type, index) {
+      const catName = state.categories[type][index];
+      if (!confirm('¿Eliminar la categoría "' + catName + '"?')) return;
+
+      state.categories[type].splice(index, 1);
+      saveSnapshotAndSync();
+      populateCategoryDropdowns();
     }
 
     // ==================== NAVEGACIÓN Y CONFIGURACIÓN ====================
@@ -1144,7 +1238,6 @@
 
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
 
-      // Añadimos snapshot cronológico independiente para no sobrescribir el mes
       state.monthlySnapshots.push({
         id: Date.now(),
         date: now.toISOString(),
@@ -1160,6 +1253,11 @@
       updateYearFilterOptions();
       render();
       syncToGitHub(false);
+    }
+
+    function refreshFinancials() {
+      render();
+      alert('¡Datos, porcentajes y tendencias actualizados correctamente!');
     }
 
     async function shareOrDownloadFile(dataString, fileName) {
@@ -1280,7 +1378,6 @@
       if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) return;
 
       const sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-      const latest = sorted[0];
       let prev = sorted.length > 1 ? sorted[1] : null;
 
       function setTrendBadge(elementId, currentVal, prevVal) {
@@ -1402,40 +1499,71 @@
           return accKey || 'BBVA';
         }
 
-        let accountDisplay = '';
         let amountColor = 'text-slate-700 dark:text-slate-200 font-semibold';
         let prefix = '';
-        let detailText = '';
 
         if (tx.type === 'income') {
           amountColor = 'text-emerald-600 dark:text-emerald-400 font-bold';
           prefix = '+';
-          accountDisplay = getAccountName(tx.account);
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
         } else if (tx.type === 'expense') {
           amountColor = 'text-rose-600 dark:text-rose-400 font-semibold';
           prefix = '-';
-          accountDisplay = getAccountName(tx.account);
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">' + (tx.category || 'Otros') + '</span>';
         } else if (tx.type === 'transfer') {
           amountColor = 'text-sky-600 dark:text-sky-400 font-bold';
           prefix = '🔄 ';
-          const originName = getAccountName(tx.account);
-          const destName = getAccountName(tx.destination);
-          accountDisplay = '<span class="font-semibold text-slate-800 dark:text-slate-200">' + originName + '</span> <span class="text-indigo-500 font-bold">➔</span> <span class="font-semibold text-slate-800 dark:text-slate-200">' + destName + '</span>';
-          detailText = '<span class="px-2 py-0.5 text-xs rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300">Traspaso</span>';
         }
 
-        tr.innerHTML = 
-          '<td class="p-3 text-slate-500 dark:text-slate-400 text-xs">' + dateStr + '</td>' +
-          '<td class="p-3 font-medium text-slate-900 dark:text-white">' + tx.concept + '</td>' +
-          '<td class="p-3">' + detailText + '</td>' +
-          '<td class="p-3 text-slate-600 dark:text-slate-300 text-xs">' + accountDisplay + '</td>' +
-          '<td class="p-3 text-right ' + amountColor + '">' + prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
-          '<td class="p-3 text-center space-x-1">' +
-            '<button onclick="editTransaction(' + tx.id + ')" class="text-xs text-sky-500 hover:text-sky-700 font-medium px-2 py-1 bg-sky-50 dark:bg-sky-950/40 rounded">Editar</button>' +
-            '<button onclick="deleteTransaction(' + tx.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button>' +
-          '</td>';
+        // Construcción segura con textContent para evitar XSS
+        const tdDate = document.createElement('td');
+        tdDate.className = 'p-3 text-slate-500 dark:text-slate-400 text-xs';
+        tdDate.textContent = dateStr;
+
+        const tdConcept = document.createElement('td');
+        tdConcept.className = 'p-3 font-medium text-slate-900 dark:text-white';
+        tdConcept.textContent = tx.concept;
+
+        const tdDetail = document.createElement('td');
+        tdDetail.className = 'p-3';
+        const badge = document.createElement('span');
+        badge.className = 'px-2 py-0.5 text-xs rounded-full ' + (tx.type === 'transfer' ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300');
+        badge.textContent = tx.type === 'transfer' ? 'Traspaso' : (tx.category || 'Otros');
+        tdDetail.appendChild(badge);
+
+        const tdAccount = document.createElement('td');
+        tdAccount.className = 'p-3 text-slate-600 dark:text-slate-300 text-xs';
+        if (tx.type === 'transfer') {
+          tdAccount.textContent = getAccountName(tx.account) + ' ➔ ' + getAccountName(tx.destination);
+        } else {
+          tdAccount.textContent = getAccountName(tx.account);
+        }
+
+        const tdAmount = document.createElement('td');
+        tdAmount.className = 'p-3 text-right ' + amountColor;
+        tdAmount.textContent = prefix + tx.amount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+        const tdActions = document.createElement('td');
+        tdActions.className = 'p-3 text-center space-x-1';
+        
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'text-xs text-sky-500 hover:text-sky-700 font-medium px-2 py-1 bg-sky-50 dark:bg-sky-950/40 rounded';
+        btnEdit.textContent = 'Editar';
+        btnEdit.onclick = function() { editTransaction(tx.id); };
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded';
+        btnDel.textContent = 'Eliminar';
+        btnDel.onclick = function() { deleteTransaction(tx.id); };
+
+        tdActions.appendChild(btnEdit);
+        tdActions.appendChild(btnDel);
+
+        tr.appendChild(tdDate);
+        tr.appendChild(tdConcept);
+        tr.appendChild(tdDetail);
+        tr.appendChild(tdAccount);
+        tr.appendChild(tdAmount);
+        tr.appendChild(tdActions);
+
         tbody.appendChild(tr);
       });
     }
@@ -1510,7 +1638,6 @@
 
       if (!amount || amount <= 0) return;
 
-      // Validación de saldos negativos
       if (type === 'expense' && state.accounts[account] < amount) {
         if (!confirm('Atención: Esta cuenta se quedará con saldo negativo. ¿Deseas continuar?')) return;
       }
@@ -1540,6 +1667,7 @@
 
       resetTxForm();
       saveSnapshotAndSync();
+      refreshFinancials();
     }
 
     function editTransaction(id) {
@@ -1573,7 +1701,6 @@
 
       const oldTx = state.transactions[idx];
 
-      // Revertir efecto anterior
       if (oldTx.type === 'expense') state.accounts[oldTx.account] += oldTx.amount;
       else if (oldTx.type === 'income') state.accounts[oldTx.account] -= oldTx.amount;
       else if (oldTx.type === 'transfer') {
@@ -1593,7 +1720,6 @@
         destination = document.getElementById('txDestination').value;
         if (account === destination) {
           alert('La cuenta origen y destino no pueden ser la misma.');
-          // Restaurar efecto anterior si falla
           if (oldTx.type === 'expense') state.accounts[oldTx.account] -= oldTx.amount;
           else if (oldTx.type === 'income') state.accounts[oldTx.account] += oldTx.amount;
           else if (oldTx.type === 'transfer') {
@@ -1606,7 +1732,6 @@
         category = document.getElementById('txCategory').value;
       }
 
-      // Aplicar nuevo efecto
       if (type === 'expense') state.accounts[account] -= amount;
       else if (type === 'income') state.accounts[account] += amount;
       else if (type === 'transfer') {
@@ -1627,6 +1752,7 @@
 
       resetTxForm();
       saveSnapshotAndSync();
+      refreshFinancials();
       alert('¡Movimiento actualizado correctamente!');
     }
 
@@ -1655,6 +1781,7 @@
         }
         state.transactions.splice(txIndex, 1);
         saveSnapshotAndSync();
+        refreshFinancials();
       }
     }
 
@@ -1676,6 +1803,7 @@
         if (!isNaN(val) && val >= 0) {
           state.btcUnits = val;
           fetchBtcPrice(false);
+          refreshFinancials();
           alert('Has actualizado la cantidad de bitcoin y el precio');
           return;
         }
@@ -1684,6 +1812,7 @@
       if (!isNaN(val)) {
         state.accounts[acc] = val;
         saveSnapshotAndSync();
+        refreshFinancials();
         alert('Has actualizado el saldo de la cuenta ' + accountDisplayName);
       }
     }
@@ -1704,6 +1833,7 @@
             if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
             saveSnapshotAndSync();
             populateCategoryDropdowns();
+            refreshFinancials();
             alert('¡Copia de seguridad importada y sincronizada con la nube!');
           } else {
             alert('El archivo no contiene un formato válido.');
