@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 5500,
+    "bbva": 5450,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
@@ -17,17 +17,27 @@
       "category": "Nómina",
       "account": "bbva",
       "destination": null
+    },
+    {
+      "id": 1794168266559,
+      "date": "2026-11-08T20:04:26.559Z",
+      "type": "expense",
+      "concept": "Gasolina",
+      "amount": 50,
+      "category": "Transporte",
+      "account": "bbva",
+      "destination": null
     }
   ],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 5500,
+      "bbva": 5450,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 32200
+      "total": 32150
     }
   },
-  "lastCloudSync": "2026-11-08T20:03:43.899Z"
+  "lastCloudSync": "2026-11-08T20:04:26.569Z"
 }
