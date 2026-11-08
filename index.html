@@ -954,6 +954,63 @@
       }
     }
 
+    function processUrlShortcuts() {
+      const params = new URLSearchParams(window.location.search);
+      const autoType = params.get('auto_type');
+      const autoConcept = params.get('auto_concept');
+      const autoAmount = parseFloat(params.get('auto_amount'));
+      const autoAccount = params.get('auto_account');
+      const autoCategory = params.get('auto_category');
+      const autoDestination = params.get('auto_destination');
+
+      if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
+        if (state.accounts[autoAccount] !== undefined) {
+          if (autoType === 'expense') {
+            state.accounts[autoAccount] -= autoAmount;
+          } else if (autoType === 'income') {
+            state.accounts[autoAccount] += autoAmount;
+          } else if (autoType === 'transfer' && autoDestination && state.accounts[autoDestination] !== undefined) {
+            state.accounts[autoAccount] -= autoAmount;
+            state.accounts[autoDestination] += autoAmount;
+          }
+
+          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : (autoType === 'transfer' ? autoDestination : 'Otros'));
+
+          state.transactions.push({
+            id: Date.now(),
+            date: new Date().toISOString(),
+            type: autoType,
+            concept: decodeURIComponent(autoConcept),
+            amount: autoAmount,
+            category: finalCategory,
+            account: autoAccount,
+            destination: autoType === 'transfer' ? autoDestination : null
+          });
+
+          const now = new Date();
+          const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+
+          if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+          state.monthlySnapshots.push({
+            id: Date.now(),
+            date: now.toISOString(),
+            dateLabel: now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            bbva: state.accounts.bbva,
+            myinvestor: state.accounts.myinvestor,
+            trade_republic_liq: state.accounts.trade_republic_liq,
+            trade_republic_btc: state.accounts.trade_republic_btc,
+            total: total
+          });
+
+          localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return true;
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      return false;
+    }
+
     async function init() {
       const saved = localStorage.getItem('mi_patrimonio_data_v4') || localStorage.getItem('mi_patrimonio_data_v3');
       if (saved) {
@@ -992,6 +1049,15 @@
         fillCompoundWith('invested');
       } else {
         setSyncStatus('⚠️ Configura Token', 'error');
+      }
+
+      const addedFromShortcut = processUrlShortcuts();
+      if (addedFromShortcut) {
+        updateYearFilterOptions();
+        populateCategoryDropdowns();
+        render();
+        fillCompoundWith('invested');
+        await syncToGitHub(false);
       }
     }
 
