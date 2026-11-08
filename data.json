@@ -5,7 +5,7 @@
     "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
-    "trade_republic_btc": 717.0075012799999
+    "trade_republic_btc": 717.2299020800001
   },
   "transactions": [],
   "monthlySnapshots": [
@@ -48,11 +48,21 @@
       "trade_republic_liq": 6000,
       "trade_republic_btc": 717.0075012799999,
       "total": 28417.00750128
+    },
+    {
+      "id": 1794178678605,
+      "date": "2026-11-08T22:57:58.605Z",
+      "dateLabel": "nov 2026, 23:57",
+      "bbva": 3500,
+      "myinvestor": 18200,
+      "trade_republic_liq": 6000,
+      "trade_republic_btc": 717.2299020800001,
+      "total": 28417.22990208
     }
   ],
-  "lastCloudSync": "2026-11-08T22:57:54.968Z",
+  "lastCloudSync": "2026-11-08T22:57:58.647Z",
   "btcUnits": 0.010744,
-  "btcPrice": 66735.62,
+  "btcPrice": 66756.32,
   "categories": {
     "expense": [
       "Supermercado",
