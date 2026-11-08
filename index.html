@@ -39,391 +39,558 @@
 
   <!-- Header / Nav -->
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
       <div class="flex items-center gap-3">
         <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
         <div>
-          <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
+          <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="syncStatusText">Sincronizando...</p>
         </div>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
-        <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
-          <span id="themeIcon">☀️</span> <span id="themeText">Modo Claro</span>
+        <button onclick="toggleTheme()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+          <span id="themeIcon">☀️</span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
         </button>
-        <button onclick="promptToken()" class="px-3 py-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition" title="Configurar Token">
+        <button onclick="promptToken()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition" title="Configurar Token">
           ⚙️ Token
         </button>
-        <button onclick="syncToGitHub(true)" id="btnSaveCloud" class="px-3 py-2 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
-          ☁️ Guardar datos
+        <button onclick="syncToGitHub(true)" id="btnSaveCloud" class="px-2.5 py-1.5 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
+          ☁️ Guardar
         </button>
-        <button onclick="exportData()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
+        <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
           💾 Exportar
         </button>
-        <label for="importFile" class="px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
+        <label for="importFile" class="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
           📂 Importar
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
       </div>
     </div>
+
+    <!-- Barra de Pestañas -->
+    <div class="max-w-7xl mx-auto px-4 border-t border-slate-100 dark:border-slate-800/80">
+      <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 no-scrollbar" aria-label="Tabs">
+        <button onclick="switchTab('panel')" id="tab-btn-panel" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition whitespace-nowrap bg-indigo-600 text-white shadow-sm">
+          🏠 Panel
+        </button>
+        <button onclick="switchTab('resumen')" id="tab-btn-resumen" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          📊 Resumen
+        </button>
+        <button onclick="switchTab('movimientos')" id="tab-btn-movimientos" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          💸 Movimientos
+        </button>
+        <button onclick="switchTab('herramientas')" id="tab-btn-herramientas" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          🔥 FIRE / Futuro
+        </button>
+      </nav>
+    </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+  <main class="max-w-7xl mx-auto px-4 py-8">
 
-    <!-- Liquidez vs Inversión & Meta -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- ==================== PESTAÑA 1: PANEL ==================== -->
+    <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Meta de Ahorro -->
-      <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <div>
-            <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Objetivo Financiero</span>
-            <h2 class="text-2xl font-bold mt-2">Meta de Patrimonio</h2>
-          </div>
-          <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
-            <label class="text-xs text-slate-300 pl-2">Objetivo (€):</label>
-            <input type="number" id="goalInput" class="w-28 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-right text-white font-semibold focus:outline-none focus:border-indigo-500" value="40000" onchange="updateGoal(this.value)">
-          </div>
-        </div>
+      <!-- Liquidez vs Inversión & Meta -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <div class="space-y-2">
-          <div class="flex justify-between text-xs text-slate-300 font-medium">
-            <span id="goalCurrentText">Actual: 0 €</span>
-            <span id="goalProgressPercent" class="font-bold text-indigo-300">0% alcanzado</span>
-            <span id="goalTargetText">Meta: 40.000 €</span>
-          </div>
-          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
-            <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Liquidez vs Inversiones -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center space-y-4 transition-colors">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Distribución Patrimonial</h3>
-        <div class="space-y-4">
-          <div>
-            <div class="flex justify-between text-xs font-semibold mb-1">
-              <span class="text-sky-600 dark:text-sky-400">💧 Liquidez / Remunerada</span>
-              <span id="liquidAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
+        <!-- Meta de Ahorro -->
+        <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div>
+              <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Objetivo Financiero</span>
+              <h2 class="text-2xl font-bold mt-2">Meta de Patrimonio</h2>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div id="liquidBar" class="bg-sky-500 h-full transition-all duration-500" style="width: 0%"></div>
+            <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
+              <label class="text-xs text-slate-300 pl-2">Objetivo (€):</label>
+              <input type="number" id="goalInput" class="w-28 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-right text-white font-semibold focus:outline-none focus:border-indigo-500" value="40000" onchange="updateGoal(this.value)">
             </div>
           </div>
-          <div>
-            <div class="flex justify-between text-xs font-semibold mb-1">
-              <span class="text-emerald-600 dark:text-emerald-400">📈 Inversiones (Fondos + BTC)</span>
-              <span id="investedAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
+          
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs text-slate-300 font-medium">
+              <span id="goalCurrentText">Actual: 0 €</span>
+              <span id="goalProgressPercent" class="font-bold text-indigo-300">0% alcanzado</span>
+              <span id="goalTargetText">Meta: 40.000 €</span>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div id="investedBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+              <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
         </div>
-      </div>
 
-    </section>
+        <!-- Liquidez vs Inversiones -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center space-y-4 transition-colors">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Distribución Patrimonial</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-sky-600 dark:text-sky-400">💧 Liquidez / Remunerada</span>
+                <span id="liquidAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div id="liquidBar" class="bg-sky-500 h-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-emerald-600 dark:text-emerald-400">📈 Inversiones (Fondos + BTC)</span>
+                <span id="investedAmount" class="text-slate-900 dark:text-white">0 € (0%)</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div id="investedBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Summary Cards -->
-    <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      </section>
+
+      <!-- Summary Cards -->
+      <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        
+        <!-- Patrimonio Total -->
+        <div class="mobile-card-full bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between transition-colors">
+          <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
+          <div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
+            <h2 id="totalBalance" class="card-title-mobile text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
+          </div>
+          <div class="mt-3">
+            <span id="trendTotal" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes ant.</span>
+          </div>
+        </div>
+
+        <!-- BBVA -->
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
+          <div>
+            <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
+            <h3 id="bbvaBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Efectivo / Día a día</p>
+          </div>
+          <div class="mt-3">
+            <span id="trendBbva" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+          </div>
+        </div>
+
+        <!-- MyInvestor -->
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
+          <div>
+            <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
+            <h3 id="myinvestorBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Fondos indexados</p>
+          </div>
+          <div class="mt-3">
+            <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+          </div>
+        </div>
+
+        <!-- Trade Republic -->
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
+          <div>
+            <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic</p>
+            <h3 id="trLiquidityBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Cuenta remunerada</p>
+          </div>
+          <div class="mt-3">
+            <span id="trendTrLiq" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+          </div>
+        </div>
+
+        <!-- Bitcoin -->
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
+          <div>
+            <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
+            <h3 id="trBtcBalance" class="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Criptomoneda BTC</p>
+          </div>
+          <div class="mt-3">
+            <span id="trendTrBtc" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- ==================== PESTAÑA 2: RESUMEN ==================== -->
+    <div id="tab-resumen" class="tab-content hidden space-y-6">
       
-      <!-- Patrimonio Total -->
-      <div class="mobile-card-full bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between transition-colors">
-        <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-600"></div>
-        <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patrimonio Total</p>
-          <h2 id="totalBalance" class="card-title-mobile text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</h2>
-        </div>
-        <div class="mt-3">
-          <span id="trendTotal" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos mes ant.</span>
-        </div>
-      </div>
-
-      <!-- BBVA -->
-      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
-        <div>
-          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">BBVA</p>
-          <h3 id="bbvaBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Efectivo / Día a día</p>
-        </div>
-        <div class="mt-3">
-          <span id="trendBbva" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
-        </div>
-      </div>
-
-      <!-- MyInvestor -->
-      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
-        <div>
-          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
-          <h3 id="myinvestorBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Fondos indexados</p>
-        </div>
-        <div class="mt-3">
-          <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
-        </div>
-      </div>
-
-      <!-- Trade Republic -->
-      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
-        <div>
-          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Trade Republic</p>
-          <h3 id="trLiquidityBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Cuenta remunerada</p>
-        </div>
-        <div class="mt-3">
-          <span id="trendTrLiq" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
-        </div>
-      </div>
-
-      <!-- Bitcoin -->
-      <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
-        <div>
-          <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
-          <h3 id="trBtcBalance" class="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Criptomoneda BTC</p>
-        </div>
-        <div class="mt-3">
-          <span id="trendTrBtc" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin datos</span>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Resumen de Flujo de Caja & Salud Financiera -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado)</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
-            <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
-            <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
-          </div>
-          <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
-            <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
-            <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
-          </div>
-          <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
-            <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro</p>
-            <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+      <!-- Resumen de Flujo de Caja & Salud Financiera -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado en Movimientos)</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
+              <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
+              <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
+            </div>
+            <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
+              <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
+              <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
+            </div>
+            <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+              <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro</p>
+              <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Indicador de Salud Financiera -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Salud Financiera</h3>
-        <div class="text-center my-auto py-2">
-          <div id="healthBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-            <span>⚪</span> <span id="healthText">Calculando...</span>
+        <!-- Indicador de Salud Financiera -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Salud Financiera</h3>
+          <div class="text-center my-auto py-2">
+            <div id="healthBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <span>⚪</span> <span id="healthText">Calculando...</span>
+            </div>
+          </div>
+          <p id="healthDesc" class="text-xs text-slate-500 text-center">Basado en tu tasa de ahorro neta del periodo.</p>
+        </div>
+      </section>
+
+      <!-- Charts Section -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
+          <div class="h-56">
+            <canvas id="distributionChart"></canvas>
           </div>
         </div>
-        <p id="healthDesc" class="text-xs text-slate-500 text-center">Basado en tu tasa de ahorro neta del periodo.</p>
-      </div>
-    </section>
 
-    <!-- Quick Action: Movimientos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento</h3>
-      <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" onsubmit="addTransaction(event)">
-        
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
-          <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
-            <option value="expense">➖ Gasto</option>
-            <option value="income">➕ Ingreso</option>
-            <option value="transfer">🔄 Traspaso</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
-          <input type="text" id="txConcept" placeholder="Ej: Compra o Traspaso..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
-          <input type="number" step="0.01" id="txAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelCategoryOrDest">Categoría</label>
-          <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-            <option value="Supermercado">🛒 Supermercado</option>
-            <option value="Nomina">💼 Nómina / Ingreso</option>
-            <option value="Bizum">💸 Bizum</option>
-            <option value="Paga extra">💰 Paga extra</option>
-            <option value="Ocio">🍿 Ocio / Restauración</option>
-            <option value="Inversion">📈 Inversión / Ahorro</option>
-            <option value="Vivienda">🏠 Vivienda / Recibos</option>
-            <option value="Transporte">🚗 Transporte / Gasolina</option>
-            <option value="Suscripciones">📱 Suscripciones</option>
-            <option value="Otros">📦 Otros</option>
-          </select>
-          <select id="txDestination" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white hidden">
-            <option value="bbva">BBVA</option>
-            <option value="myinvestor">MyInvestor</option>
-            <option value="trade_republic_liq">Trade Republic</option>
-            <option value="trade_republic_btc">Bitcoin</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelAccount">Cuenta</label>
-          <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
-            <option value="bbva">BBVA</option>
-            <option value="myinvestor">MyInvestor</option>
-            <option value="trade_republic_liq">Trade Republic</option>
-            <option value="trade_republic_btc">Bitcoin</option>
-          </select>
-        </div>
-
-        <div class="flex items-end">
-          <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
-            Guardar
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Charts Section -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
-        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
-        <div class="h-56">
-          <canvas id="distributionChart"></canvas>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
-        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Gastos por Categoría (%)</h3>
-        <div class="h-56">
-          <canvas id="categoryChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Gráfico de Evolución con Selector de Rango -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors flex flex-col justify-between">
-        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución del Patrimonio</h3>
-          <select id="timeRangeSelect" onchange="updateCharts()" class="px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
-            <option value="all">Todo el Histórico</option>
-            <option value="6">Últimos 6 Meses</option>
-            <option value="3">Últimos 3 Meses</option>
-          </select>
-        </div>
-        <div class="h-52">
-          <canvas id="evolutionChart"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- Historial de Movimientos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
-        
-        <div class="flex flex-wrap gap-2 items-center">
-          <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
-            <option value="all">Todos los Meses</option>
-            <option value="0">Enero</option>
-            <option value="1">Febrero</option>
-            <option value="2">Marzo</option>
-            <option value="3">Abril</option>
-            <option value="4">Mayo</option>
-            <option value="5">Junio</option>
-            <option value="6">Julio</option>
-            <option value="7">Agosto</option>
-            <option value="8">Septiembre</option>
-            <option value="9">Octubre</option>
-            <option value="10">Noviembre</option>
-            <option value="11">Diciembre</option>
-          </select>
-
-          <select id="filterYear" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
-            <option value="all">Todos los Años</option>
-          </select>
-
-          <div class="flex gap-1 border-l border-slate-200 dark:border-slate-700 pl-2">
-            <button onclick="filterType('all')" class="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200">Todos</button>
-            <button onclick="filterType('expense')" class="px-2 py-1 text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-100">Gastos</button>
-            <button onclick="filterType('income')" class="px-2 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded hover:bg-emerald-100">Ingresos</button>
-            <button onclick="filterType('transfer')" class="px-2 py-1 text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 rounded hover:bg-sky-100">Traspasos</button>
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Gastos por Categoría (%)</h3>
+          <div class="h-56">
+            <canvas id="categoryChart"></canvas>
           </div>
         </div>
-      </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Fecha</th>
-              <th class="p-3">Concepto</th>
-              <th class="p-3">Detalle / Categoría</th>
-              <th class="p-3">Cuenta (Origen / Ruta)</th>
-              <th class="p-3 text-right">Importe</th>
-              <th class="p-3 text-center">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
-          </tbody>
-        </table>
-      </div>
-    </section>
+        <!-- Gráfico de Evolución con Selector de Rango -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors flex flex-col justify-between">
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución del Patrimonio</h3>
+            <select id="timeRangeSelect" onchange="updateCharts()" class="px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
+              <option value="all">Todo el Histórico</option>
+              <option value="6">Últimos 6 Meses</option>
+              <option value="3">Últimos 3 Meses</option>
+            </select>
+          </div>
+          <div class="h-52">
+            <canvas id="evolutionChart"></canvas>
+          </div>
+        </div>
+      </section>
 
-    <!-- Ajuste Directo de Saldos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos (Separados)</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
-          <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">MyInvestor (€)</label>
-          <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
-          <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (€)</label>
-          <input type="number" step="0.01" id="inputTRBtc" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-          <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Bitcoin</button>
-        </div>
-      </div>
-    </section>
+    </div>
 
-    <!-- Historial de Saldos -->
-    <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales (Foto de Cuentas)</h3>
-      <p class="text-xs text-slate-500 mb-4">Registro histórico guardado cada vez que actualizas tus cuentas.</p>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
-            <tr>
-              <th class="p-3">Periodo (Mes/Año)</th>
-              <th class="p-3">BBVA</th>
-              <th class="p-3">MyInvestor</th>
-              <th class="p-3">Trade Republic</th>
-              <th class="p-3">Bitcoin</th>
-              <th class="p-3 text-right">Patrimonio Total</th>
-            </tr>
-          </thead>
-          <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <!-- ==================== PESTAÑA 3: MOVIMIENTOS ==================== -->
+    <div id="tab-movimientos" class="tab-content hidden space-y-6">
+
+      <!-- Quick Action: Movimientos -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Registrar Movimiento</h3>
+        <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" onsubmit="addTransaction(event)">
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
+            <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
+              <option value="expense">➖ Gasto</option>
+              <option value="income">➕ Ingreso</option>
+              <option value="transfer">🔄 Traspaso</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Concepto</label>
+            <input type="text" id="txConcept" placeholder="Ej: Compra o Traspaso..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Importe (€)</label>
+            <input type="number" step="0.01" id="txAmount" placeholder="0.00" required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelCategoryOrDest">Categoría</label>
+            <select id="txCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+              <option value="Supermercado">🛒 Supermercado</option>
+              <option value="Nomina">💼 Nómina / Ingreso</option>
+              <option value="Bizum">💸 Bizum</option>
+              <option value="Paga extra">💰 Paga extra</option>
+              <option value="Ocio">🍿 Ocio / Restauración</option>
+              <option value="Inversion">📈 Inversión / Ahorro</option>
+              <option value="Vivienda">🏠 Vivienda / Recibos</option>
+              <option value="Transporte">🚗 Transporte / Gasolina</option>
+              <option value="Suscripciones">📱 Suscripciones</option>
+              <option value="Otros">📦 Otros</option>
+            </select>
+            <select id="txDestination" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white hidden">
+              <option value="bbva">BBVA</option>
+              <option value="myinvestor">MyInvestor</option>
+              <option value="trade_republic_liq">Trade Republic</option>
+              <option value="trade_republic_btc">Bitcoin</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" id="labelAccount">Cuenta</label>
+            <select id="txAccount" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+              <option value="bbva">BBVA</option>
+              <option value="myinvestor">MyInvestor</option>
+              <option value="trade_republic_liq">Trade Republic</option>
+              <option value="trade_republic_btc">Bitcoin</option>
+            </select>
+          </div>
+
+          <div class="flex items-end">
+            <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Historial de Movimientos -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
+          
+          <div class="flex flex-wrap gap-2 items-center">
+            <select id="filterMonth" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
+              <option value="all">Todos los Meses</option>
+              <option value="0">Enero</option>
+              <option value="1">Febrero</option>
+              <option value="2">Marzo</option>
+              <option value="3">Abril</option>
+              <option value="4">Mayo</option>
+              <option value="5">Junio</option>
+              <option value="6">Julio</option>
+              <option value="7">Agosto</option>
+              <option value="8">Septiembre</option>
+              <option value="9">Octubre</option>
+              <option value="10">Noviembre</option>
+              <option value="11">Diciembre</option>
+            </select>
+
+            <select id="filterYear" onchange="renderTransactions()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
+              <option value="all">Todos los Años</option>
+            </select>
+
+            <div class="flex gap-1 border-l border-slate-200 dark:border-slate-700 pl-2">
+              <button onclick="filterType('all')" class="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200">Todos</button>
+              <button onclick="filterType('expense')" class="px-2 py-1 text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-100">Gastos</button>
+              <button onclick="filterType('income')" class="px-2 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded hover:bg-emerald-100">Ingresos</button>
+              <button onclick="filterType('transfer')" class="px-2 py-1 text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 rounded hover:bg-sky-100">Traspasos</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
+              <tr>
+                <th class="p-3">Fecha</th>
+                <th class="p-3">Concepto</th>
+                <th class="p-3">Detalle / Categoría</th>
+                <th class="p-3">Cuenta (Origen / Ruta)</th>
+                <th class="p-3 text-right">Importe</th>
+                <th class="p-3 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Ajuste Directo de Saldos -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Ajuste Directo de Saldos (Separados)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
+            <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">MyInvestor (€)</label>
+            <input type="number" step="0.01" id="inputMyInvestor" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('myinvestor')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar MyInvestor</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
+            <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (€)</label>
+            <input type="number" step="0.01" id="inputTRBtc" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Bitcoin</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial de Saldos -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Historial de Saldos Mensuales (Foto de Cuentas)</h3>
+        <p class="text-xs text-slate-500 mb-4">Registro histórico guardado cada vez que actualizas tus cuentas.</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs">
+              <tr>
+                <th class="p-3">Periodo (Mes/Año)</th>
+                <th class="p-3">BBVA</th>
+                <th class="p-3">MyInvestor</th>
+                <th class="p-3">Trade Republic</th>
+                <th class="p-3">Bitcoin</th>
+                <th class="p-3 text-right">Patrimonio Total</th>
+              </tr>
+            </thead>
+            <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== PESTAÑA 4: FIRE / FUTURO ==================== -->
+    <div id="tab-herramientas" class="tab-content hidden space-y-6">
+
+      <!-- Regla del 4% (Libertad Financiera) -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div>
+            <span class="text-xs font-semibold tracking-wider uppercase text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">Libertad Financiera</span>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-2">Regla del 4% (Calculadora FIRE)</h3>
+            <p class="text-xs text-slate-500 mt-1">Calcula cuánto capital necesitas para cubrir tus gastos indefinidamente y cuánto puedes retirar hoy.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl">
+            <button onclick="setFireSource('invested')" id="btnFireInvested" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition">Solo Inversiones</button>
+            <button onclick="setFireSource('total')" id="btnFireTotal" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 transition">Patrimonio Total</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Inputs Regla 4% -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Gasto Mensual Objetivo (€/mes)</label>
+              <input type="number" id="fireMonthlyExpense" value="1500" oninput="calculate4Percent()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tasa de Retiro Segura (% anual)</label>
+              <input type="number" step="0.1" id="fireWithdrawRate" value="4.0" oninput="calculate4Percent()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+              <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+                <span>Capital Actual Vinculado:</span>
+                <span id="fireCurrentCapital" class="font-bold text-slate-900 dark:text-white">0 €</span>
+              </div>
+              <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span>Gasto Anual Objetivo:</span>
+                <span id="fireAnnualExpense" class="font-bold text-slate-900 dark:text-white">18.000 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resultados Regla 4% -->
+          <div class="flex flex-col justify-between space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+                <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">🎯 Capital Necesario (FIRE)</p>
+                <h4 id="fireTargetNumber" class="text-2xl font-extrabold text-indigo-700 dark:text-indigo-300 mt-1">450.000 €</h4>
+              </div>
+              <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
+                <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">💸 Renta Mensual Hoy</p>
+                <h4 id="fireMonthlySafe" class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €/mes</h4>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
+              <div class="flex justify-between text-xs font-semibold">
+                <span class="text-slate-600 dark:text-slate-300">Progreso hacia la Libertad Financiera</span>
+                <span id="fireProgressText" class="text-indigo-600 dark:text-indigo-400 font-bold">0%</span>
+              </div>
+              <div class="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div id="fireProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <p id="fireRemainingText" class="text-[11px] text-slate-500">Te faltan 0 € para alcanzar tu objetivo FIRE.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calculadora de Interés Compuesto -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div>
+            <span class="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">Proyección</span>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-2">Calculadora de Interés Compuesto</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="fillCompoundWith('invested')" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
+              📥 Usar Solo Inversiones
+            </button>
+            <button onclick="fillCompoundWith('total')" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 transition">
+              📥 Usar Patrimonio Total
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Inputs -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Capital Inicial (€)</label>
+              <input type="number" id="compInitial" value="0" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Aportación Mensual (€)</label>
+              <input type="number" id="compMonthly" value="500" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad (% anual)</label>
+                <input type="number" step="0.5" id="compRate" value="8" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Años</label>
+                <input type="number" id="compYears" value="15" min="1" max="60" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+
+            <!-- Totales -->
+            <div class="grid grid-cols-1 gap-3 pt-2">
+              <div class="p-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center">
+                <span class="text-xs font-medium text-indigo-700 dark:text-indigo-400">💰 Capital Final:</span>
+                <span id="compFinalTotal" class="text-lg font-extrabold text-indigo-700 dark:text-indigo-300">0 €</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">💵 Total Aportado:</span>
+                <span id="compTotalContributed" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 €</span>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex justify-between items-center">
+                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">✨ Interés Generado:</span>
+                <span id="compTotalInterest" class="text-sm font-bold text-emerald-700 dark:text-emerald-300">0 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico Interés Compuesto -->
+          <div class="lg:col-span-2 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Crecimiento Año a Año (Aportado vs. Interés Compuesto)</h4>
+            <div class="h-72 w-full">
+              <canvas id="compoundChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
 
   </main>
 
   <script>
-    // CONFIGURACIÓN DE GITHUB (Sin exponer el token en el código fuente público)
+    // CONFIGURACIÓN DE GITHUB
     const GITHUB_OWNER = 'lcapi06';
     const GITHUB_REPO = 'FINANZAS-EFM';
     const GITHUB_FILE = 'data.json';
@@ -443,6 +610,7 @@
     }
 
     let currentFileSha = null;
+    let fireSource = 'invested'; // 'invested' o 'total'
 
     let state = {
       goal: 40000,
@@ -460,6 +628,33 @@
     };
 
     let currentTypeFilter = 'all';
+
+    // ==================== NAVEGACIÓN POR PESTAÑAS ====================
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(function(el) {
+        el.classList.add('hidden');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm', 'font-bold');
+        btn.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800', 'font-semibold');
+      });
+
+      const activeTab = document.getElementById('tab-' + tabId);
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if (activeTab) activeTab.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800', 'font-semibold');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm', 'font-bold');
+      }
+
+      // Redibujar gráficos al mostrar su pestaña correspondiente
+      if (tabId === 'resumen') {
+        updateCharts();
+      } else if (tabId === 'herramientas') {
+        calculate4Percent();
+        calculateCompound();
+      }
+    }
 
     function setSyncStatus(text, type) {
       const el = document.getElementById('syncStatusText');
@@ -586,7 +781,7 @@
         setSyncStatus('❌ Error al guardar en nube', 'error');
         if (isManual) alert('Error al guardar en GitHub. Revisa tu Token.');
       } finally {
-        if (btn) btn.innerText = '☁️ Guardar datos';
+        if (btn) btn.innerText = '☁️ Guardar';
       }
     }
 
@@ -607,12 +802,14 @@
       applyTheme();
       updateYearFilterOptions();
       render();
+      fillCompoundWith('invested');
 
       if (getGitHubToken()) {
         await syncFromGitHub();
         applyTheme();
         updateYearFilterOptions();
         render();
+        fillCompoundWith('invested');
       } else {
         setSyncStatus('⚠️ Configura tu Token ⚙️', 'error');
       }
@@ -621,6 +818,7 @@
       if (addedFromShortcut) {
         updateYearFilterOptions();
         render();
+        fillCompoundWith('invested');
         await syncToGitHub(false);
       }
     }
@@ -651,6 +849,7 @@
       }
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
       updateCharts();
+      calculateCompound();
     }
 
     function handleTypeChange() {
@@ -874,6 +1073,8 @@
       renderTransactions();
       renderSnapshots();
       updateCharts();
+      calculate4Percent();
+      calculateCompound();
     }
 
     function updateAllTrends() {
@@ -1175,9 +1376,152 @@
       }
     }
 
+    // ==================== REGLA DEL 4% & INTERÉS COMPUESTO ====================
+    function setFireSource(source) {
+      fireSource = source;
+      const btnInv = document.getElementById('btnFireInvested');
+      const btnTot = document.getElementById('btnFireTotal');
+      if (source === 'invested') {
+        btnInv.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition';
+        btnTot.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 transition';
+      } else {
+        btnTot.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition';
+        btnInv.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 transition';
+      }
+      calculate4Percent();
+    }
+
+    function calculate4Percent() {
+      const monthlyExp = parseFloat(document.getElementById('fireMonthlyExpense').value) || 0;
+      const rate = parseFloat(document.getElementById('fireWithdrawRate').value) || 4.0;
+      
+      const invested = state.accounts.myinvestor + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + state.accounts.trade_republic_liq + invested;
+      const currentCap = fireSource === 'invested' ? invested : total;
+
+      const annualExp = monthlyExp * 12;
+      const targetFire = rate > 0 ? annualExp / (rate / 100) : 0;
+      const monthlySafe = (currentCap * (rate / 100)) / 12;
+      const pct = targetFire > 0 ? Math.min((currentCap / targetFire) * 100, 100) : 0;
+      const remaining = Math.max(0, targetFire - currentCap);
+
+      document.getElementById('fireCurrentCapital').innerText = currentCap.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('fireAnnualExpense').innerText = annualExp.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('fireTargetNumber').innerText = targetFire.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('fireMonthlySafe').innerText = monthlySafe.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/mes';
+      document.getElementById('fireProgressText').innerText = pct.toFixed(1) + '%';
+      document.getElementById('fireProgressBar').style.width = pct + '%';
+
+      if (remaining > 0) {
+        document.getElementById('fireRemainingText').innerText = 'Te faltan ' + remaining.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € para alcanzar tu objetivo FIRE.';
+      } else if (targetFire > 0) {
+        document.getElementById('fireRemainingText').innerText = '🎉 ¡Enhorabuena! Ya has alcanzado tu objetivo FIRE.';
+      } else {
+        document.getElementById('fireRemainingText').innerText = 'Introduce un gasto mensual mayor que 0.';
+      }
+    }
+
+    function fillCompoundWith(source) {
+      const invested = state.accounts.myinvestor + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + state.accounts.trade_republic_liq + invested;
+      const val = source === 'invested' ? invested : total;
+      document.getElementById('compInitial').value = Math.round(val);
+      calculateCompound();
+    }
+
     let chartDist = null;
     let chartCat = null;
     let chartEvol = null;
+    let chartComp = null;
+
+    function calculateCompound() {
+      const initial = parseFloat(document.getElementById('compInitial').value) || 0;
+      const monthly = parseFloat(document.getElementById('compMonthly').value) || 0;
+      const rate = (parseFloat(document.getElementById('compRate').value) || 0) / 100;
+      const years = parseInt(document.getElementById('compYears').value) || 1;
+
+      const labels = ['Año 0'];
+      const dataTotal = [initial];
+      const dataContrib = [initial];
+
+      let currentBalance = initial;
+      let totalContrib = initial;
+      const monthlyRate = rate / 12;
+
+      for (let y = 1; y <= years; y++) {
+        for (let m = 1; m <= 12; m++) {
+          currentBalance = (currentBalance + monthly) * (1 + monthlyRate);
+          totalContrib += monthly;
+        }
+        labels.push('Año ' + y);
+        dataTotal.push(Math.round(currentBalance));
+        dataContrib.push(Math.round(totalContrib));
+      }
+
+      const totalInterest = Math.max(0, currentBalance - totalContrib);
+
+      document.getElementById('compFinalTotal').innerText = Math.round(currentBalance).toLocaleString('es-ES') + ' €';
+      document.getElementById('compTotalContributed').innerText = Math.round(totalContrib).toLocaleString('es-ES') + ' €';
+      document.getElementById('compTotalInterest').innerText = '+' + Math.round(totalInterest).toLocaleString('es-ES') + ' €';
+
+      const canvas = document.getElementById('compoundChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+
+      if (chartComp) chartComp.destroy();
+      chartComp = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Capital Total',
+              data: dataTotal,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Total Aportado',
+              data: dataContrib,
+              borderColor: '#6366f1',
+              borderDash: [5, 5],
+              borderWidth: 2,
+              fill: false,
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES') + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 10 }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
 
     function updateCharts() {
       const total = state.accounts.bbva + state.accounts.myinvestor + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
