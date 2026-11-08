@@ -2,23 +2,12 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3450,
+    "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 730.0738706
   },
-  "transactions": [
-    {
-      "id": 1794176733854,
-      "date": "2026-11-08T22:25:33.854Z",
-      "type": "expense",
-      "concept": "Gasolina ",
-      "amount": 50,
-      "category": "Transporte",
-      "account": "bbva",
-      "destination": null
-    }
-  ],
+  "transactions": [],
   "monthlySnapshots": [
     {
       "id": 1794176031267,
@@ -39,9 +28,19 @@
       "trade_republic_liq": 6000,
       "trade_republic_btc": 730.0738706,
       "total": 28380.0738706
+    },
+    {
+      "id": 1794178587358,
+      "date": "2026-11-08T22:56:27.358Z",
+      "dateLabel": "nov 2026, 23:56",
+      "bbva": 3500,
+      "myinvestor": 18200,
+      "trade_republic_liq": 6000,
+      "trade_republic_btc": 730.0738706,
+      "total": 28430.0738706
     }
   ],
-  "lastCloudSync": "2026-11-08T22:25:33.867Z",
+  "lastCloudSync": "2026-11-08T22:56:27.373Z",
   "btcUnits": 0.010744,
   "btcPrice": 67951.775,
   "categories": {
