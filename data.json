@@ -2,12 +2,23 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3500,
+    "bbva": 3000,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 717.2299020800001
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794179977245,
+      "date": "2026-11-08T23:19:37.245Z",
+      "type": "expense",
+      "concept": "Vivienda",
+      "amount": 500,
+      "category": "Vivienda",
+      "account": "bbva",
+      "destination": null
+    }
+  ],
   "monthlySnapshots": [
     {
       "id": 1794176031267,
@@ -58,9 +69,19 @@
       "trade_republic_liq": 6000,
       "trade_republic_btc": 717.2299020800001,
       "total": 28417.22990208
+    },
+    {
+      "id": 1794179977245,
+      "date": "2026-11-08T23:19:37.245Z",
+      "dateLabel": "nov 2026, 00:19",
+      "bbva": 3000,
+      "myinvestor": 18200,
+      "trade_republic_liq": 6000,
+      "trade_republic_btc": 717.2299020800001,
+      "total": 27917.22990208
     }
   ],
-  "lastCloudSync": "2026-11-08T22:57:58.647Z",
+  "lastCloudSync": "2026-11-08T23:19:37.257Z",
   "btcUnits": 0.010744,
   "btcPrice": 66756.32,
   "categories": {
