@@ -2,32 +2,21 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3470,
+    "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
   },
-  "transactions": [
-    {
-      "id": 1794166108189,
-      "date": "2026-11-08T19:28:28.189Z",
-      "type": "expense",
-      "concept": "Christian ",
-      "amount": 30,
-      "category": "Ocio",
-      "account": "bbva",
-      "destination": null
-    }
-  ],
+  "transactions": [],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 3470,
+      "bbva": 3500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 30170
+      "total": 30200
     }
   },
-  "lastCloudSync": "2026-11-08T19:28:28.202Z"
+  "lastCloudSync": "2026-11-08T19:29:59.881Z"
 }
