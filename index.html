@@ -655,8 +655,9 @@
             state.accounts.trade_republic_btc = units * priceEur;
           }
           save();
-          if (isManual && units <= 0) {
-            alert('Precio BTC actual: ' + priceEur.toLocaleString('es-ES') + ' €.\nIntroduce tu cantidad de BTC en Movimientos -> Ajuste Directo de Saldos.');
+          
+          if (isManual) {
+            alert('Has actualizado el precio de Bitcoin a ' + priceEur.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
           }
         }
       } catch (err) {
@@ -1393,14 +1394,23 @@
 
     function updateAccountBalance(acc) {
       let val = 0;
-      if (acc === 'bbva') val = parseFloat(document.getElementById('inputBBVA').value);
-      if (acc === 'myinvestor') val = parseFloat(document.getElementById('inputMyInvestor').value);
-      if (acc === 'trade_republic_liq') val = parseFloat(document.getElementById('inputTRLiq').value);
-      if (acc === 'trade_republic_btc') {
+      let accountDisplayName = '';
+
+      if (acc === 'bbva') {
+        val = parseFloat(document.getElementById('inputBBVA').value);
+        accountDisplayName = 'BBVA';
+      } else if (acc === 'myinvestor') {
+        val = parseFloat(document.getElementById('inputMyInvestor').value);
+        accountDisplayName = 'MyInvestor';
+      } else if (acc === 'trade_republic_liq') {
+        val = parseFloat(document.getElementById('inputTRLiq').value);
+        accountDisplayName = 'Trade Republic';
+      } else if (acc === 'trade_republic_btc') {
         val = parseFloat(document.getElementById('inputTRBtc').value);
         if (!isNaN(val) && val >= 0) {
           state.btcUnits = val;
           fetchBtcPrice(false);
+          alert('Has actualizado la cantidad de bitcoin y el precio');
           return;
         }
       }
@@ -1408,6 +1418,7 @@
       if (!isNaN(val)) {
         state.accounts[acc] = val;
         save();
+        alert('Has actualizado el saldo de la cuenta ' + accountDisplayName);
       }
     }
 
