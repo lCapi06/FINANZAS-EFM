@@ -2,21 +2,32 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3500,
+    "bbva": 2995,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794163852553,
+      "date": "2026-11-08T18:50:52.553Z",
+      "type": "expense",
+      "concept": "Prueba 1",
+      "amount": 505,
+      "category": "Supermercado",
+      "account": "bbva",
+      "destination": null
+    }
+  ],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 3500,
+      "bbva": 2995,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 30200
+      "total": 29695
     }
   },
-  "lastCloudSync": "2026-11-08T18:04:37.498Z"
+  "lastCloudSync": "2026-11-08T18:50:52.564Z"
 }
