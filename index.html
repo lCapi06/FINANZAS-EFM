@@ -39,48 +39,52 @@
 
   <!-- Header / Nav -->
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-      <div class="flex items-center gap-3">
-        <div class="text-2xl p-1 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💵</div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="syncStatusText">Sincronizando...</p>
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl p-1.5 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl">💎</div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-none">Finanzas Personales</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="syncStatusText">Sincronizando...</p>
+          </div>
         </div>
       </div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <button onclick="toggleTheme()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
-          <span id="themeIcon">☀️</span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
+      
+      <!-- Botones de Acción Optimizados para Móvil -->
+      <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
+        <button onclick="toggleTheme()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1">
+          <span id="themeIcon">☀️</span> <span id="themeText" class="hidden md:inline">Claro</span>
         </button>
-        <button onclick="promptToken()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition" title="Configurar Token">
-          ⚙️ Token
+        <button onclick="promptToken()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition flex items-center gap-1" title="Configurar Token">
+          <span>⚙️</span> <span class="hidden md:inline">Token</span>
         </button>
-        <button onclick="syncToGitHub(true)" id="btnSaveCloud" class="px-2.5 py-1.5 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition">
-          ☁️ Guardar
+        <button onclick="syncToGitHub(true)" id="btnSaveCloud" class="px-2.5 py-1.5 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition flex items-center gap-1">
+          <span>☁️</span> <span>Guardar</span>
         </button>
-        <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
-          💾 Exportar
+        <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1">
+          <span>💾</span> <span>Exportar</span>
         </button>
-        <label for="importFile" class="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition">
-          📂 Importar
+        <label for="importFile" class="px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition flex items-center gap-1">
+          <span>📂</span> <span>Importar</span>
         </label>
         <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
       </div>
     </div>
 
-    <!-- Barra de Pestañas -->
+    <!-- Barra de Pestañas Mejorada -->
     <div class="max-w-7xl mx-auto px-4 border-t border-slate-100 dark:border-slate-800/80">
       <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 no-scrollbar" aria-label="Tabs">
-        <button onclick="switchTab('panel')" id="tab-btn-panel" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition whitespace-nowrap bg-indigo-600 text-white shadow-sm">
-          🏠 Panel
+        <button onclick="switchTab('panel')" id="tab-btn-panel" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1.5">
+          <span>📊</span> Panel
         </button>
-        <button onclick="switchTab('resumen')" id="tab-btn-resumen" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-          📊 Resumen
+        <button onclick="switchTab('resumen')" id="tab-btn-resumen" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5">
+          <span>📈</span> Resumen
         </button>
-        <button onclick="switchTab('movimientos')" id="tab-btn-movimientos" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-          💸 Movimientos
+        <button onclick="switchTab('movimientos')" id="tab-btn-movimientos" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5">
+          <span>💸</span> Movimientos
         </button>
-        <button onclick="switchTab('herramientas')" id="tab-btn-herramientas" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-          🔥 FIRE / Futuro
+        <button onclick="switchTab('herramientas')" id="tab-btn-herramientas" class="tab-btn px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5">
+          <span>🎯</span> Libertad
         </button>
       </nav>
     </div>
@@ -91,27 +95,26 @@
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Liquidez vs Inversión & Meta -->
+      <!-- Liquidez vs Inversión & Meta Automática por Hitos -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <!-- Meta de Ahorro -->
+        <!-- Meta Automática por Hitos (50k en 50k) -->
         <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div>
-              <span class="text-xs font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Objetivo Financiero</span>
-              <h2 class="text-2xl font-bold mt-2">Meta de Patrimonio</h2>
+              <span id="goalMilestoneBadge" class="text-xs font-semibold tracking-wider uppercase text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-500/35">Hito Actual: 0 € - 50.000 €</span>
+              <h2 class="text-2xl font-bold mt-2">Objetivo Patrimonial Automático</h2>
             </div>
-            <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
-              <label class="text-xs text-slate-300 pl-2">Objetivo (€):</label>
-              <input type="number" id="goalInput" class="w-28 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-right text-white font-semibold focus:outline-none focus:border-indigo-500" value="40000" onchange="updateGoal(this.value)">
+            <div id="milestoneSuccessBanner" class="hidden px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold animate-pulse">
+              🎉 ¡Hito superado!
             </div>
           </div>
           
           <div class="space-y-2">
             <div class="flex justify-between text-xs text-slate-300 font-medium">
               <span id="goalCurrentText">Actual: 0 €</span>
-              <span id="goalProgressPercent" class="font-bold text-indigo-300">0% alcanzado</span>
-              <span id="goalTargetText">Meta: 40.000 €</span>
+              <span id="goalProgressPercent" class="font-bold text-indigo-300">0% completado</span>
+              <span id="goalTargetText">Meta del tramo: 50.000 €</span>
             </div>
             <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
               <div id="goalProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -452,7 +455,7 @@
 
     </div>
 
-    <!-- ==================== PESTAÑA 4: FIRE / FUTURO ==================== -->
+    <!-- ==================== PESTAÑA 4: LIBERTAD ==================== -->
     <div id="tab-herramientas" class="tab-content hidden space-y-6">
 
       <!-- Regla del 4% (Libertad Financiera) -->
@@ -647,7 +650,6 @@
         activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm', 'font-bold');
       }
 
-      // Redibujar gráficos al mostrar su pestaña correspondiente
       if (tabId === 'resumen') {
         updateCharts();
       } else if (tabId === 'herramientas') {
@@ -724,7 +726,7 @@
       }
 
       const btn = document.getElementById('btnSaveCloud');
-      if (btn) btn.innerText = '⏳ Guardando...';
+      if (btn) btn.innerHTML = '<span>⏳</span> <span>Guardando...</span>';
       setSyncStatus('☁️ Guardando en GitHub...', 'loading');
 
       try {
@@ -781,7 +783,7 @@
         setSyncStatus('❌ Error al guardar en nube', 'error');
         if (isManual) alert('Error al guardar en GitHub. Revisa tu Token.');
       } finally {
-        if (btn) btn.innerText = '☁️ Guardar';
+        if (btn) btn.innerHTML = '<span>☁️</span> <span>Guardar</span>';
       }
     }
 
@@ -827,11 +829,11 @@
       if (state.theme === 'light') {
         document.documentElement.classList.remove('dark');
         document.getElementById('themeIcon').innerText = '🌙';
-        document.getElementById('themeText').innerText = 'Modo Oscuro';
+        document.getElementById('themeText').innerText = 'Oscuro';
       } else {
         document.documentElement.classList.add('dark');
         document.getElementById('themeIcon').innerText = '☀️';
-        document.getElementById('themeText').innerText = 'Modo Claro';
+        document.getElementById('themeText').innerText = 'Claro';
       }
     }
 
@@ -840,12 +842,12 @@
         document.documentElement.classList.remove('dark');
         state.theme = 'light';
         document.getElementById('themeIcon').innerText = '🌙';
-        document.getElementById('themeText').innerText = 'Modo Oscuro';
+        document.getElementById('themeText').innerText = 'Oscuro';
       } else {
         document.documentElement.classList.add('dark');
         state.theme = 'dark';
         document.getElementById('themeIcon').innerText = '☀️';
-        document.getElementById('themeText').innerText = 'Modo Claro';
+        document.getElementById('themeText').innerText = 'Claro';
       }
       localStorage.setItem('mi_patrimonio_data_v3', JSON.stringify(state));
       updateCharts();
@@ -1062,13 +1064,28 @@
       document.getElementById('liquidBar').style.width = liqPct + '%';
       document.getElementById('investedBar').style.width = invPct + '%';
 
-      document.getElementById('goalInput').value = state.goal || 40000;
-      const target = state.goal || 40000;
-      const percent = Math.min(Math.round((total / target) * 100), 100);
-      document.getElementById('goalCurrentText').innerText = 'Actual: ' + total.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
-      document.getElementById('goalTargetText').innerText = 'Meta: ' + target.toLocaleString('es-ES') + ' €';
-      document.getElementById('goalProgressPercent').innerText = percent + '% alcanzado';
-      document.getElementById('goalProgressBar').style.width = percent + '%';
+      // ==================== OBJETIVO PATRIMONIAL AUTOMÁTICO (HITOS DE 50K) ====================
+      const step = 50000;
+      const currentMilestoneIndex = Math.floor(total / step);
+      const milestoneStart = currentMilestoneIndex * step;
+      const milestoneTarget = (currentMilestoneIndex + 1) * step;
+      
+      const currentInMilestone = total - milestoneStart;
+      const milestonePercent = Math.min(Math.max((currentInMilestone / step) * 100, 0), 100);
+
+      document.getElementById('goalMilestoneBadge').innerText = 'Hito Actual: ' + milestoneStart.toLocaleString('es-ES') + ' € - ' + milestoneTarget.toLocaleString('es-ES') + ' €';
+      document.getElementById('goalCurrentText').innerText = 'Actual en tramo: ' + currentInMilestone.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('goalTargetText').innerText = 'Meta del tramo: ' + milestoneTarget.toLocaleString('es-ES') + ' €';
+      document.getElementById('goalProgressPercent').innerText = milestonePercent.toFixed(0) + '% completado';
+      document.getElementById('goalProgressBar').style.width = milestonePercent + '%';
+
+      const successBanner = document.getElementById('milestoneSuccessBanner');
+      if (currentMilestoneIndex > 0) {
+        successBanner.classList.remove('hidden');
+        successBanner.innerText = '🎉 ¡' + milestoneStart.toLocaleString('es-ES') + ' € superados!';
+      } else {
+        successBanner.classList.add('hidden');
+      }
 
       renderTransactions();
       renderSnapshots();
@@ -1118,14 +1135,6 @@
       setTrendBadge('trendMyinvestor', state.accounts.myinvestor, prevSnap ? prevSnap.myinvestor : null);
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, prevSnap ? prevSnap.trade_republic_liq : null);
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, prevSnap ? prevSnap.trade_republic_btc : null);
-    }
-
-    function updateGoal(val) {
-      const num = parseFloat(val);
-      if (num && num > 0) {
-        state.goal = num;
-        save();
-      }
     }
 
     function renderTransactions() {
