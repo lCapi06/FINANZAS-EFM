@@ -2,32 +2,21 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3422,
+    "bbva": 3500,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 2500
   },
-  "transactions": [
-    {
-      "id": 1794160872558,
-      "date": "2026-11-08T18:01:12.558Z",
-      "type": "expense",
-      "concept": "Restaurante",
-      "amount": 78,
-      "category": "Ocio",
-      "account": "bbva",
-      "destination": null
-    }
-  ],
+  "transactions": [],
   "monthlySnapshots": {
     "2026-11": {
       "dateLabel": "nov 2026",
-      "bbva": 3422,
+      "bbva": 3500,
       "myinvestor": 18200,
       "trade_republic_liq": 6000,
       "trade_republic_btc": 2500,
-      "total": 30122
+      "total": 30200
     }
   },
-  "lastCloudSync": "2026-11-08T18:04:31.109Z"
+  "lastCloudSync": "2026-11-08T18:04:37.498Z"
 }
