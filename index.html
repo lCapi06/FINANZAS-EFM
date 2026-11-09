@@ -206,7 +206,7 @@
           <div>
             <div class="flex items-center justify-between gap-1">
               <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Bitcoin</p>
-              <button onclick="fetchBtcPrice(true)" id="btnRefreshBtc" class="p-1 text-xs rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition" title="Actualizar precio BTC en vivo">
+              <button onclick="fetchBtcPrice(true); event.stopPropagation();" id="btnRefreshBtc" class="p-1 text-xs rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition" title="Actualizar precio BTC en vivo">
                 🔄
               </button>
             </div>
@@ -220,12 +220,12 @@
 
       </section>
 
-      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Con recuadro rojo y botón de rendimiento) -->
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Sin botones de edición de saldo, solo inversión y rendimiento) -->
       <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-rose-500 shadow-md transition-all space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
-            <p class="text-xs text-slate-500">Gestiona tus fondos y actualiza su rendimiento diario o invierte tu efectivo apartado.</p>
+            <p class="text-xs text-slate-500">Consulta tus fondos, actualiza su rendimiento diario o invierte tu efectivo apartado.</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="updateMyInvestorPerformance()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1">
@@ -240,10 +240,7 @@
           <!-- Fidelity S&P 500 -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
-                <button onclick="editFundBalance('fidelity_sp500', 'Fidelity S&P 500')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
-              </div>
+              <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
               <p id="fundFidelityVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -255,10 +252,7 @@
           <!-- Vanguard Emergentes -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
-                <button onclick="editFundBalance('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
-              </div>
+              <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Mercados Emergentes</h4>
               <p id="fundEmergingVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -270,10 +264,7 @@
           <!-- Vanguard Small Caps -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
-                <button onclick="editFundBalance('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
-              </div>
+              <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
               <p id="fundSmallCapsVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -544,6 +535,29 @@
         </div>
       </section>
 
+      <!-- Ajuste Directo de Fondos Indexados -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Fondos Indexados</h3>
+        <p class="text-xs text-slate-500">Actualiza los saldos de tus fondos indexados de MyInvestor y crea una nueva foto en su historial.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
+            <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateFundBalance('fidelity_sp500')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar S&P 500</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (€)</label>
+            <input type="number" step="0.01" id="inputFundEmerging" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateFundBalance('vanguard_emerging')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Emergentes</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (€)</label>
+            <input type="number" step="0.01" id="inputFundSmallCaps" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateFundBalance('vanguard_smallcaps')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Small Caps</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Historial de Saldos -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Historial de Saldos (Foto Mensual)</h3>
@@ -563,6 +577,29 @@
               </tr>
             </thead>
             <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Historial de Saldos de Fondos Indexados -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Historial de Fondos Indexados (Foto Mensual)</h3>
+        <p class="text-xs text-slate-500 mb-4">Registro mensual de la evolución de cada fondo indexado y el total de la cartera.</p>
+        <div class="max-h-[320px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl relative">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs sticky top-0 z-10 shadow-sm">
+              <tr>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Fecha</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">S&P 500</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Emergentes</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Small Caps</th>
+                <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">Total Fondos</th>
+                <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">% Total</th>
+                <th class="p-3 text-center bg-slate-50 dark:bg-slate-800">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="fundSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
             </tbody>
           </table>
         </div>
@@ -746,6 +783,7 @@
       },
       transactions: [],
       monthlySnapshots: [],
+      fundSnapshots: [],
       lastExportDate: null,
       lastCloudSync: null
     };
@@ -796,19 +834,11 @@
       return cash + funds;
     }
 
-    // Permitir editar el saldo inicial o real de cada fondo de manera independiente
-    function editFundBalance(fundKey, fundName) {
-      const currentVal = state.myinvestor.funds[fundKey] || 0;
-      const input = prompt('Introduce el saldo real actual para ' + fundName + ' (€):', currentVal);
-      if (input === null) return;
-      const val = parseFloat(input);
-      if (!isNaN(val) && val >= 0) {
-        state.myinvestor.funds[fundKey] = val;
-        saveAndSync();
-        alert('Saldo de ' + fundName + ' actualizado correctamente.');
-      } else {
-        alert('Por favor, introduce un importe válido.');
-      }
+    function getFundsTotal() {
+      if (!state.myinvestor || !state.myinvestor.funds) return 0;
+      return (state.myinvestor.funds.fidelity_sp500 || 0) + 
+             (state.myinvestor.funds.vanguard_emerging || 0) + 
+             (state.myinvestor.funds.vanguard_smallcaps || 0);
     }
 
     function investInFund(fundKey, fundName) {
@@ -831,6 +861,10 @@
       state.myinvestor.cash -= amountToInvest;
       state.myinvestor.funds[fundKey] += amountToInvest;
 
+      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
+        state.fundSnapshots = [createFundSnapshotObject(new Date())];
+      }
+
       saveAndSync();
       alert('¡Se han invertido ' + amountToInvest.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € en ' + fundName + ' con éxito!');
     }
@@ -850,6 +884,10 @@
 
       const newTotal = getMyInvestorTotal();
       const diff = newTotal - prevTotal;
+
+      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
+        state.fundSnapshots = [createFundSnapshotObject(new Date())];
+      }
 
       saveAndSync();
       alert('¡Rendimiento del día anterior aplicado con éxito!\nGanancia estimada: +' + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
@@ -1079,6 +1117,9 @@
           if (!Array.isArray(state.monthlySnapshots)) {
             state.monthlySnapshots = [];
           }
+          if (!Array.isArray(state.fundSnapshots)) {
+            state.fundSnapshots = [];
+          }
           localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
           const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
           setSyncStatus('☁️ Sincronizado (' + syncDate + ')', 'ok');
@@ -1180,15 +1221,27 @@
       };
     }
 
-    function checkAndTakeMonthlySnapshot() {
-      if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
-        return false;
-      }
+    function createFundSnapshotObject(dateObj) {
+      const funds = state.myinvestor.funds;
+      const total = (funds.fidelity_sp500 || 0) + (funds.vanguard_emerging || 0) + (funds.vanguard_smallcaps || 0);
+      return {
+        id: Date.now(),
+        date: dateObj.toISOString(),
+        dateLabel: formatDateDDMMYYYY(dateObj),
+        fidelity_sp500: funds.fidelity_sp500 || 0,
+        vanguard_emerging: funds.vanguard_emerging || 0,
+        vanguard_smallcaps: funds.vanguard_smallcaps || 0,
+        total: total
+      };
+    }
 
+    function checkAndTakeMonthlySnapshot() {
       const now = new Date();
       const currentYear = now.getFullYear();
       const currentMonth = now.getMonth();
+      let updated = false;
 
+      if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       const hasCurrentMonth = state.monthlySnapshots.some(function(s) {
         const sd = new Date(s.date);
         return sd.getFullYear() === currentYear && sd.getMonth() === currentMonth;
@@ -1197,6 +1250,22 @@
       if (!hasCurrentMonth) {
         const firstOfMonth = new Date(currentYear, currentMonth, 1, 0, 0, 0);
         state.monthlySnapshots.push(createSnapshotObject(firstOfMonth));
+        updated = true;
+      }
+
+      if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+      const hasCurrentFundMonth = state.fundSnapshots.some(function(s) {
+        const sd = new Date(s.date);
+        return sd.getFullYear() === currentYear && sd.getMonth() === currentMonth;
+      });
+
+      if (!hasCurrentFundMonth) {
+        const firstOfMonth = new Date(currentYear, currentMonth, 1, 0, 0, 0);
+        state.fundSnapshots.push(createFundSnapshotObject(firstOfMonth));
+        updated = true;
+      }
+
+      if (updated) {
         localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
         return true;
       }
@@ -1206,6 +1275,12 @@
     function deleteSnapshot(id) {
       if (!confirm('¿Estás seguro de que quieres eliminar esta entrada del historial de saldos?')) return;
       state.monthlySnapshots = state.monthlySnapshots.filter(function(s) { return s.id !== id; });
+      saveAndSync();
+    }
+
+    function deleteFundSnapshot(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta entrada del historial de fondos?')) return;
+      state.fundSnapshots = state.fundSnapshots.filter(function(s) { return s.id !== id; });
       saveAndSync();
     }
 
@@ -1287,6 +1362,9 @@
           }
           if (!Array.isArray(state.monthlySnapshots)) {
             state.monthlySnapshots = [];
+          }
+          if (!Array.isArray(state.fundSnapshots)) {
+            state.fundSnapshots = [];
           }
         } catch (e) {
           console.error("Error al cargar localStorage", e);
@@ -1395,6 +1473,13 @@
         });
       }
 
+      if (Array.isArray(state.fundSnapshots)) {
+        state.fundSnapshots.forEach(function(s) {
+          const y = new Date(s.date).getFullYear();
+          if (y >= 2026) yearsSet.add(y);
+        });
+      }
+
       const sortedYears = Array.from(yearsSet).sort(function(a, b) { return b - a; });
       
       yearSelect.innerHTML = '<option value="all">Todos los Años</option>';
@@ -1497,6 +1582,10 @@
         document.getElementById('fundFidelityVal').innerText = (state.myinvestor.funds.fidelity_sp500 || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundEmergingVal').innerText = (state.myinvestor.funds.vanguard_emerging || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundSmallCapsVal').innerText = (state.myinvestor.funds.vanguard_smallcaps || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+        document.getElementById('inputFundFidelity').value = state.myinvestor.funds.fidelity_sp500 || 0;
+        document.getElementById('inputFundEmerging').value = state.myinvestor.funds.vanguard_emerging || 0;
+        document.getElementById('inputFundSmallCaps').value = state.myinvestor.funds.vanguard_smallcaps || 0;
       }
 
       updateAllTrends();
@@ -1532,6 +1621,7 @@
 
       renderTransactions();
       renderSnapshots();
+      renderFundSnapshots();
       updateCharts();
       calculate4Percent();
       calculateCompound();
@@ -1802,6 +1892,54 @@
       });
     }
 
+    function renderFundSnapshots() {
+      const tbody = document.getElementById('fundSnapshotsTable');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Sin historial de fondos todavía. Actualiza el saldo de un fondo para registrar tu punto de partida.</td></tr>';
+        return;
+      }
+
+      const sortedAsc = state.fundSnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+
+      function formatPctBadge(curr, prev) {
+        if (prev === null || prev === undefined || prev === 0) {
+          return '<span class="ml-1 text-[10px] text-slate-400 font-normal">(0,0%)</span>';
+        }
+        const pct = ((curr - prev) / prev) * 100;
+        const sign = pct >= 0 ? '+' : '';
+        const color = pct > 0.05 ? 'text-emerald-600 dark:text-emerald-400' : (pct < -0.05 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400');
+        return '<span class="ml-1 text-[10px] font-semibold ' + color + '">(' + sign + pct.toFixed(1).replace('.', ',') + '%)</span>';
+      }
+
+      const rowsWithPct = sortedAsc.map(function(snap, idx) {
+        const prev = idx > 0 ? sortedAsc[idx - 1] : null;
+        return {
+          snap: snap,
+          prev: prev
+        };
+      });
+
+      rowsWithPct.reverse().forEach(function(item) {
+        const snap = item.snap;
+        const prev = item.prev;
+        const tr = document.createElement('tr');
+        const dateFormatted = formatDateDDMMYYYY(new Date(snap.date));
+
+        tr.innerHTML = 
+          '<td class="p-3 font-semibold text-slate-900 dark:text-white">' + dateFormatted + '</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.fidelity_sp500||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.fidelity_sp500||0, prev ? prev.fidelity_sp500 : null) + '</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.vanguard_emerging||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.vanguard_emerging||0, prev ? prev.vanguard_emerging : null) + '</td>' +
+          '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.vanguard_smallcaps||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.vanguard_smallcaps||0, prev ? prev.vanguard_smallcaps : null) + '</td>' +
+          '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
+          '<td class="p-3 text-right">' + formatPctBadge(snap.total||0, prev ? prev.total : null) + '</td>' +
+          '<td class="p-3 text-center"><button onclick="deleteFundSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
     function handleTxSubmit(e) {
       e.preventDefault();
       const editId = document.getElementById('editTxId').value;
@@ -1989,7 +2127,7 @@
           else state.accounts[tx.account] += tx.amount;
         } else if (tx.type === 'income') {
           if (tx.account === 'myinvestor') state.myinvestor.cash -= tx.amount;
-          else state.accounts[tx.account] -= tx.amount;
+          else state.accounts[tx.amount] -= amount;
         } else if (tx.type === 'transfer') {
           if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
           else state.accounts[tx.account] += tx.amount;
@@ -2036,6 +2174,52 @@
       }
     }
 
+    function updateFundBalance(fundKey) {
+      let val = 0;
+      let fundName = '';
+
+      if (fundKey === 'fidelity_sp500') {
+        val = parseFloat(document.getElementById('inputFundFidelity').value);
+        fundName = 'Fidelity S&P 500';
+      } else if (fundKey === 'vanguard_emerging') {
+        val = parseFloat(document.getElementById('inputFundEmerging').value);
+        fundName = 'Vanguard Emergentes';
+      } else if (fundKey === 'vanguard_smallcaps') {
+        val = parseFloat(document.getElementById('inputFundSmallCaps').value);
+        fundName = 'Vanguard Small Caps';
+      }
+
+      if (!isNaN(val) && val >= 0) {
+        if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+        if (!state.myinvestor.funds) state.myinvestor.funds = {};
+
+        state.myinvestor.funds[fundKey] = val;
+
+        if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
+          state.fundSnapshots = [createFundSnapshotObject(new Date())];
+        } else {
+          const now = new Date();
+          const curY = now.getFullYear();
+          const curM = now.getMonth();
+          let currentSnap = state.fundSnapshots.find(function(s) {
+            const sd = new Date(s.date);
+            return sd.getFullYear() === curY && sd.getMonth() === curM;
+          });
+          if (currentSnap) {
+            currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
+            currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
+            currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
+            currentSnap.total = getFundsTotal();
+          } else {
+            state.fundSnapshots.push(createFundSnapshotObject(now));
+          }
+        }
+
+        saveAndSync();
+        alert('Has actualizado el saldo de ' + fundName);
+      }
+    }
+
     function importData(event) {
       const fileReader = new FileReader();
       fileReader.onload = function(e) {
@@ -2053,6 +2237,7 @@
               };
             }
             if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+            if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
             saveAndSync();
             populateCategoryDropdowns();
             alert('¡Copia de seguridad importada y sincronizada con la nube!');
