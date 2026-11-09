@@ -3,7 +3,7 @@
   "theme": "dark",
   "accounts": {
     "bbva": 2605.58,
-    "myinvestor": 18200,
+    "myinvestor": 17145.98,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 727.42563576
   },
@@ -20,7 +20,7 @@
       "total": 27533.00563576
     }
   ],
-  "lastCloudSync": "2026-11-09T00:02:53.099Z",
+  "lastCloudSync": "2026-11-09T00:03:43.511Z",
   "btcUnits": 0.010744,
   "btcPrice": 67705.29,
   "categories": {
