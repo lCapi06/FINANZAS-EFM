@@ -146,7 +146,7 @@
 
       </section>
 
-      <!-- Summary Cards (Ordenadas: BBVA, Trade Republic, MyInvestor, Bitcoin) -->
+      <!-- Summary Cards -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         <!-- Patrimonio Total -->
@@ -185,7 +185,7 @@
           </div>
         </div>
 
-        <!-- MyInvestor (Con desplegable de fondos al hacer clic) -->
+        <!-- MyInvestor -->
         <div onclick="toggleMyInvestorDetails()" class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors cursor-pointer hover:border-indigo-500/50 relative group">
           <div>
             <div class="flex justify-between items-center">
@@ -241,8 +241,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
-          <!-- Fidelity S&P 500 -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
@@ -254,7 +252,6 @@
             </button>
           </div>
 
-          <!-- Vanguard Emergentes -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
@@ -266,7 +263,6 @@
             </button>
           </div>
 
-          <!-- Vanguard Small Caps -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
@@ -277,7 +273,6 @@
               Invertir en Vanguard Small Caps
             </button>
           </div>
-
         </div>
       </section>
 
@@ -580,7 +575,7 @@
                 <th class="p-3 bg-slate-50 dark:bg-slate-800">BBVA</th>
                 <th class="p-3 bg-slate-50 dark:bg-slate-800">MyInvestor</th>
                 <th class="p-3 bg-slate-50 dark:bg-slate-800">Trade Republic</th>
-                <th class="p-3 bg-slate-50 dark:bg-slate-800">Bitcoin</th>
+                <th class="p-3 bg-slate-50 dark:bg-slate-800">Bitcoin (Mercado)</th>
                 <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">Patrimonio Total</th>
                 <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">% Total</th>
                 <th class="p-3 text-center bg-slate-50 dark:bg-slate-800">Acciones</th>
@@ -894,7 +889,7 @@
       }
       state.btcInvestedCost = val;
       saveAndSync();
-      alert('Coste de adquisición de Bitcoin actualizado a ' + val.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € (sin alterar el precio de mercado).');
+      alert('Coste de adquisición de Bitcoin actualizado a ' + val.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €.');
     }
 
     function getMyInvestorTotal() {
@@ -1279,7 +1274,8 @@
 
     function createSnapshotObject(dateObj) {
       const myInvTotal = getMyInvestorTotal();
-      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const btcMarketValue = state.accounts.trade_republic_btc; // Valor de mercado real en vivo
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcMarketValue;
       return {
         id: Date.now(),
         date: dateObj.toISOString(),
@@ -1287,7 +1283,7 @@
         bbva: state.accounts.bbva,
         myinvestor: myInvTotal,
         trade_republic_liq: state.accounts.trade_republic_liq,
-        trade_republic_btc: state.accounts.trade_republic_btc,
+        trade_republic_btc: btcMarketValue,
         total: total
       };
     }
@@ -1750,11 +1746,7 @@
       setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null);
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null);
       setTrendBadge('trendMyinvestor', myInvTotal, baseline ? baseline.myinvestor : null);
-
-      const btcBase = (state.btcInvestedCost && state.btcInvestedCost > 0) 
-        ? state.btcInvestedCost 
-        : (baseline ? baseline.trade_republic_btc : null);
-      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcBase);
+      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, baseline ? baseline.trade_republic_btc : null);
     }
 
     function renderTransactions() {
@@ -2259,6 +2251,17 @@
         saveAndSync();
         alert('Has actualizado el saldo de la cuenta ' + accountDisplayName);
       }
+    }
+
+    function updateBtcInvestedCost() {
+      const val = parseFloat(document.getElementById('inputBtcInvestedCost').value);
+      if (isNaN(val) || val < 0) {
+        alert('Por favor, introduce una cantidad válida en euros.');
+        return;
+      }
+      state.btcInvestedCost = val;
+      saveAndSync();
+      alert('Coste de adquisición de Bitcoin actualizado a ' + val.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €.');
     }
 
     function updateFundBalance(fundKey) {
