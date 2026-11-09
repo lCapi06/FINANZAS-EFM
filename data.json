@@ -20,7 +20,7 @@
       "total": 66963.32444948
     }
   ],
-  "lastCloudSync": "2026-11-09T04:43:15.754Z",
+  "lastCloudSync": "2026-11-09T12:06:16.580Z",
   "btcUnits": 0.010744,
   "btcPrice": 66870.295,
   "categories": {
@@ -30,8 +30,8 @@
       "Vivienda",
       "Transporte",
       "Suscripciones",
-      "Otros",
-      "Regalos"
+      "Regalos",
+      "Otros"
     ],
     "income": [
       "Nomina",
