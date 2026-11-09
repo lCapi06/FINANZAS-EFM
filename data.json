@@ -2,12 +2,23 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 2571.43,
+    "bbva": 2553.43,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
     "trade_republic_btc": 716.0520910800001
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794259134301,
+      "date": "2026-11-09T21:18:54.301Z",
+      "type": "expense",
+      "concept": "Regalos",
+      "amount": 18,
+      "category": "Regalos",
+      "account": "bbva",
+      "destination": null
+    }
+  ],
   "monthlySnapshots": [
     {
       "id": 1794258905864,
@@ -20,7 +31,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-09T21:16:43.903Z",
+  "lastCloudSync": "2026-11-09T21:18:54.314Z",
   "btcUnits": 0.010744,
   "btcPrice": 66646.695,
   "categories": {
