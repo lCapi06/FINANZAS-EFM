@@ -2,12 +2,23 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 2605.58,
+    "bbva": 4605.58,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
     "trade_republic_btc": 718.45444948
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794230106963,
+      "date": "2026-11-09T13:15:06.963Z",
+      "type": "income",
+      "concept": "Nómina ",
+      "amount": 2000,
+      "category": "Nómina",
+      "account": "bbva",
+      "destination": null
+    }
+  ],
   "monthlySnapshots": [
     {
       "id": 1794182749061,
@@ -20,7 +31,7 @@
       "total": 66963.32444948
     }
   ],
-  "lastCloudSync": "2026-11-09T12:06:16.580Z",
+  "lastCloudSync": "2026-11-09T13:15:06.979Z",
   "btcUnits": 0.010744,
   "btcPrice": 66870.295,
   "categories": {
@@ -39,5 +50,13 @@
       "Paga extra",
       "Otros"
     ]
+  },
+  "myinvestor": {
+    "cash": 0,
+    "funds": {
+      "fidelity_sp500": 18200,
+      "vanguard_emerging": 0,
+      "vanguard_smallcaps": 0
+    }
   }
 }
