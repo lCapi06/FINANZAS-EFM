@@ -220,22 +220,30 @@
 
       </section>
 
-      <!-- Panel Desplegable de Fondos Indexados de MyInvestor -->
-      <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border border-indigo-500/30 shadow-md transition-all space-y-4">
-        <div class="flex justify-between items-center">
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Con recuadro rojo y botón de rendimiento) -->
+      <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-rose-500 shadow-md transition-all space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Cartera de Fondos Indexados - MyInvestor</h3>
-            <p class="text-xs text-slate-500">Haz clic en invertir para aplicar el % del efectivo apartado cuando te llegue al fondo.</p>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
+            <p class="text-xs text-slate-500">Gestiona tus fondos y actualiza su rendimiento diario o invierte tu efectivo apartado.</p>
           </div>
-          <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
+          <div class="flex items-center gap-2">
+            <button onclick="updateMyInvestorPerformance()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1">
+              📈 Actualizar Rendimiento
+            </button>
+            <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           <!-- Fidelity S&P 500 -->
-          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 1</span>
+              <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
+                <button onclick="editFundBalance('fidelity_sp500', 'Fidelity S&P 500')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
+              </div>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
               <p id="fundFidelityVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -245,9 +253,12 @@
           </div>
 
           <!-- Vanguard Emergentes -->
-          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 2</span>
+              <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
+                <button onclick="editFundBalance('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
+              </div>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Mercados Emergentes</h4>
               <p id="fundEmergingVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -257,9 +268,12 @@
           </div>
 
           <!-- Vanguard Small Caps -->
-          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
-              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 3</span>
+              <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
+                <button onclick="editFundBalance('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="text-[10px] text-indigo-500 underline">Editar saldo</button>
+              </div>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
               <p id="fundSmallCapsVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
             </div>
@@ -508,49 +522,26 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos y Rendimiento Fondos MyInvestor -->
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Saldos</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
-              <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
-              <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
-              <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4 flex flex-col justify-between">
+      <!-- Ajuste Directo de Saldos General -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Saldos</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-bold text-slate-900 dark:text-white">Rendimiento Cartera Fondos</h3>
-              <button onclick="updateMyInvestorPerformance()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition" title="Aplicar rendimiento del día anterior">
-                📈 Actualizar Rendimiento
-              </button>
-            </div>
-            <p class="text-xs text-slate-500 mb-4">Aplica el interés compuesto de finalización del día anterior sobre tus fondos indexados.</p>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
+            <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
           </div>
-
-          <div class="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
-            <span class="text-xs font-bold text-indigo-900 dark:text-indigo-300 uppercase">💡 Nota operativa</span>
-            <p class="text-xs text-slate-600 dark:text-slate-300">
-              Para invertir el dinero traspasado, haz clic en la tarjeta de <b>MyInvestor</b> en la pestaña <i>Panel</i> para desplegar los fondos y utilizar los botones de inversión individuales.
-            </p>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
+            <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
+            <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
           </div>
         </div>
-
       </section>
 
       <!-- Historial de Saldos -->
@@ -744,7 +735,7 @@
       myinvestor: {
         cash: 1200.00, 
         funds: {
-          fidelity_sp500: 12000.00,
+          fidelity_sp500: 10000.00,
           vanguard_emerging: 3000.00,
           vanguard_smallcaps: 4000.00
         }
@@ -805,7 +796,21 @@
       return cash + funds;
     }
 
-    // Invertir un % del efectivo apartado en un fondo específico
+    // Permitir editar el saldo inicial o real de cada fondo de manera independiente
+    function editFundBalance(fundKey, fundName) {
+      const currentVal = state.myinvestor.funds[fundKey] || 0;
+      const input = prompt('Introduce el saldo real actual para ' + fundName + ' (€):', currentVal);
+      if (input === null) return;
+      const val = parseFloat(input);
+      if (!isNaN(val) && val >= 0) {
+        state.myinvestor.funds[fundKey] = val;
+        saveAndSync();
+        alert('Saldo de ' + fundName + ' actualizado correctamente.');
+      } else {
+        alert('Por favor, introduce un importe válido.');
+      }
+    }
+
     function investInFund(fundKey, fundName) {
       if (!state.myinvestor || state.myinvestor.cash <= 0) {
         alert('No hay efectivo apartado en MyInvestor disponible para invertir.');
@@ -1063,7 +1068,7 @@
         if (cloudState && cloudState.accounts) {
           state = cloudState;
           if (!state.myinvestor) {
-            state.myinvestor = { cash: 0, funds: { fidelity_sp500: 18200, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+            state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
           }
           if (!state.categories) {
             state.categories = {
@@ -1264,11 +1269,11 @@
             const oldMyInv = state.accounts.myinvestor;
             delete state.accounts.myinvestor;
             if (!state.myinvestor) {
-              state.myinvestor = { cash: 0, funds: { fidelity_sp500: oldMyInv, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+              state.myinvestor = { cash: 0, funds: { fidelity_sp500: oldMyInv, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
             }
           }
           if (!state.myinvestor) {
-            state.myinvestor = { cash: 0, funds: { fidelity_sp500: 18200, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+            state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
           }
           if (!state.accounts.trade_republic_liq) {
             state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
@@ -1848,9 +1853,6 @@
         if (account === 'myinvestor') state.myinvestor.cash -= amount;
         else state.accounts[account] -= amount;
 
-        // Al hacer traspaso a myinvestor, el dinero se suma al total a través del incremento de fondos o efectivo apartado.
-        // Aquí incrementamos el total mediante el efectivo apartado para que esté listo para invertir, 
-        // pero asegurando que la suma patrimonial global refleje correctamente el traspaso.
         if (destination === 'myinvestor') {
           if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
           state.myinvestor.cash += amount;
@@ -2042,7 +2044,7 @@
           if (importedState && (importedState.accounts || importedState.myinvestor)) {
             state = importedState;
             if (!state.myinvestor) {
-              state.myinvestor = { cash: 0, funds: { fidelity_sp500: 18200, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+              state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
             }
             if (!state.categories) {
               state.categories = {
