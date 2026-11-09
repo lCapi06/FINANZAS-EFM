@@ -88,19 +88,9 @@
       "trade_republic_liq": 6000,
       "trade_republic_btc": 727.42563576,
       "total": 27927.42563576
-    },
-    {
-      "id": 1794180006730,
-      "date": "2026-11-08T23:20:06.730Z",
-      "dateLabel": "nov 2026, 00:20",
-      "bbva": 3500,
-      "myinvestor": 18200,
-      "trade_republic_liq": 6000,
-      "trade_republic_btc": 727.42563576,
-      "total": 28427.42563576
     }
   ],
-  "lastCloudSync": "2026-11-08T23:42:30.537Z",
+  "lastCloudSync": "2026-11-09T00:01:55.688Z",
   "btcUnits": 0.010744,
   "btcPrice": 67705.29,
   "categories": {
