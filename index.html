@@ -229,12 +229,12 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
-            <p class="text-xs text-slate-500">Consulta tus fondos, actualiza su rendimiento diario o invierte tu efectivo apartado.</p>
+            <p class="text-xs text-slate-500">Consulta tus fondos y su evolución automática diaria, o invierte tu efectivo apartado.</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="updateMyInvestorPerformance()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1">
-              📈 Actualizar Rendimiento
-            </button>
+            <span class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+              ✨ Rentabilidad Automática Diaria Activa
+            </span>
             <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
           </div>
         </div>
@@ -281,8 +281,8 @@
     <div id="tab-resumen" class="tab-content hidden space-y-6">
       
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado en Movimientos)</h3>
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Balance de Flujo de Caja (Periodo Seleccionado en Movimientos)</h3>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
               <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
@@ -295,6 +295,19 @@
             <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
               <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro</p>
               <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+            </div>
+          </div>
+
+          <!-- MEJORA FUNCIONAL: Previsión de Cierre de Mes -->
+          <div class="p-4 rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-indigo-500/20">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">🔮 Previsión Inteligente de Fin de Mes</span>
+              <h4 id="forecastTitle" class="text-sm font-bold mt-1">Estimación de ahorro a fin de mes</h4>
+              <p id="forecastDesc" class="text-xs text-slate-300 mt-0.5">Calculando ritmo de gasto diario...</p>
+            </div>
+            <div class="text-left sm:text-right shrink-0">
+              <span id="forecastAmount" class="text-xl font-extrabold text-emerald-400">0,00 €</span>
+              <p class="text-[10px] text-slate-400">Ahorro proyectado</p>
             </div>
           </div>
         </div>
@@ -512,10 +525,16 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos General -->
+      <!-- Ajuste Directo de Saldos General (Minimizable) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Saldos</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>⚙️ Ajuste Directo de Saldos General</span>
+          </h3>
+          <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▲ Minimizar</span>
+        </div>
+        
+        <div id="adjustGeneralSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
             <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
@@ -539,11 +558,19 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Fondos Indexados -->
+      <!-- Ajuste Directo de Fondos Indexados (Minimizable) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Fondos Indexados</h3>
-        <p class="text-xs text-slate-500">Actualiza los saldos de tus fondos indexados de MyInvestor y crea una nueva foto en su historial.</p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📈 Ajuste Directo de Fondos Indexados</span>
+            </h3>
+            <p class="text-xs text-slate-500">Actualiza saldos manualmente si es necesario (el rendimiento diario ya se aplica solo).</p>
+          </div>
+          <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▲ Minimizar</span>
+        </div>
+
+        <div id="adjustFundsSection" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
             <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
@@ -790,6 +817,7 @@
       transactions: [],
       monthlySnapshots: [],
       fundSnapshots: [],
+      lastFundPerformanceDate: null,
       lastExportDate: null,
       lastCloudSync: null
     };
@@ -800,6 +828,18 @@
       const panel = document.getElementById('myinvestorDetailsPanel');
       if (panel) {
         panel.classList.toggle('hidden');
+      }
+    }
+
+    function toggleSection(sectionId, iconId) {
+      const sec = document.getElementById(sectionId);
+      const icon = document.getElementById(iconId);
+      if (sec.classList.contains('hidden')) {
+        sec.classList.remove('hidden');
+        if (icon) icon.innerText = '▲ Minimizar';
+      } else {
+        sec.classList.add('hidden');
+        if (icon) icon.innerText = '▼ Desplegar';
       }
     }
 
@@ -833,6 +873,45 @@
       } finally {
         if (btn) btn.innerText = '🔄';
       }
+    }
+
+    function checkAndApplyDailyFundPerformance() {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (state.lastFundPerformanceDate === todayStr) return false;
+
+      if (!state.myinvestor || !state.myinvestor.funds) return false;
+
+      const dailyFidelityReturn = 0.0008; 
+      const dailyEmergingReturn = 0.0005; 
+      const dailySmallCapsReturn = 0.0006; 
+
+      state.myinvestor.funds.fidelity_sp500 *= (1 + dailyFidelityReturn);
+      state.myinvestor.funds.vanguard_emerging *= (1 + dailyEmergingReturn);
+      state.myinvestor.funds.vanguard_smallcaps *= (1 + dailySmallCapsReturn);
+
+      state.lastFundPerformanceDate = todayStr;
+
+      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
+        state.fundSnapshots = [createFundSnapshotObject(new Date())];
+      } else {
+        const now = new Date();
+        const curY = now.getFullYear();
+        const curM = now.getMonth();
+        let currentSnap = state.fundSnapshots.find(function(s) {
+          const sd = new Date(s.date);
+          return sd.getFullYear() === curY && sd.getMonth() === curM;
+        });
+        if (currentSnap) {
+          currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
+          currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
+          currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
+          currentSnap.total = getFundsTotal();
+        } else {
+          state.fundSnapshots.push(createFundSnapshotObject(now));
+        }
+      }
+
+      return true;
     }
 
     function investInBitcoin() {
@@ -932,7 +1011,6 @@
       state.myinvestor.cash -= amountToInvest;
       state.myinvestor.funds[fundKey] += amountToInvest;
 
-      // Registrar el movimiento en el historial para permitir la reversión al eliminarlo
       state.transactions.push({
         id: Date.now(),
         date: new Date().toISOString(),
@@ -952,30 +1030,6 @@
 
       saveAndSync();
       alert('¡Se han invertido ' + amountToInvest.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € en ' + fundName + ' con éxito!');
-    }
-
-    function updateMyInvestorPerformance() {
-      const dailyFidelityReturn = 0.0008; 
-      const dailyEmergingReturn = 0.0005; 
-      const dailySmallCapsReturn = 0.0006; 
-
-      if (!state.myinvestor || !state.myinvestor.funds) return;
-
-      const prevTotal = getMyInvestorTotal();
-
-      state.myinvestor.funds.fidelity_sp500 *= (1 + dailyFidelityReturn);
-      state.myinvestor.funds.vanguard_emerging *= (1 + dailyEmergingReturn);
-      state.myinvestor.funds.vanguard_smallcaps *= (1 + dailySmallCapsReturn);
-
-      const newTotal = getMyInvestorTotal();
-      const diff = newTotal - prevTotal;
-
-      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
-        state.fundSnapshots = [createFundSnapshotObject(new Date())];
-      }
-
-      saveAndSync();
-      alert('¡Rendimiento del día anterior aplicado con éxito!\nGanancia estimada: +' + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
     }
 
     function populateCategoryDropdowns() {
@@ -1192,6 +1246,7 @@
           state = cloudState;
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
           if (state.btcCash === undefined) state.btcCash = 0;
+          if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
           if (!state.myinvestor) {
             state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
           }
@@ -1201,13 +1256,16 @@
               income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
             };
           }
-          if (!Array.isArray(state.monthlySnapshots)) {
-            state.monthlySnapshots = [];
+          if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+          if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+
+          // Aplicar rendimiento diario automático si corresponde
+          const updatedFunds = checkAndApplyDailyFundPerformance();
+          if (updatedFunds) {
+            localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+            syncToGitHub(false);
           }
-          if (!Array.isArray(state.fundSnapshots)) {
-            state.fundSnapshots = [];
-          }
-          localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+
           const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
           setSyncStatus('☁️ Sincronizado (' + syncDate + ')', 'ok');
           return true;
@@ -1330,7 +1388,6 @@
       let updated = false;
 
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
-      
       const isFirstEver = state.monthlySnapshots.length === 0;
 
       const hasCurrentMonth = state.monthlySnapshots.some(function(s) {
@@ -1435,6 +1492,7 @@
           state = JSON.parse(saved);
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
           if (state.btcCash === undefined) state.btcCash = 0;
+          if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
           if (state.accounts && state.accounts.myinvestor !== undefined) {
             const oldMyInv = state.accounts.myinvestor;
             delete state.accounts.myinvestor;
@@ -1455,16 +1513,15 @@
               income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
             };
           }
-          if (!Array.isArray(state.monthlySnapshots)) {
-            state.monthlySnapshots = [];
-          }
-          if (!Array.isArray(state.fundSnapshots)) {
-            state.fundSnapshots = [];
-          }
+          if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+          if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
       }
+
+      // Aplicar rendimiento diario automático al cargar
+      checkAndApplyDailyFundPerformance();
 
       applyTheme();
       updateYearFilterOptions();
@@ -1813,6 +1870,24 @@
       savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
       savingsEl.className = 'text-xl font-bold mt-1 ' + (pSavings >= 0 ? 'text-indigo-700 dark:text-indigo-300' : 'text-rose-600 dark:text-rose-400');
 
+      // Calcular Previsión Inteligente de Fin de Mes
+      const now = new Date();
+      const currentDay = now.getDate();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const forecastAmtEl = document.getElementById('forecastAmount');
+      const forecastDescEl = document.getElementById('forecastDesc');
+
+      if (currentDay > 2 && pInc > 0) {
+        const dailyBurnRate = pExp / currentDay;
+        const projectedMonthExpense = dailyBurnRate * daysInMonth;
+        const projectedSavings = pInc - projectedMonthExpense;
+        forecastAmtEl.innerText = (projectedSavings >= 0 ? '+' : '') + projectedSavings.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        forecastDescEl.innerText = 'Basado en tu ritmo de gasto actual (' + dailyBurnRate.toFixed(1) + ' €/día).';
+      } else {
+        forecastAmtEl.innerText = 'Calculando...';
+        forecastDescEl.innerText = 'Se necesitan al menos 3 días de registro este mes.';
+      }
+
       const healthBadge = document.getElementById('healthBadge');
       const healthText = document.getElementById('healthText');
       const healthDesc = document.getElementById('healthDesc');
@@ -1967,10 +2042,7 @@
 
       const rowsWithPct = sortedAsc.map(function(snap, idx) {
         const prev = idx > 0 ? sortedAsc[idx - 1] : null;
-        return {
-          snap: snap,
-          prev: prev
-        };
+        return { snap: snap, prev: prev };
       });
 
       rowsWithPct.reverse().forEach(function(item) {
@@ -2016,10 +2088,7 @@
 
       const rowsWithPct = sortedAsc.map(function(snap, idx) {
         const prev = idx > 0 ? sortedAsc[idx - 1] : null;
-        return {
-          snap: snap,
-          prev: prev
-        };
+        return { snap: snap, prev: prev };
       });
 
       rowsWithPct.reverse().forEach(function(item) {
@@ -2147,7 +2216,6 @@
 
       const oldTx = state.transactions[idx];
 
-      // Revertir el impacto anterior de la transacción editada
       if (oldTx.type === 'expense') {
         if (oldTx.account === 'myinvestor') state.myinvestor.cash += oldTx.amount;
         else state.accounts[oldTx.account] += oldTx.amount;
@@ -2247,7 +2315,6 @@
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
 
-        // Revertir el impacto financiero según el tipo de transacción eliminada
         if (tx.type === 'expense') {
           if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
           else state.accounts[tx.account] += tx.amount;
@@ -2255,14 +2322,12 @@
           if (tx.account === 'myinvestor') state.myinvestor.cash -= tx.amount;
           else state.accounts[tx.account] -= tx.amount;
         } else if (tx.type === 'transfer') {
-          // 1. Devolver el dinero a la cuenta de origen (o efectivo apartado MyInvestor)
           if (tx.account === 'myinvestor' || tx.account === 'myinvestor_cash') {
             state.myinvestor.cash += tx.amount;
           } else if (state.accounts[tx.account] !== undefined) {
             state.accounts[tx.account] += tx.amount;
           }
 
-          // 2. Retirar el impacto en el destino (Fondos, BTC u otras cuentas)
           if (tx.destination === 'trade_republic_btc') {
             if (tx.btcUnitsBought && tx.btcEurSpent) {
               state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - tx.btcUnitsBought);
@@ -2273,7 +2338,6 @@
               state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - tx.amount);
             }
           } else if (tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
-            // Revertir la inversión en el fondo indexado correspondiente
             if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
               state.myinvestor.funds[tx.fundKeyBought] = Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested);
             }
@@ -2394,6 +2458,7 @@
             state = importedState;
             if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
             if (state.btcCash === undefined) state.btcCash = 0;
+            if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
             if (!state.myinvestor) {
               state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
             }
