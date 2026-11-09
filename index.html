@@ -87,7 +87,19 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- Alerta DCA (Aportación Periódica) -->
+    <div id="dcaAlertBanner" class="hidden p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">⏳</span>
+        <div>
+          <h4 class="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase">Aviso de Aportación Periódica (DCA)</h4>
+          <p id="dcaAlertText" class="text-xs text-amber-700 dark:text-amber-400 mt-0.5">Han pasado más de 30 días desde tu última inversión en fondos o Bitcoin.</p>
+        </div>
+      </div>
+      <button onclick="switchTab('movimientos')" class="px-3 py-1.5 text-xs font-bold bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition shrink-0">Invertir ahora</button>
+    </div>
 
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
@@ -351,6 +363,14 @@
             <canvas id="evolutionChart"></canvas>
           </div>
         </div>
+
+        <!-- Gráfico de Evolución Histórica por Fondo Indexado (2.C) -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-3 transition-colors space-y-4">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">Evolución Histórica por Fondo Indexado</h3>
+          <div class="h-64">
+            <canvas id="fundEvolutionChart"></canvas>
+          </div>
+        </div>
       </section>
 
     </div>
@@ -456,7 +476,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
           <div>
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mes</label>
             <select id="filterMonth" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
@@ -501,7 +521,18 @@
             </select>
           </div>
 
-          <div class="col-span-2 sm:col-span-2 lg:col-span-4">
+          <!-- Filtro Rango de Fechas Libre (2.A) -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Desde</label>
+            <input type="date" id="filterDateFrom" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Hasta</label>
+            <input type="date" id="filterDateTo" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+          </div>
+
+          <div class="col-span-2 sm:col-span-2 lg:col-span-6">
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Buscar por concepto</label>
             <input type="text" id="filterConcept" oninput="renderTransactions()" placeholder="Escribe para buscar concepto..." class="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
@@ -525,16 +556,16 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos General (Minimizable) -->
+      <!-- Ajuste Directo de Saldos General (Minimizado por defecto) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span>⚙️ Ajuste Directo de Saldos General</span>
           </h3>
-          <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▲ Minimizar</span>
+          <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
         </div>
         
-        <div id="adjustGeneralSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
             <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
@@ -558,7 +589,7 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Fondos Indexados (Minimizable) -->
+      <!-- Ajuste Directo de Fondos Indexados (Minimizado por defecto) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
         <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
           <div>
@@ -567,10 +598,10 @@
             </h3>
             <p class="text-xs text-slate-500">Actualiza saldos manualmente si es necesario (el Valor Liquidativo diario se aplica solo).</p>
           </div>
-          <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▲ Minimizar</span>
+          <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
         </div>
 
-        <div id="adjustFundsSection" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
             <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
@@ -875,19 +906,17 @@
       }
     }
 
-    // Actualización automática diaria basada en el Valor Liquidativo real de mercado
     async function checkAndApplyDailyFundPerformance() {
-      const todayStr = new Date().toISOString().slice(0, 10); // ej: '2026-11-10'
+      const todayStr = new Date().toISOString().slice(0, 10);
       if (state.lastFundPerformanceDate === todayStr) return false;
 
       if (!state.myinvestor || !state.myinvestor.funds) return false;
 
-      let fidelityChange = 0.012;  // 1.2% estimado de cambio de VL diario por defecto si API no responde
-      let emergingChange = 0.009;  // 0.9%
-      let smallCapsChange = 0.010; // 1.0%
+      let fidelityChange = 0.012;  
+      let emergingChange = 0.009;  
+      let smallCapsChange = 0.010; 
 
       try {
-        // Petición a Yahoo Finance en tiempo real para obtener variación diaria real de índices de referencia (S&P 500 ^GSPC, Emerging EEM, Small Caps IWM)
         const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&range=2d');
         if (res.ok) {
           const data = await res.json();
@@ -901,7 +930,6 @@
         console.warn('Usando estimación de VL de mercado basada en cierre anterior:', e);
       }
 
-      // Aplicar variación real de Valor Liquidativo (VL)
       state.myinvestor.funds.fidelity_sp500 *= (1 + fidelityChange);
       state.myinvestor.funds.vanguard_emerging *= (1 + emergingChange);
       state.myinvestor.funds.vanguard_smallcaps *= (1 + smallCapsChange);
@@ -1276,7 +1304,6 @@
           if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
           if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
-          // Comprobar y actualizar VL diario si cambió el día
           const updatedFunds = await checkAndApplyDailyFundPerformance();
           if (updatedFunds) {
             localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
@@ -1537,7 +1564,6 @@
         }
       }
 
-      // Aplicar actualización diaria de VL al cargar
       await checkAndApplyDailyFundPerformance();
 
       applyTheme();
@@ -1721,6 +1747,38 @@
       await shareOrDownloadFile(dataString, datedFileName);
     }
 
+    function checkDcaAlert() {
+      const banner = document.getElementById('dcaAlertBanner');
+      const alertText = document.getElementById('dcaAlertText');
+      if (!banner || !alertText) return;
+
+      // Buscar última transacción de inversión (transferencia a fondo o btc)
+      const investmentTxs = state.transactions.filter(t => t.type === 'transfer' && (t.destination === 'myinvestor_fund' || t.destination === 'trade_republic_btc'));
+      
+      let lastDate = null;
+      if (investmentTxs.length > 0) {
+        const sortedInv = investmentTxs.sort((a,b) => new Date(b.date) - new Date(a.date));
+        lastDate = new Date(sortedInv[0].date);
+      } else if (state.monthlySnapshots.length > 0) {
+        const sortedSnaps = state.monthlySnapshots.sort((a,b) => new Date(b.date) - new Date(a.date));
+        lastDate = new Date(sortedSnaps[0].date);
+      }
+
+      if (lastDate) {
+        const diffDays = Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
+        if (diffDays > 30) {
+          banner.classList.remove('hidden');
+          alertText.innerText = `Han pasado ${diffDays} días desde tu última aportación registrada. ¡Es hora de revisar tu DCA!`;
+          return;
+        }
+      } else {
+        banner.classList.remove('hidden');
+        alertText.innerText = `No hay aportaciones de inversión registradas todavía. ¡Empieza tu DCA!`;
+        return;
+      }
+      banner.classList.add('hidden');
+    }
+
     function render() {
       const myInvTotal = getMyInvestorTotal();
       const btcCashVal = parseFloat(state.btcCash) || 0;
@@ -1759,6 +1817,7 @@
       }
 
       updateAllTrends();
+      checkDcaAlert();
 
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
       const invPct = total > 0 ? Math.round((invested / total) * 100) : 0;
@@ -1852,6 +1911,8 @@
       const yearVal = document.getElementById('filterYear').value;
       const catVal = document.getElementById('filterCategory').value;
       const accVal = document.getElementById('filterAccount').value;
+      const dateFromVal = document.getElementById('filterDateFrom').value;
+      const dateToVal = document.getElementById('filterDateTo').value;
       const conceptSearch = document.getElementById('filterConcept').value.toLowerCase().trim();
 
       let list = state.transactions;
@@ -1865,11 +1926,21 @@
         const matchMonth = (monthVal === 'all') || (d.getMonth() === parseInt(monthVal));
         const matchYear = (yearVal === 'all') || (d.getFullYear() === parseInt(yearVal));
         
+        let matchDateRange = true;
+        if (dateFromVal) {
+          const fromD = new Date(dateFromVal + 'T00:00:00');
+          if (d < fromD) matchDateRange = false;
+        }
+        if (dateToVal && matchDateRange) {
+          const toD = new Date(dateToVal + 'T23:59:59');
+          if (d > toD) matchDateRange = false;
+        }
+
         const matchCategory = (catVal === 'all') || (t.category === catVal) || (t.type === 'transfer' && catVal === 'Inversion');
         const matchAccount = (accVal === 'all') || (t.account === accVal) || (t.destination === accVal);
         const matchConcept = (!conceptSearch) || (t.concept && t.concept.toLowerCase().includes(conceptSearch));
 
-        return matchMonth && matchYear && matchCategory && matchAccount && matchConcept;
+        return matchMonth && matchYear && matchDateRange && matchCategory && matchAccount && matchConcept;
       });
 
       let pInc = 0;
@@ -2559,6 +2630,7 @@
     let chartCat = null;
     let chartEvol = null;
     let chartComp = null;
+    let chartFundEvol = null;
 
     function calculateCompound() {
       const initial = parseFloat(document.getElementById('compInitial').value) || 0;
@@ -2790,6 +2862,87 @@
               callbacks: {
                 label: function(context) {
                   return ' Patrimonio: ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
+      });
+
+      // Gráfico Evolución por Fondo (2.C)
+      const ctxFundEvol = document.getElementById('fundEvolutionChart').getContext('2d');
+      if (chartFundEvol) chartFundEvol.destroy();
+
+      let fundLabels = [];
+      let fidelityData = [];
+      let emergingData = [];
+      let smallCapsData = [];
+
+      if (Array.isArray(state.fundSnapshots) && state.fundSnapshots.length > 0) {
+        let sortedFunds = state.fundSnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        sortedFunds.forEach(function(s) {
+          fundLabels.push(formatDateDDMMYYYY(new Date(s.date)));
+          fidelityData.push(s.fidelity_sp500 || 0);
+          emergingData.push(s.vanguard_emerging || 0);
+          smallCapsData.push(s.vanguard_smallcaps || 0);
+        });
+      } else {
+        fundLabels.push(formatDateDDMMYYYY(new Date()));
+        fidelityData.push(state.myinvestor.funds.fidelity_sp500);
+        emergingData.push(state.myinvestor.funds.vanguard_emerging);
+        smallCapsData.push(state.myinvestor.funds.vanguard_smallcaps);
+      }
+
+      chartFundEvol = new Chart(ctxFundEvol, {
+        type: 'line',
+        data: {
+          labels: fundLabels,
+          datasets: [
+            {
+              label: 'Fidelity S&P 500',
+              data: fidelityData,
+              borderColor: '#6366f1',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: 'Vanguard Emergentes',
+              data: emergingData,
+              borderColor: '#10b981',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: 'Vanguard Small Caps',
+              data: smallCapsData,
+              borderColor: '#f59e0b',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
                 }
               }
             }
