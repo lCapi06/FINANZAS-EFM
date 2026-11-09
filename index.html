@@ -50,9 +50,6 @@
       
       <!-- Botones de Acción Ultra Compactos para Móvil -->
       <div class="flex items-center gap-1 shrink-0">
-        <button onclick="refreshFinancials()" class="p-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 transition" title="Refrescar Datos y Porcentajes">
-          🔄
-        </button>
         <button onclick="toggleTheme()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
         </button>
@@ -96,15 +93,22 @@
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Liquidez vs Inversión & Meta Automática por Hitos -->
+      <!-- Botón de Refrescar Datos colocado encima de los objetivos -->
+      <div class="flex justify-end">
+        <button onclick="refreshFinancials()" class="px-3 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900 transition flex items-center gap-1.5 shadow-sm">
+          🔄 <span>Refrescar Datos y Porcentajes</span>
+        </button>
+      </div>
+
+      <!-- Liquidez vs Inversión & Objetivo Patrimonial -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <!-- Meta Automática por Hitos (50k en 50k) -->
+        <!-- Objetivo Patrimonial -->
         <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div>
               <span id="goalMilestoneBadge" class="text-xs font-semibold tracking-wider uppercase text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-500/35">Hito Actual: 0 € - 50.000 €</span>
-              <h2 class="text-2xl font-bold mt-2">Objetivo Patrimonial Automático</h2>
+              <h2 class="text-2xl font-bold mt-2">Objetivo Patrimonial</h2>
             </div>
             <div id="milestoneSuccessBanner" class="hidden px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold animate-pulse">
               🎉 ¡Hito superado!
@@ -383,7 +387,7 @@
         </section>
       </div>
 
-      <!-- Historial de Movimientos (Con Scroll Vertical de aprox 5 filas) -->
+      <!-- Historial de Movimientos -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
@@ -493,7 +497,7 @@
         </div>
       </section>
 
-      <!-- Historial de Saldos (Foto Mensual Automática + % Individual y Total) -->
+      <!-- Historial de Saldos (Con botón de eliminar individual por cada fila) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Historial de Saldos (Foto Mensual)</h3>
         <p class="text-xs text-slate-500 mb-4">Registro inicial y foto automática el día 1 de cada mes con variación porcentual respecto al mes anterior.</p>
@@ -508,6 +512,7 @@
                 <th class="p-3 bg-slate-50 dark:bg-slate-800">Bitcoin</th>
                 <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">Patrimonio Total</th>
                 <th class="p-3 text-right bg-slate-50 dark:bg-slate-800">% Total</th>
+                <th class="p-3 text-center bg-slate-50 dark:bg-slate-800">Acciones</th>
               </tr>
             </thead>
             <tbody id="balanceSnapshotsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1056,14 +1061,13 @@
 
     function checkAndTakeMonthlySnapshot() {
       if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
-        return false; // Se creará la primera foto cuando el usuario haga su primer ajuste manual
+        return false;
       }
 
       const now = new Date();
       const currentYear = now.getFullYear();
       const currentMonth = now.getMonth();
 
-      // Comprobamos si ya existe una foto para el mes y año actual
       const hasCurrentMonth = state.monthlySnapshots.some(function(s) {
         const sd = new Date(s.date);
         return sd.getFullYear() === currentYear && sd.getMonth() === currentMonth;
@@ -1076,6 +1080,12 @@
         return true;
       }
       return false;
+    }
+
+    function deleteSnapshot(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta entrada del historial de saldos?')) return;
+      state.monthlySnapshots = state.monthlySnapshots.filter(function(s) { return s.id !== id; });
+      saveAndSync();
     }
 
     function processUrlShortcuts() {
@@ -1352,7 +1362,7 @@
       document.getElementById('liquidBar').style.width = liqPct + '%';
       document.getElementById('investedBar').style.width = invPct + '%';
 
-      // ==================== OBJETIVO PATRIMONIAL AUTOMÁTICO (HITOS DE 50K) ====================
+      // ==================== OBJETIVO PATRIMONIAL (HITOS DE 50K) ====================
       const step = 50000;
       const currentMilestoneIndex = Math.floor(total / step);
       const milestoneStart = currentMilestoneIndex * step;
@@ -1389,7 +1399,7 @@
 
       if (hasSnapshots) {
         const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        baseline = sortedAsc[0]; // Primera entrada del historial de saldos
+        baseline = sortedAsc[0];
       }
 
       function setTrendBadge(elementId, currentVal, baseVal) {
@@ -1598,18 +1608,17 @@
       renderTransactions();
     }
 
-    // ==================== HISTORIAL DE SALDOS CON % INDIVIDUAL Y TOTAL ====================
+    // ==================== HISTORIAL DE SALDOS CON BOTÓN DE ELIMINAR INDIVIDUAL ====================
     function renderSnapshots() {
       const tbody = document.getElementById('balanceSnapshotsTable');
       if (!tbody) return;
       tbody.innerHTML = '';
 
       if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Ajusta un saldo manualmente para crear tu punto de partida.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Sin historial de saldos todavía. Ajusta un saldo manualmente para crear tu punto de partida.</td></tr>';
         return;
       }
 
-      // Ordenar cronológicamente (antiguo -> nuevo) para calcular el % respecto al mes anterior
       const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
 
       function formatPctBadge(curr, prev) {
@@ -1630,7 +1639,6 @@
         };
       });
 
-      // Mostrar del más reciente al más antiguo
       rowsWithPct.reverse().forEach(function(item) {
         const snap = item.snap;
         const prev = item.prev;
@@ -1644,7 +1652,8 @@
           '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.trade_republic_liq||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.trade_republic_liq||0, prev ? prev.trade_republic_liq : null) + '</td>' +
           '<td class="p-3 text-amber-600 dark:text-amber-400">' + (snap.trade_republic_btc||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.trade_republic_btc||0, prev ? prev.trade_republic_btc : null) + '</td>' +
           '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
-          '<td class="p-3 text-right">' + formatPctBadge(snap.total||0, prev ? prev.total : null) + '</td>';
+          '<td class="p-3 text-right">' + formatPctBadge(snap.total||0, prev ? prev.total : null) + '</td>' +
+          '<td class="p-3 text-center"><button onclick="deleteSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
         tbody.appendChild(tr);
       });
     }
@@ -1853,7 +1862,6 @@
 
       if (!isNaN(val)) {
         state.accounts[acc] = val;
-        // Si es el primer ajuste manual (historial vacío), creamos la foto inicial
         if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
           state.monthlySnapshots = [createSnapshotObject(new Date())];
         }
