@@ -2,14 +2,25 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3500,
+    "bbva": 2605.58,
     "myinvestor": 18200,
     "trade_republic_liq": 6000,
     "trade_republic_btc": 727.42563576
   },
   "transactions": [],
-  "monthlySnapshots": [],
-  "lastCloudSync": "2026-11-09T00:02:04.457Z",
+  "monthlySnapshots": [
+    {
+      "id": 1794182573051,
+      "date": "2026-11-09T00:02:53.051Z",
+      "dateLabel": "09/11/2026",
+      "bbva": 2605.58,
+      "myinvestor": 18200,
+      "trade_republic_liq": 6000,
+      "trade_republic_btc": 727.42563576,
+      "total": 27533.00563576
+    }
+  ],
+  "lastCloudSync": "2026-11-09T00:02:53.099Z",
   "btcUnits": 0.010744,
   "btcPrice": 67705.29,
   "categories": {
