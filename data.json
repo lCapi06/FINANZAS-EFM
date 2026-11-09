@@ -4,7 +4,7 @@
   "accounts": {
     "bbva": 2605.58,
     "myinvestor": 17145.98,
-    "trade_republic_liq": 46463.31,
+    "trade_republic_liq": 46493.31,
     "trade_republic_btc": 745.0899121599999
   },
   "transactions": [
@@ -15,16 +15,6 @@
       "concept": "Bitcoin ",
       "amount": 30,
       "category": "trade_republic_btc",
-      "account": "trade_republic_liq",
-      "destination": "trade_republic_btc"
-    },
-    {
-      "id": 1794246551282,
-      "date": "2026-11-09T17:49:11.282Z",
-      "type": "transfer",
-      "concept": "Compra Bitcoin (0.000451 BTC a 66.557,14 €)",
-      "amount": 30,
-      "category": null,
       "account": "trade_republic_liq",
       "destination": "trade_republic_btc"
     }
@@ -41,7 +31,7 @@
       "total": 67147.75
     }
   ],
-  "lastCloudSync": "2026-11-09T17:49:11.301Z",
+  "lastCloudSync": "2026-11-09T17:49:48.099Z",
   "btcUnits": 0.011194740521602941,
   "btcPrice": 66557.14,
   "categories": {
