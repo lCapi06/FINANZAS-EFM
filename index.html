@@ -215,7 +215,7 @@
               </div>
             </div>
             <h3 id="trBtcBalance" class="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0,00 €</h3>
-            <p id="btcUnitsSubtext" class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">0 BTC</p>
+            <p id="btcUnitsSubtext" class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">0 BTC | Apartado: 0 €</p>
           </div>
           <div class="mt-3">
             <span id="trendTrBtc" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">+0,00 € (0,00%)</span>
@@ -515,7 +515,7 @@
       <!-- Ajuste Directo de Saldos General -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Saldos</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
             <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
@@ -530,6 +530,11 @@
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
             <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
             <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Coste Adquisición BTC (€)</label>
+            <input type="number" step="0.01" id="inputBtcCost" placeholder="Ej: 2500.00" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('btc_cost')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Actualizar Coste BTC</button>
           </div>
         </div>
       </section>
@@ -764,6 +769,7 @@
       btcUnits: 0,
       btcPrice: 0,
       btcInvestedCost: 0,
+      btcCash: 0,
       accounts: {
         bbva: 3500.00,
         trade_republic_liq: 6000.00,
@@ -812,6 +818,8 @@
           const units = parseFloat(state.btcUnits) || 0;
           if (units > 0) {
             state.accounts.trade_republic_btc = units * priceEur;
+          } else {
+            state.accounts.trade_republic_btc = 0;
           }
           saveAndSync();
           
@@ -828,17 +836,18 @@
     }
 
     function investInBitcoin() {
-      const amountStr = prompt('¿Cuántos euros (€) has invertido en Bitcoin?\n(Se descontarán de tu cuenta remunerada de Trade Republic y aumentarán tu coste de adquisición)', '30');
+      const pendingCash = parseFloat(state.btcCash) || 0;
+      const defaultAmount = pendingCash > 0 ? pendingCash.toFixed(2) : '30';
+      const amountStr = prompt(
+        'Tienes ' + pendingCash.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € apartados en espera para Bitcoin.\n¿Cuántos euros (€) vas a destinar a la compra?',
+        defaultAmount
+      );
       if (amountStr === null) return;
       const amountEur = parseFloat(amountStr.replace(',', '.'));
 
       if (isNaN(amountEur) || amountEur <= 0) {
         alert('Por favor, introduce un importe en euros válido.');
         return;
-      }
-
-      if (state.accounts.trade_republic_liq < amountEur) {
-        if (!confirm('Atención: Tu saldo en Trade Republic (' + state.accounts.trade_republic_liq.toFixed(2) + ' €) quedará en negativo. ¿Continuar?')) return;
       }
 
       const defaultPrice = state.btcPrice > 0 ? state.btcPrice.toFixed(2) : '';
@@ -851,12 +860,23 @@
         return;
       }
 
-      const newUnits = amountEur / buyPrice;
+      // Descontar del apartado en espera de BTC; si falta, se descuenta el resto de Trade Republic
+      if (pendingCash >= amountEur) {
+        state.btcCash = pendingCash - amountEur;
+      } else {
+        const remaining = amountEur - pendingCash;
+        state.btcCash = 0;
+        if (state.accounts.trade_republic_liq < remaining) {
+          if (!confirm('Atención: No hay suficiente saldo apartado y Trade Republic quedará en negativo. ¿Continuar?')) {
+            state.btcCash = pendingCash;
+            return;
+          }
+        }
+        state.accounts.trade_republic_liq -= remaining;
+      }
 
-      state.accounts.trade_republic_liq -= amountEur;
+      const newUnits = amountEur / buyPrice;
       state.btcUnits = (parseFloat(state.btcUnits) || 0) + newUnits;
-      
-      // Se acumula automáticamente al coste de adquisición real
       state.btcInvestedCost = (parseFloat(state.btcInvestedCost) || 0) + amountEur;
 
       const marketPrice = state.btcPrice > 0 ? state.btcPrice : buyPrice;
@@ -872,13 +892,6 @@
         account: 'trade_republic_liq',
         destination: 'trade_republic_btc'
       });
-
-      // Si existe la primera foto histórica, actualizamos su coste inicial de BTC con el nuevo acumulado
-      if (Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0) {
-        const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        sortedAsc[0].trade_republic_btc = state.btcInvestedCost;
-        sortedAsc[0].total = sortedAsc[0].bbva + sortedAsc[0].myinvestor + sortedAsc[0].trade_republic_liq + state.btcInvestedCost;
-      }
 
       saveAndSync();
       alert('¡Compra registrada!\n+' + newUnits.toFixed(8) + ' BTC añadidos.\nNuevo coste de adquisición total: ' + state.btcInvestedCost.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
@@ -1163,6 +1176,7 @@
         if (cloudState && cloudState.accounts) {
           state = cloudState;
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
+          if (state.btcCash === undefined) state.btcCash = 0;
           if (!state.myinvestor) {
             state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
           }
@@ -1267,7 +1281,7 @@
     function createSnapshotObject(dateObj, isFirstEver = false) {
       const myInvTotal = getMyInvestorTotal();
       const btcValueForSnapshot = isFirstEver ? (state.btcInvestedCost || 0) : state.accounts.trade_republic_btc;
-      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcValueForSnapshot;
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcValueForSnapshot + (state.btcCash || 0);
       return {
         id: Date.now(),
         date: dateObj.toISOString(),
@@ -1367,7 +1381,9 @@
             if (autoAccount === 'myinvestor') state.myinvestor.cash = Math.max(0, state.myinvestor.cash - autoAmount);
             else state.accounts[autoAccount] -= autoAmount;
 
-            if (autoDestination === 'myinvestor') {
+            if (autoDestination === 'trade_republic_btc') {
+              state.btcCash = (parseFloat(state.btcCash) || 0) + autoAmount;
+            } else if (autoDestination === 'myinvestor') {
               if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
               state.myinvestor.cash += autoAmount;
             } else if (state.accounts[autoDestination] !== undefined) {
@@ -1403,6 +1419,7 @@
         try {
           state = JSON.parse(saved);
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
+          if (state.btcCash === undefined) state.btcCash = 0;
           if (state.accounts && state.accounts.myinvestor !== undefined) {
             const oldMyInv = state.accounts.myinvestor;
             delete state.accounts.myinvestor;
@@ -1617,9 +1634,10 @@
 
     function render() {
       const myInvTotal = getMyInvestorTotal();
-      const liquid = state.accounts.bbva + state.accounts.trade_republic_liq + (state.myinvestor ? state.myinvestor.cash : 0);
+      const btcCashVal = parseFloat(state.btcCash) || 0;
+      const liquid = state.accounts.bbva + state.accounts.trade_republic_liq + (state.myinvestor ? state.myinvestor.cash : 0) + btcCashVal;
       const invested = myInvTotal - (state.myinvestor ? state.myinvestor.cash : 0) + state.accounts.trade_republic_btc;
-      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + btcCashVal;
 
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -1633,13 +1651,13 @@
       document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
       const units = parseFloat(state.btcUnits) || 0;
-      document.getElementById('btcUnitsSubtext').innerText = units > 0 
-        ? units.toLocaleString('es-ES', { maximumFractionDigits: 8 }) + ' BTC' 
-        : 'Criptomoneda BTC';
+      const unitsLabel = units > 0 ? units.toLocaleString('es-ES', { maximumFractionDigits: 8 }) + ' BTC' : '0 BTC';
+      document.getElementById('btcUnitsSubtext').innerText = unitsLabel + ' | Apartado: ' + btcCashVal.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €';
 
       document.getElementById('inputBBVA').value = state.accounts.bbva;
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
       document.getElementById('inputTRBtc').value = state.btcUnits || 0;
+      document.getElementById('inputBtcCost').value = state.btcInvestedCost || 0;
 
       if (state.myinvestor && state.myinvestor.funds) {
         document.getElementById('fundFidelityVal').innerText = (state.myinvestor.funds.fidelity_sp500 || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -1724,14 +1742,14 @@
       }
 
       const myInvTotal = getMyInvestorTotal();
-      const totalCurrent = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const btcCashVal = parseFloat(state.btcCash) || 0;
+      const totalCurrent = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + btcCashVal;
 
       setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null);
       setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null);
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null);
       setTrendBadge('trendMyinvestor', myInvTotal, baseline ? baseline.myinvestor : null);
 
-      // Rendimiento de Bitcoin respecto al coste de adquisición actual acumulado
       const btcCost = parseFloat(state.btcInvestedCost) || 0;
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcCost > 0 ? btcCost : null);
     }
@@ -2057,7 +2075,9 @@
         if (account === 'myinvestor') state.myinvestor.cash -= amount;
         else state.accounts[account] -= amount;
 
-        if (destination === 'myinvestor') {
+        if (destination === 'trade_republic_btc') {
+          state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
+        } else if (destination === 'myinvestor') {
           if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
           state.myinvestor.cash += amount;
         } else if (state.accounts[destination] !== undefined) {
@@ -2121,8 +2141,13 @@
         if (oldTx.account === 'myinvestor') state.myinvestor.cash += oldTx.amount;
         else state.accounts[oldTx.account] += oldTx.amount;
 
-        if (oldTx.destination === 'myinvestor') state.myinvestor.cash -= oldTx.amount;
-        else state.accounts[oldTx.destination] -= oldTx.amount;
+        if (oldTx.destination === 'trade_republic_btc') {
+          state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - oldTx.amount);
+        } else if (oldTx.destination === 'myinvestor') {
+          state.myinvestor.cash -= oldTx.amount;
+        } else {
+          state.accounts[oldTx.destination] -= oldTx.amount;
+        }
       }
 
       const type = document.getElementById('txType').value;
@@ -2153,8 +2178,13 @@
         if (account === 'myinvestor') state.myinvestor.cash -= amount;
         else state.accounts[account] -= amount;
 
-        if (destination === 'myinvestor') state.myinvestor.cash += amount;
-        else state.accounts[destination] += amount;
+        if (destination === 'trade_republic_btc') {
+          state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
+        } else if (destination === 'myinvestor') {
+          state.myinvestor.cash += amount;
+        } else {
+          state.accounts[destination] += amount;
+        }
       }
 
       state.transactions[idx] = {
@@ -2198,8 +2228,13 @@
           if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
           else state.accounts[tx.account] += tx.amount;
 
-          if (tx.destination === 'myinvestor') state.myinvestor.cash -= tx.amount;
-          else state.accounts[tx.destination] -= tx.amount;
+          if (tx.destination === 'trade_republic_btc') {
+            state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - tx.amount);
+          } else if (tx.destination === 'myinvestor') {
+            state.myinvestor.cash -= tx.amount;
+          } else {
+            state.accounts[tx.destination] -= tx.amount;
+          }
         }
         state.transactions.splice(txIndex, 1);
         saveAndSync();
@@ -2225,7 +2260,22 @@
             state.monthlySnapshots = [createSnapshotObject(new Date(), true)];
           }
           saveAndSync();
-          alert('Has actualizado la cantidad de bitcoin y el precio');
+          alert('Has actualizado la cantidad de bitcoin y su valor en vivo');
+          return;
+        }
+      } else if (acc === 'btc_cost') {
+        val = parseFloat(document.getElementById('inputBtcCost').value);
+        if (!isNaN(val) && val >= 0) {
+          state.btcInvestedCost = val;
+          if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
+            state.monthlySnapshots = [createSnapshotObject(new Date(), true)];
+          } else {
+            const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+            sortedAsc[0].trade_republic_btc = val;
+            sortedAsc[0].total = sortedAsc[0].bbva + sortedAsc[0].myinvestor + sortedAsc[0].trade_republic_liq + val;
+          }
+          saveAndSync();
+          alert('Has actualizado el coste de adquisición inicial de Bitcoin');
           return;
         }
       }
@@ -2294,6 +2344,7 @@
           if (importedState && (importedState.accounts || importedState.myinvestor)) {
             state = importedState;
             if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
+            if (state.btcCash === undefined) state.btcCash = 0;
             if (!state.myinvestor) {
               state.myinvestor = { cash: 0, funds: { fidelity_sp500: 10000, vanguard_emerging: 3000, vanguard_smallcaps: 4000 } };
             }
@@ -2340,7 +2391,7 @@
       
       const myInvFunds = getMyInvestorTotal() - (state.myinvestor ? state.myinvestor.cash : 0);
       const invested = myInvFunds + state.accounts.trade_republic_btc;
-      const total = state.accounts.bbva + getMyInvestorTotal() + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + getMyInvestorTotal() + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + (parseFloat(state.btcCash) || 0);
       const currentCap = fireSource === 'invested' ? invested : total;
 
       const annualExp = monthlyExp * 12;
@@ -2368,7 +2419,7 @@
     function fillCompoundWith(source) {
       const myInvFunds = getMyInvestorTotal() - (state.myinvestor ? state.myinvestor.cash : 0);
       const invested = myInvFunds + state.accounts.trade_republic_btc;
-      const total = state.accounts.bbva + getMyInvestorTotal() + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + getMyInvestorTotal() + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + (parseFloat(state.btcCash) || 0);
       const val = source === 'invested' ? invested : total;
       document.getElementById('compInitial').value = Math.round(val);
       calculateCompound();
@@ -2470,7 +2521,8 @@
 
     function updateCharts() {
       const myInvTotal = getMyInvestorTotal();
-      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc;
+      const btcTotal = state.accounts.trade_republic_btc + (parseFloat(state.btcCash) || 0);
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcTotal;
       const isDark = document.documentElement.classList.contains('dark');
       const textColor = isDark ? '#94a3b8' : '#64748b';
 
@@ -2481,7 +2533,7 @@
         data: {
           labels: ['BBVA', 'Trade Republic', 'MyInvestor', 'Bitcoin'],
           datasets: [{
-            data: [state.accounts.bbva, state.accounts.trade_republic_liq, myInvTotal, state.accounts.trade_republic_btc],
+            data: [state.accounts.bbva, state.accounts.trade_republic_liq, myInvTotal, btcTotal],
             backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#f59e0b'],
             borderWidth: isDark ? 0 : 2,
             borderColor: isDark ? 'transparent' : '#ffffff'
