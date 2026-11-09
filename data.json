@@ -4,10 +4,21 @@
   "accounts": {
     "bbva": 2605.58,
     "myinvestor": 17145.98,
-    "trade_republic_liq": 46493.31,
+    "trade_republic_liq": 46463.31,
     "trade_republic_btc": 715.08991216
   },
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1794246493553,
+      "date": "2026-11-09T17:48:13.553Z",
+      "type": "transfer",
+      "concept": "Bitcoin ",
+      "amount": 30,
+      "category": "trade_republic_btc",
+      "account": "trade_republic_liq",
+      "destination": "trade_republic_btc"
+    }
+  ],
   "monthlySnapshots": [
     {
       "id": 1794243291951,
@@ -20,7 +31,7 @@
       "total": 67147.75
     }
   ],
-  "lastCloudSync": "2026-11-09T17:44:42.455Z",
+  "lastCloudSync": "2026-11-09T17:48:13.568Z",
   "btcUnits": 0.010744,
   "btcPrice": 66557.14,
   "categories": {
@@ -60,5 +71,5 @@
     }
   ],
   "btcInvestedCost": 820,
-  "btcCash": 0
+  "btcCash": 30
 }
