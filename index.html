@@ -48,7 +48,6 @@
         </div>
       </div>
       
-      <!-- Botones de Acción Ultra Compactos para Móvil -->
       <div class="flex items-center gap-1 shrink-0">
         <button onclick="toggleTheme()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
@@ -69,7 +68,7 @@
       </div>
     </div>
 
-    <!-- Barra de Pestañas Mejorada -->
+    <!-- Barra de Pestañas -->
     <div class="max-w-7xl mx-auto px-3 border-t border-slate-100 dark:border-slate-800/80">
       <nav class="flex space-x-1 overflow-x-auto py-2 no-scrollbar justify-between sm:justify-start" aria-label="Tabs">
         <button onclick="switchTab('panel')" id="tab-btn-panel" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1">
@@ -93,7 +92,7 @@
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Liquidez vs Inversión & Objetivo Patrimonial -->
+      <!-- Objetivo Patrimonial & Distribución -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
         <!-- Objetivo Patrimonial -->
@@ -147,7 +146,7 @@
 
       </section>
 
-      <!-- Summary Cards -->
+      <!-- Summary Cards (Ordenadas: BBVA, Trade Republic, MyInvestor, Bitcoin) -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         <!-- Patrimonio Total -->
@@ -174,18 +173,6 @@
           </div>
         </div>
 
-        <!-- MyInvestor -->
-        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
-          <div>
-            <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
-            <h3 id="myinvestorBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
-            <p id="myinvestorSubtext" class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Fondos + Apartado</p>
-          </div>
-          <div class="mt-3">
-            <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">+0,00 € (0,00%)</span>
-          </div>
-        </div>
-
         <!-- Trade Republic -->
         <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
           <div>
@@ -195,6 +182,22 @@
           </div>
           <div class="mt-3">
             <span id="trendTrLiq" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">+0,00 € (0,00%)</span>
+          </div>
+        </div>
+
+        <!-- MyInvestor (Con desplegable de fondos al hacer clic) -->
+        <div onclick="toggleMyInvestorDetails()" class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors cursor-pointer hover:border-indigo-500/50 relative group">
+          <div>
+            <div class="flex justify-between items-center">
+              <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">MyInvestor</p>
+              <span class="text-xs text-indigo-500 font-bold group-hover:scale-110 transition">▼</span>
+            </div>
+            <h3 id="myinvestorBalance" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0,00 €</h3>
+            <p id="myinvestorSubtext" class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Fondos + Apartado</p>
+          </div>
+          <div class="mt-3 flex justify-between items-center">
+            <span id="trendMyinvestor" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">+0,00 € (0,00%)</span>
+            <span class="text-[10px] text-indigo-500 font-medium">Ver fondos ↗</span>
           </div>
         </div>
 
@@ -216,12 +219,63 @@
         </div>
 
       </section>
+
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor -->
+      <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border border-indigo-500/30 shadow-md transition-all space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Cartera de Fondos Indexados - MyInvestor</h3>
+            <p class="text-xs text-slate-500">Haz clic en invertir para aplicar el % del efectivo apartado cuando te llegue al fondo.</p>
+          </div>
+          <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Fidelity S&P 500 -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 1</span>
+              <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
+              <p id="fundFidelityVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+            </div>
+            <button onclick="investInFund('fidelity_sp500', 'Fidelity S&P 500')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+              Invertir en Fidelity SP500
+            </button>
+          </div>
+
+          <!-- Vanguard Emergentes -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 2</span>
+              <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Mercados Emergentes</h4>
+              <p id="fundEmergingVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+            </div>
+            <button onclick="investInFund('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+              Invertir en Vanguard Emergentes
+            </button>
+          </div>
+
+          <!-- Vanguard Small Caps -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="text-[11px] font-bold text-indigo-500 uppercase">Fondo 3</span>
+              <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
+              <p id="fundSmallCapsVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+            </div>
+            <button onclick="investInFund('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+              Invertir en Vanguard Small Caps
+            </button>
+          </div>
+
+        </div>
+      </section>
+
     </div>
 
     <!-- ==================== PESTAÑA 2: RESUMEN ==================== -->
     <div id="tab-resumen" class="tab-content hidden space-y-6">
       
-      <!-- Resumen de Flujo de Caja & Salud Financiera -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400 mb-4">Balance de Flujo de Caja (Periodo Seleccionado en Movimientos)</h3>
@@ -241,7 +295,6 @@
           </div>
         </div>
 
-        <!-- Indicador de Salud Financiera -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
           <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Salud Financiera</h3>
           <div class="text-center my-auto py-2">
@@ -253,7 +306,6 @@
         </div>
       </section>
 
-      <!-- Charts Section -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
           <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
@@ -269,7 +321,6 @@
           </div>
         </div>
 
-        <!-- Gráfico de Evolución con Selector de Rango -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors flex flex-col justify-between">
           <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
             <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución del Patrimonio</h3>
@@ -290,9 +341,7 @@
     <!-- ==================== PESTAÑA 3: MOVIMIENTOS ==================== -->
     <div id="tab-movimientos" class="tab-content hidden space-y-6">
 
-      <!-- Quick Action: Movimientos y Gestión de Categorías Visual -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Registrar Movimiento -->
         <section class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4" id="formTitle">Registrar Movimiento</h3>
           <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4" onsubmit="handleTxSubmit(event)">
@@ -350,7 +399,6 @@
           </form>
         </section>
 
-        <!-- Crear y Ordenar Categorías (Más Visual) -->
         <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between space-y-4">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Gestión de Categorías</h3>
@@ -371,7 +419,6 @@
             </form>
           </div>
 
-          <!-- Listado Visual y Ordenable -->
           <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
             <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Orden y Listado</h4>
             <div id="categoryManagerList" class="space-y-2 max-h-44 overflow-y-auto pr-1 no-scrollbar">
@@ -380,7 +427,6 @@
         </section>
       </div>
 
-      <!-- Historial de Movimientos -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
@@ -393,7 +439,6 @@
           </div>
         </div>
 
-        <!-- Filtros Avanzados Optimizados para Móvil -->
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
           <div>
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mes</label>
@@ -463,10 +508,9 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos y Cartera MyInvestor -->
+      <!-- Ajuste Directo de Saldos y Rendimiento Fondos MyInvestor -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Ajuste Directo General -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ajuste Directo de Saldos</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -488,63 +532,22 @@
           </div>
         </div>
 
-        <!-- Gestión Cartera MyInvestor & Fondos Indexados -->
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white">MyInvestor (Fondos + Apartado)</h3>
-            <button onclick="updateMyInvestorPerformance()" class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition" title="Aplicar rendimiento del día anterior">
-              📈 Actualizar Rendimiento
-            </button>
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white">Rendimiento Cartera Fondos</h3>
+              <button onclick="updateMyInvestorPerformance()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition" title="Aplicar rendimiento del día anterior">
+                📈 Actualizar Rendimiento
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Aplica el interés compuesto de finalización del día anterior sobre tus fondos indexados.</p>
           </div>
 
-          <!-- Ajuste Efectivo Apartado -->
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
-              <span>Efectivo Apartado (para invertir):</span>
-              <span id="myinvestorCashLabel" class="font-bold text-indigo-600 dark:text-indigo-400">0,00 €</span>
-            </div>
-            <div class="flex gap-2">
-              <input type="number" step="0.01" id="inputMyInvestorCash" placeholder="Nuevo efectivo apartado..." class="flex-1 px-2.5 py-1 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
-              <button onclick="updateMyInvestorCash()" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Apartado</button>
-            </div>
-          </div>
-
-          <!-- Listado y Estado de los 3 Fondos con Botones Individuales por % -->
-          <div class="space-y-3 pt-1 text-xs">
-            
-            <!-- Fidelity S&P 500 -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-              <div>
-                <span class="font-medium text-slate-800 dark:text-slate-200 block">Fidelity S&P 500</span>
-                <span id="fundFidelityVal" class="font-bold text-slate-900 dark:text-white text-sm">0,00 €</span>
-              </div>
-              <button onclick="investInFund('fidelity_sp500', 'Fidelity S&P 500')" class="px-3 py-1.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition shadow-sm">
-                🚀 Invertir % Apartado
-              </button>
-            </div>
-
-            <!-- Vanguard Emergentes -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-              <div>
-                <span class="font-medium text-slate-800 dark:text-slate-200 block">Vanguard Mercados Emergentes</span>
-                <span id="fundEmergingVal" class="font-bold text-slate-900 dark:text-white text-sm">0,00 €</span>
-              </div>
-              <button onclick="investInFund('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="px-3 py-1.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition shadow-sm">
-                🚀 Invertir % Apartado
-              </button>
-            </div>
-
-            <!-- Vanguard Global Small Caps -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
-              <div>
-                <span class="font-medium text-slate-800 dark:text-slate-200 block">Vanguard Global Small Caps</span>
-                <span id="fundSmallCapsVal" class="font-bold text-slate-900 dark:text-white text-sm">0,00 €</span>
-              </div>
-              <button onclick="investInFund('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="px-3 py-1.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition shadow-sm">
-                🚀 Invertir % Apartado
-              </button>
-            </div>
-
+          <div class="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+            <span class="text-xs font-bold text-indigo-900 dark:text-indigo-300 uppercase">💡 Nota operativa</span>
+            <p class="text-xs text-slate-600 dark:text-slate-300">
+              Para invertir el dinero traspasado, haz clic en la tarjeta de <b>MyInvestor</b> en la pestaña <i>Panel</i> para desplegar los fondos y utilizar los botones de inversión individuales.
+            </p>
           </div>
         </div>
 
@@ -579,7 +582,6 @@
     <!-- ==================== PESTAÑA 4: LIBERTAD ==================== -->
     <div id="tab-herramientas" class="tab-content hidden space-y-6">
 
-      <!-- Regla del 4% (Libertad Financiera) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
           <div>
@@ -641,7 +643,6 @@
         </div>
       </section>
 
-      <!-- Calculadora de Interés Compuesto -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
           <div>
@@ -709,7 +710,6 @@
   </main>
 
   <script>
-    // CONFIGURACIÓN DE GITHUB
     const GITHUB_OWNER = 'lcapi06';
     const GITHUB_REPO = 'FINANZAS-EFM';
     const GITHUB_FILE = 'data.json';
@@ -742,7 +742,7 @@
         trade_republic_btc: 2500.00
       },
       myinvestor: {
-        cash: 1200.00, // Efectivo apartado en MyInvestor
+        cash: 1200.00, 
         funds: {
           fidelity_sp500: 12000.00,
           vanguard_emerging: 3000.00,
@@ -761,7 +761,13 @@
 
     let currentTypeFilter = 'all';
 
-    // ==================== ACTUALIZACIÓN PRECIO BITCOIN EN VIVO (COINBASE API) ====================
+    function toggleMyInvestorDetails() {
+      const panel = document.getElementById('myinvestorDetailsPanel');
+      if (panel) {
+        panel.classList.toggle('hidden');
+      }
+    }
+
     async function fetchBtcPrice(isManual = false) {
       const btn = document.getElementById('btnRefreshBtc');
       if (btn) btn.innerText = '⏳';
@@ -792,7 +798,6 @@
       }
     }
 
-    // ==================== GESTIÓN CARTERA MYINVESTOR ====================
     function getMyInvestorTotal() {
       const cash = state.myinvestor ? (state.myinvestor.cash || 0) : 0;
       const funds = state.myinvestor && state.myinvestor.funds ? 
@@ -800,21 +805,7 @@
       return cash + funds;
     }
 
-    function updateMyInvestorCash() {
-      const val = parseFloat(document.getElementById('inputMyInvestorCash').value);
-      if (!isNaN(val) && val >= 0) {
-        if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-        state.myinvestor.cash = val;
-        
-        if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
-          state.monthlySnapshots = [createSnapshotObject(new Date())];
-        }
-        saveAndSync();
-        alert('Efectivo apartado en MyInvestor actualizado.');
-      }
-    }
-
-    // Invertir un % específico del efectivo apartado en el fondo seleccionado
+    // Invertir un % del efectivo apartado en un fondo específico
     function investInFund(fundKey, fundName) {
       if (!state.myinvestor || state.myinvestor.cash <= 0) {
         alert('No hay efectivo apartado en MyInvestor disponible para invertir.');
@@ -832,7 +823,6 @@
 
       const amountToInvest = state.myinvestor.cash * (pct / 100);
 
-      // Descontar del efectivo apartado y sumar al fondo elegido
       state.myinvestor.cash -= amountToInvest;
       state.myinvestor.funds[fundKey] += amountToInvest;
 
@@ -841,9 +831,9 @@
     }
 
     function updateMyInvestorPerformance() {
-      const dailyFidelityReturn = 0.0008; // +0.08%
-      const dailyEmergingReturn = 0.0005; // +0.05%
-      const dailySmallCapsReturn = 0.0006; // +0.06%
+      const dailyFidelityReturn = 0.0008; 
+      const dailyEmergingReturn = 0.0005; 
+      const dailySmallCapsReturn = 0.0006; 
 
       if (!state.myinvestor || !state.myinvestor.funds) return;
 
@@ -860,7 +850,6 @@
       alert('¡Rendimiento del día anterior aplicado con éxito!\nGanancia estimada: +' + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
     }
 
-    // ==================== GESTIÓN VISUAL Y ORDENABLE DE CATEGORÍAS ====================
     function populateCategoryDropdowns() {
       const txType = document.getElementById('txType').value;
       const txCatSelect = document.getElementById('txCategory');
@@ -935,21 +924,18 @@
           const btnUp = document.createElement('button');
           btnUp.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
           btnUp.textContent = '▲';
-          btnUp.title = 'Subir';
           btnUp.onclick = function() { moveCategory(type, idx, -1); };
           if (idx === 0) btnUp.disabled = true;
 
           const btnDown = document.createElement('button');
           btnDown.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
           btnDown.textContent = '▼';
-          btnDown.title = 'Bajar';
           btnDown.onclick = function() { moveCategory(type, idx, 1); };
           if (idx === list.length - 1) btnDown.disabled = true;
 
           const btnDel = document.createElement('button');
           btnDel.className = 'p-1 bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-600 hover:text-white transition text-[10px]';
           btnDel.textContent = '✕';
-          btnDel.title = 'Eliminar categoría';
           btnDel.onclick = function() { deleteCategory(type, idx); };
 
           btnGroup.appendChild(btnUp);
@@ -1008,7 +994,6 @@
       populateCategoryDropdowns();
     }
 
-    // ==================== NAVEGACIÓN Y CONFIGURACIÓN ====================
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.add('hidden');
@@ -1168,7 +1153,6 @@
       }
     }
 
-    // ==================== FOTO MENSUAL AUTOMÁTICA (DÍA 1 DE MES) ====================
     function formatDateDDMMYYYY(dateObj) {
       const d = String(dateObj.getDate()).padStart(2, '0');
       const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1486,13 +1470,13 @@
 
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('trLiquidityBalance').innerText = state.accounts.trade_republic_liq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = myInvTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       
       const cashApartado = state.myinvestor ? state.myinvestor.cash : 0;
       const fundsTotal = myInvTotal - cashApartado;
       document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
 
-      document.getElementById('trLiquidityBalance').innerText = state.accounts.trade_republic_liq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
       const units = parseFloat(state.btcUnits) || 0;
@@ -1503,15 +1487,12 @@
       document.getElementById('inputBBVA').value = state.accounts.bbva;
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
       document.getElementById('inputTRBtc').value = state.btcUnits || 0;
-      document.getElementById('inputMyInvestorCash').value = cashApartado;
 
       if (state.myinvestor && state.myinvestor.funds) {
         document.getElementById('fundFidelityVal').innerText = (state.myinvestor.funds.fidelity_sp500 || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundEmergingVal').innerText = (state.myinvestor.funds.vanguard_emerging || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundSmallCapsVal').innerText = (state.myinvestor.funds.vanguard_smallcaps || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       }
-
-      document.getElementById('myinvestorCashLabel').innerText = cashApartado.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
       updateAllTrends();
 
@@ -1522,7 +1503,6 @@
       document.getElementById('liquidBar').style.width = liqPct + '%';
       document.getElementById('investedBar').style.width = invPct + '%';
 
-      // ==================== OBJETIVO PATRIMONIAL (HITOS DE 50K) ====================
       const step = 50000;
       const currentMilestoneIndex = Math.floor(total / step);
       const milestoneStart = currentMilestoneIndex * step;
@@ -1552,7 +1532,6 @@
       calculateCompound();
     }
 
-    // ==================== TENDENCIAS DEL PANEL RESPECTO A LA PRIMERA ENTRADA ====================
     function updateAllTrends() {
       const hasSnapshots = Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0;
       let baseline = null;
@@ -1591,8 +1570,8 @@
 
       setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null);
       setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null);
-      setTrendBadge('trendMyinvestor', myInvTotal, baseline ? baseline.myinvestor : null);
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null);
+      setTrendBadge('trendMyinvestor', myInvTotal, baseline ? baseline.myinvestor : null);
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, baseline ? baseline.trade_republic_btc : null);
     }
 
@@ -1769,7 +1748,6 @@
       renderTransactions();
     }
 
-    // ==================== HISTORIAL DE SALDOS ====================
     function renderSnapshots() {
       const tbody = document.getElementById('balanceSnapshotsTable');
       if (!tbody) return;
@@ -1870,6 +1848,9 @@
         if (account === 'myinvestor') state.myinvestor.cash -= amount;
         else state.accounts[account] -= amount;
 
+        // Al hacer traspaso a myinvestor, el dinero se suma al total a través del incremento de fondos o efectivo apartado.
+        // Aquí incrementamos el total mediante el efectivo apartado para que esté listo para invertir, 
+        // pero asegurando que la suma patrimonial global refleje correctamente el traspaso.
         if (destination === 'myinvestor') {
           if (!state.myinvestor) state.myinvestor = { cash: 0, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
           state.myinvestor.cash += amount;
@@ -2085,7 +2066,6 @@
       }
     }
 
-    // ==================== REGLA DEL 4% & INTERÉS COMPUESTO ====================
     function setFireSource(source) {
       fireSource = source;
       const btnInv = document.getElementById('btnFireInvested');
@@ -2245,10 +2225,10 @@
       chartDist = new Chart(ctxDist, {
         type: 'doughnut',
         data: {
-          labels: ['BBVA', 'MyInvestor', 'Trade Republic', 'Bitcoin'],
+          labels: ['BBVA', 'Trade Republic', 'MyInvestor', 'Bitcoin'],
           datasets: [{
-            data: [state.accounts.bbva, myInvTotal, state.accounts.trade_republic_liq, state.accounts.trade_republic_btc],
-            backgroundColor: ['#3b82f6', '#6366f1', '#10b981', '#f59e0b'],
+            data: [state.accounts.bbva, state.accounts.trade_republic_liq, myInvTotal, state.accounts.trade_republic_btc],
+            backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#f59e0b'],
             borderWidth: isDark ? 0 : 2,
             borderColor: isDark ? 'transparent' : '#ffffff'
           }]
