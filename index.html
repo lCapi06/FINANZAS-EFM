@@ -860,7 +860,6 @@
         return;
       }
 
-      // Descontar del apartado en espera de BTC; si falta, se descuenta el resto de Trade Republic
       if (pendingCash >= amountEur) {
         state.btcCash = pendingCash - amountEur;
       } else {
@@ -890,7 +889,9 @@
         amount: amountEur,
         category: null,
         account: 'trade_republic_liq',
-        destination: 'trade_republic_btc'
+        destination: 'trade_republic_btc',
+        btcUnitsBought: newUnits,
+        btcEurSpent: amountEur
       });
 
       saveAndSync();
@@ -930,6 +931,20 @@
 
       state.myinvestor.cash -= amountToInvest;
       state.myinvestor.funds[fundKey] += amountToInvest;
+
+      // Registrar el movimiento en el historial para permitir la reversión al eliminarlo
+      state.transactions.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'transfer',
+        concept: 'Inversión en ' + fundName,
+        amount: amountToInvest,
+        category: null,
+        account: 'myinvestor_cash',
+        destination: 'myinvestor_fund',
+        fundKeyBought: fundKey,
+        fundEurInvested: amountToInvest
+      });
 
       if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
         state.fundSnapshots = [createFundSnapshotObject(new Date())];
@@ -1838,7 +1853,8 @@
         
         function getAccountName(accKey) {
           if (accKey === 'bbva') return 'BBVA';
-          if (accKey === 'myinvestor') return 'MyInvestor';
+          if (accKey === 'myinvestor' || accKey === 'myinvestor_cash') return 'MyInvestor';
+          if (accKey === 'myinvestor_fund') return 'Fondo Indexado';
           if (accKey === 'trade_republic_liq') return 'Trade Republic';
           if (accKey === 'trade_republic_btc') return 'Bitcoin';
           return accKey || 'BBVA';
@@ -2131,6 +2147,7 @@
 
       const oldTx = state.transactions[idx];
 
+      // Revertir el impacto anterior de la transacción editada
       if (oldTx.type === 'expense') {
         if (oldTx.account === 'myinvestor') state.myinvestor.cash += oldTx.amount;
         else state.accounts[oldTx.account] += oldTx.amount;
@@ -2138,14 +2155,25 @@
         if (oldTx.account === 'myinvestor') state.myinvestor.cash -= oldTx.amount;
         else state.accounts[oldTx.account] -= oldTx.amount;
       } else if (oldTx.type === 'transfer') {
-        if (oldTx.account === 'myinvestor') state.myinvestor.cash += oldTx.amount;
-        else state.accounts[oldTx.account] += oldTx.amount;
+        if (oldTx.account === 'myinvestor' || oldTx.account === 'myinvestor_cash') state.myinvestor.cash += oldTx.amount;
+        else if (state.accounts[oldTx.account] !== undefined) state.accounts[oldTx.account] += oldTx.amount;
 
         if (oldTx.destination === 'trade_republic_btc') {
-          state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - oldTx.amount);
+          if (oldTx.btcUnitsBought) {
+            state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - oldTx.btcUnitsBought);
+            state.btcInvestedCost = Math.max(0, (parseFloat(state.btcInvestedCost) || 0) - oldTx.btcEurSpent);
+            const marketPrice = state.btcPrice > 0 ? state.btcPrice : (oldTx.btcEurSpent / oldTx.btcUnitsBought);
+            state.accounts.trade_republic_btc = state.btcUnits * marketPrice;
+          } else {
+            state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - oldTx.amount);
+          }
+        } else if (oldTx.destination === 'myinvestor_fund' && oldTx.fundKeyBought) {
+          if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[oldTx.fundKeyBought] !== undefined) {
+            state.myinvestor.funds[oldTx.fundKeyBought] = Math.max(0, state.myinvestor.funds[oldTx.fundKeyBought] - oldTx.fundEurInvested);
+          }
         } else if (oldTx.destination === 'myinvestor') {
           state.myinvestor.cash -= oldTx.amount;
-        } else {
+        } else if (state.accounts[oldTx.destination] !== undefined) {
           state.accounts[oldTx.destination] -= oldTx.amount;
         }
       }
@@ -2218,6 +2246,8 @@
       const txIndex = state.transactions.findIndex(function(t) { return t.id === id; });
       if (txIndex !== -1) {
         const tx = state.transactions[txIndex];
+
+        // Revertir el impacto financiero según el tipo de transacción eliminada
         if (tx.type === 'expense') {
           if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
           else state.accounts[tx.account] += tx.amount;
@@ -2225,19 +2255,38 @@
           if (tx.account === 'myinvestor') state.myinvestor.cash -= tx.amount;
           else state.accounts[tx.account] -= tx.amount;
         } else if (tx.type === 'transfer') {
-          if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
-          else state.accounts[tx.account] += tx.amount;
+          // 1. Devolver el dinero a la cuenta de origen (o efectivo apartado MyInvestor)
+          if (tx.account === 'myinvestor' || tx.account === 'myinvestor_cash') {
+            state.myinvestor.cash += tx.amount;
+          } else if (state.accounts[tx.account] !== undefined) {
+            state.accounts[tx.account] += tx.amount;
+          }
 
+          // 2. Retirar el impacto en el destino (Fondos, BTC u otras cuentas)
           if (tx.destination === 'trade_republic_btc') {
-            state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - tx.amount);
+            if (tx.btcUnitsBought && tx.btcEurSpent) {
+              state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - tx.btcUnitsBought);
+              state.btcInvestedCost = Math.max(0, (parseFloat(state.btcInvestedCost) || 0) - tx.btcEurSpent);
+              const marketPrice = state.btcPrice > 0 ? state.btcPrice : (tx.btcEurSpent / tx.btcUnitsBought);
+              state.accounts.trade_republic_btc = state.btcUnits * marketPrice;
+            } else {
+              state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - tx.amount);
+            }
+          } else if (tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
+            // Revertir la inversión en el fondo indexado correspondiente
+            if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
+              state.myinvestor.funds[tx.fundKeyBought] = Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested);
+            }
           } else if (tx.destination === 'myinvestor') {
             state.myinvestor.cash -= tx.amount;
-          } else {
+          } else if (state.accounts[tx.destination] !== undefined) {
             state.accounts[tx.destination] -= tx.amount;
           }
         }
+
         state.transactions.splice(txIndex, 1);
         saveAndSync();
+        alert('¡Movimiento eliminado y saldos de cuentas, apartado y fondos restaurados correctamente!');
       }
     }
 
