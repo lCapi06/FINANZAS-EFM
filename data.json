@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3605.58,
+    "bbva": 4605.58,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
     "trade_republic_btc": 718.45444948
@@ -17,16 +17,6 @@
       "category": "Nómina",
       "account": "bbva",
       "destination": null
-    },
-    {
-      "id": 1794230122086,
-      "date": "2026-11-09T13:15:22.086Z",
-      "type": "transfer",
-      "concept": "Inversión ",
-      "amount": 1000,
-      "category": "myinvestor",
-      "account": "bbva",
-      "destination": "myinvestor"
     }
   ],
   "monthlySnapshots": [
@@ -41,7 +31,7 @@
       "total": 66963.32444948
     }
   ],
-  "lastCloudSync": "2026-11-09T13:15:22.115Z",
+  "lastCloudSync": "2026-11-09T13:21:24.455Z",
   "btcUnits": 0.010744,
   "btcPrice": 66870.295,
   "categories": {
@@ -62,7 +52,7 @@
     ]
   },
   "myinvestor": {
-    "cash": 1000,
+    "cash": 0,
     "funds": {
       "fidelity_sp500": 18200,
       "vanguard_emerging": 0,
