@@ -8,19 +8,8 @@
     "trade_republic_btc": 718.45444948
   },
   "transactions": [],
-  "monthlySnapshots": [
-    {
-      "id": 1794182573051,
-      "date": "2026-11-09T00:02:53.051Z",
-      "dateLabel": "09/11/2026",
-      "bbva": 2605.58,
-      "myinvestor": 18200,
-      "trade_republic_liq": 6000,
-      "trade_republic_btc": 727.42563576,
-      "total": 27533.00563576
-    }
-  ],
-  "lastCloudSync": "2026-11-09T00:05:04.559Z",
+  "monthlySnapshots": [],
+  "lastCloudSync": "2026-11-09T00:05:41.443Z",
   "btcUnits": 0.010744,
   "btcPrice": 66870.295,
   "categories": {
