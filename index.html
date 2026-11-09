@@ -158,6 +158,40 @@
 
       </section>
 
+      <!-- Fondo de Emergencia (Solo BBVA) -->
+      <section class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🛡️</span>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Fondo de Emergencia (Solo BBVA)</h3>
+            </div>
+            <p id="efStatusText" class="text-xs text-slate-500 dark:text-slate-400">Calculando cobertura según tu saldo en BBVA...</p>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div class="flex items-center gap-1.5">
+              <label class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Gasto/mes (€):</label>
+              <input type="number" id="efMonthlyCost" value="1200" onchange="saveEmergencySettings()" class="w-20 px-2 py-1 text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none">
+            </div>
+            <div class="flex items-center gap-1.5">
+              <label class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Objetivo (meses):</label>
+              <input type="number" id="efTargetMonths" value="6" min="1" max="24" onchange="saveEmergencySettings()" class="w-16 px-2 py-1 text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-1.5">
+          <div class="flex justify-between text-xs font-semibold">
+            <span id="efMonthsCovered" class="text-indigo-600 dark:text-indigo-400 font-bold">0,0 meses cubiertos</span>
+            <span id="efTargetAmount" class="text-slate-500 dark:text-slate-400">Meta: 7.200 €</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="efProgressBar" class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- Summary Cards -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
@@ -241,7 +275,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
-            <p class="text-xs text-slate-500">Valor Liquidativo actualizado automáticamente cada mañana según mercado (Referencia base: 09/11/2026).</p>
+            <p class="text-xs text-slate-500">Valor Liquidativo actualizado automáticamente y rentabilidad real frente al capital aportado.</p>
           </div>
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg">
@@ -257,6 +291,9 @@
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
               <p id="fundFidelityVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+              <div class="mt-1.5">
+                <span id="trendFundFidelity" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+              </div>
             </div>
             <button onclick="investInFund('fidelity_sp500', 'Fidelity S&P 500')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
               Invertir en Fidelity SP500
@@ -268,6 +305,9 @@
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Mercados Emergentes</h4>
               <p id="fundEmergingVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+              <div class="mt-1.5">
+                <span id="trendFundEmerging" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+              </div>
             </div>
             <button onclick="investInFund('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
               Invertir en Vanguard Emergentes
@@ -279,6 +319,9 @@
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
               <p id="fundSmallCapsVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
+              <div class="mt-1.5">
+                <span id="trendFundSmallCaps" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+              </div>
             </div>
             <button onclick="investInFund('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
               Invertir en Vanguard Small Caps
@@ -335,6 +378,19 @@
         </div>
       </section>
 
+      <!-- Presupuesto Mensual por Categoría -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría (Mes Actual)</h3>
+            <p class="text-xs text-slate-500">Fija un límite mensual para cada categoría. Recibirás alertas visuales al superar el 80% o el 100%.</p>
+          </div>
+        </div>
+        <div id="budgetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Generado por JS -->
+        </div>
+      </section>
+
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
           <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Distribución por Entidad (%)</h3>
@@ -364,7 +420,7 @@
           </div>
         </div>
 
-        <!-- Gráfico de Evolución Histórica por Fondo Indexado (2.C) -->
+        <!-- Gráfico de Evolución Histórica por Fondo Indexado -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-3 transition-colors space-y-4">
           <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">Evolución Histórica por Fondo Indexado</h3>
           <div class="h-64">
@@ -521,7 +577,6 @@
             </select>
           </div>
 
-          <!-- Filtro Rango de Fechas Libre (2.A) -->
           <div>
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Desde</label>
             <input type="date" id="filterDateFrom" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
@@ -596,26 +651,49 @@
             <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span>📈 Ajuste Directo de Fondos Indexados</span>
             </h3>
-            <p class="text-xs text-slate-500">Actualiza saldos manualmente si es necesario (el Valor Liquidativo diario se aplica solo).</p>
+            <p class="text-xs text-slate-500">Actualiza saldos y el coste de adquisición inicial para calcular tu rentabilidad real.</p>
           </div>
           <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
         </div>
 
         <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
-            <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateFundBalance('fidelity_sp500')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar S&P 500</button>
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
+              <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundBalance('fidelity_sp500')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor S&P 500</button>
+            </div>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición S&P 500 (€)</label>
+              <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundCost('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste S&P 500</button>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (€)</label>
-            <input type="number" step="0.01" id="inputFundEmerging" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateFundBalance('vanguard_emerging')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Emergentes</button>
+
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (€)</label>
+              <input type="number" step="0.01" id="inputFundEmerging" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundBalance('vanguard_emerging')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Emergentes</button>
+            </div>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición Emergentes (€)</label>
+              <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundCost('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste Emergentes</button>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (€)</label>
-            <input type="number" step="0.01" id="inputFundSmallCaps" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateFundBalance('vanguard_smallcaps')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Small Caps</button>
+
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (€)</label>
+              <input type="number" step="0.01" id="inputFundSmallCaps" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundBalance('vanguard_smallcaps')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Small Caps</button>
+            </div>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición Small Caps (€)</label>
+              <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+              <button onclick="updateFundCost('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste Small Caps</button>
+            </div>
           </div>
         </div>
       </section>
@@ -671,6 +749,20 @@
 
     <!-- ==================== PESTAÑA 4: LIBERTAD ==================== -->
     <div id="tab-herramientas" class="tab-content hidden space-y-6">
+
+      <!-- Mensaje Informativo España: Inflación & Impuestos -->
+      <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex items-start gap-3">
+        <span class="text-xl">🇪🇸</span>
+        <div class="text-xs space-y-1">
+          <h4 class="font-bold text-indigo-900 dark:text-indigo-200 uppercase">Referencia Fiscal e Inflación en España (2026)</h4>
+          <p class="text-indigo-800 dark:text-indigo-300">
+            <strong>• Inflación anual (IPC):</strong> 4,9% (dato adelantado INE oct. 2026). Para proyecciones a largo plazo (15-30 años) suele usarse una media histórica del 2,5% - 3,0%.
+          </p>
+          <p class="text-indigo-800 dark:text-indigo-300">
+            <strong>• Impuestos del Ahorro (IRPF 2026):</strong> 19% hasta 6.000 € de ganancia | 21% de 6.000 € a 50.000 € | 23% de 50.000 € a 200.000 € | 27% de 200.000 € a 300.000 € | 30% más de 300.000 €.
+          </p>
+        </div>
+      </div>
 
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
@@ -733,11 +825,12 @@
         </div>
       </section>
 
+      <!-- Simulador Avanzado de Interés Compuesto (Escenarios, Inflación e Impuestos) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
           <div>
-            <span class="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">Proyección</span>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-2">Calculadora de Interés Compuesto</h3>
+            <span class="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">Simulador Avanzado</span>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-2">Proyección Real (Inflación, Impuestos y Escenarios)</h3>
           </div>
           <div class="flex flex-wrap gap-2">
             <button onclick="fillCompoundWith('invested')" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition">
@@ -750,18 +843,21 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Capital Inicial (€)</label>
-              <input type="number" id="compInitial" value="0" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Aportación Mensual (€)</label>
-              <input type="number" id="compMonthly" value="500" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
+          <div class="space-y-3">
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad (% anual)</label>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Capital Inicial (€)</label>
+                <input type="number" id="compInitial" value="0" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Aportación/mes (€)</label>
+                <input type="number" id="compMonthly" value="500" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad Base (%)</label>
                 <input type="number" step="0.5" id="compRate" value="8" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
               <div>
@@ -770,25 +866,36 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 pt-2">
-              <div class="p-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center">
-                <span class="text-xs font-medium text-indigo-700 dark:text-indigo-400">💰 Capital Final:</span>
-                <span id="compFinalTotal" class="text-lg font-extrabold text-indigo-700 dark:text-indigo-300">0 €</span>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-rose-500 mb-1">Inflación Anual (%)</label>
+                <input type="number" step="0.1" id="compInflation" value="3.0" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-amber-500 mb-1">Impuestos Ganancia (%)</label>
+                <input type="number" step="1" id="compTax" value="21" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-2.5 pt-2">
+              <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center">
+                <span class="text-xs font-medium text-indigo-700 dark:text-indigo-400">💰 Moderado (Nominal):</span>
+                <span id="compFinalTotal" class="text-base font-extrabold text-indigo-700 dark:text-indigo-300">0 €</span>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex justify-between items-center">
+                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">🛡️ Neto Real (Tras IPC e IRPF):</span>
+                <span id="compNetRealTotal" class="text-base font-extrabold text-emerald-700 dark:text-emerald-300">0 €</span>
               </div>
               <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <span class="text-xs font-medium text-slate-600 dark:text-slate-400">💵 Total Aportado:</span>
                 <span id="compTotalContributed" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 €</span>
               </div>
-              <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex justify-between items-center">
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">✨ Interés Generado:</span>
-                <span id="compTotalInterest" class="text-sm font-bold text-emerald-700 dark:text-emerald-300">0 €</span>
-              </div>
             </div>
           </div>
 
           <div class="lg:col-span-2 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Crecimiento Año a Año (Aportado vs. Interés Compuesto)</h4>
-            <div class="h-72 w-full">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Escenarios Reales (Poder Adquisitivo descontando Inflación)</h4>
+            <div class="h-80 w-full">
               <canvas id="compoundChart"></canvas>
             </div>
           </div>
@@ -828,6 +935,11 @@
       btcPrice: 0,
       btcInvestedCost: 0,
       btcCash: 0,
+      emergencyFund: {
+        monthlyCost: 1200,
+        targetMonths: 6
+      },
+      budgets: {},
       accounts: {
         bbva: 3500.00,
         trade_republic_liq: 6000.00,
@@ -839,6 +951,11 @@
           fidelity_sp500: 12302.97,
           vanguard_emerging: 2437.22,
           vanguard_smallcaps: 4000.00
+        },
+        fundsCost: {
+          fidelity_sp500: 0,
+          vanguard_emerging: 0,
+          vanguard_smallcaps: 0
         }
       },
       categories: {
@@ -872,6 +989,114 @@
         sec.classList.add('hidden');
         if (icon) icon.innerText = '▼ Desplegar';
       }
+    }
+
+    function saveEmergencySettings() {
+      const cost = parseFloat(document.getElementById('efMonthlyCost').value) || 1200;
+      const months = parseInt(document.getElementById('efTargetMonths').value) || 6;
+      state.emergencyFund = { monthlyCost: cost, targetMonths: months };
+      saveAndSync();
+    }
+
+    function renderEmergencyFund() {
+      if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
+      const cost = state.emergencyFund.monthlyCost || 1200;
+      const targetMonths = state.emergencyFund.targetMonths || 6;
+
+      document.getElementById('efMonthlyCost').value = cost;
+      document.getElementById('efTargetMonths').value = targetMonths;
+
+      const bbva = state.accounts.bbva || 0;
+      const targetAmount = cost * targetMonths;
+      const monthsCovered = cost > 0 ? (bbva / cost) : 0;
+      const pct = targetAmount > 0 ? Math.min((bbva / targetAmount) * 100, 100) : 0;
+
+      document.getElementById('efMonthsCovered').innerText = monthsCovered.toFixed(1).replace('.', ',') + ' meses cubiertos';
+      document.getElementById('efTargetAmount').innerText = 'Meta: ' + targetAmount.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      
+      const bar = document.getElementById('efProgressBar');
+      bar.style.width = pct + '%';
+
+      const statusText = document.getElementById('efStatusText');
+      if (bbva >= targetAmount) {
+        bar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-500';
+        const excess = bbva - targetAmount;
+        statusText.innerText = '✅ ¡Objetivo cumplido! Tienes un excedente de ' + excess.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € en BBVA listo para invertir si lo deseas.';
+      } else {
+        bar.className = 'h-full bg-indigo-500 rounded-full transition-all duration-500';
+        const missing = targetAmount - bbva;
+        statusText.innerText = 'Te faltan ' + missing.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € en BBVA para cubrir tus ' + targetMonths + ' meses de colchón.';
+      }
+    }
+
+    function saveBudget(category, value) {
+      if (!state.budgets) state.budgets = {};
+      const num = parseFloat(value);
+      if (isNaN(num) || num <= 0) {
+        delete state.budgets[category];
+      } else {
+        state.budgets[category] = num;
+      }
+      saveAndSync();
+    }
+
+    function renderBudgets() {
+      const grid = document.getElementById('budgetGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (!state.budgets) state.budgets = {};
+      const now = new Date();
+      const curM = now.getMonth();
+      const curY = now.getFullYear();
+
+      const spentByCat = {};
+      state.transactions.forEach(function(t) {
+        if (t.type === 'expense') {
+          const d = new Date(t.date);
+          if (d.getMonth() === curM && d.getFullYear() === curY) {
+            spentByCat[t.category] = (spentByCat[t.category] || 0) + t.amount;
+          }
+        }
+      });
+
+      const expenseCats = (state.categories && state.categories.expense) ? state.categories.expense : [];
+      expenseCats.forEach(function(cat) {
+        const limit = state.budgets[cat] || 0;
+        const spent = spentByCat[cat] || 0;
+        const pct = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+
+        let barColor = 'bg-emerald-500';
+        let alertBadge = '';
+        if (limit > 0) {
+          if (spent >= limit) {
+            barColor = 'bg-rose-500';
+            alertBadge = '<span class="text-[10px] font-bold text-rose-600 dark:text-rose-400">🚨 Límite superado</span>';
+          } else if (spent >= limit * 0.8) {
+            barColor = 'bg-amber-500';
+            alertBadge = '<span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">⚠️ Cerca del límite</span>';
+          }
+        }
+
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-2.5';
+        card.innerHTML = 
+          '<div class="flex justify-between items-center gap-2">' +
+            '<span class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">' + cat + '</span>' +
+            '<div class="flex items-center gap-1">' +
+              '<span class="text-[10px] text-slate-400">Tope:</span>' +
+              '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Sin límite" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="w-20 px-2 py-1 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none">' +
+            '</div>' +
+          '</div>' +
+          '<div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">' +
+            '<div class="h-full ' + barColor + ' transition-all duration-500" style="width: ' + pct + '%"></div>' +
+          '</div>' +
+          '<div class="flex justify-between items-center text-xs">' +
+            '<span class="text-slate-600 dark:text-slate-300 font-medium">Gastado: <strong>' + spent.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €</strong></span>' +
+            alertBadge +
+          '</div>';
+        grid.appendChild(card);
+      });
     }
 
     async function fetchBtcPrice(isManual = false) {
@@ -1056,6 +1281,9 @@
       state.myinvestor.cash -= amountToInvest;
       state.myinvestor.funds[fundKey] += amountToInvest;
 
+      if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+      state.myinvestor.fundsCost[fundKey] = (state.myinvestor.fundsCost[fundKey] || 0) + amountToInvest;
+
       state.transactions.push({
         id: Date.now(),
         date: new Date().toISOString(),
@@ -1239,6 +1467,7 @@
       }
 
       if (tabId === 'resumen') {
+        renderBudgets();
         updateCharts();
       } else if (tabId === 'herramientas') {
         calculate4Percent();
@@ -1291,9 +1520,14 @@
           state = cloudState;
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
           if (state.btcCash === undefined) state.btcCash = 0;
+          if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
+          if (!state.budgets) state.budgets = {};
           if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
           if (!state.myinvestor) {
-            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 } };
+            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+          }
+          if (!state.myinvestor.fundsCost) {
+            state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
           }
           if (!state.categories) {
             state.categories = {
@@ -1356,7 +1590,7 @@
 
         const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
         const bodyData = {
-          message: 'Actualización automática VL desde Finanzas App',
+          message: 'Actualización automática desde Finanzas App',
           content: base64Content
         };
         if (currentFileSha) bodyData.sha = currentFileSha;
@@ -1500,7 +1734,7 @@
             if (autoDestination === 'trade_republic_btc') {
               state.btcCash = (parseFloat(state.btcCash) || 0) + autoAmount;
             } else if (autoDestination === 'myinvestor') {
-              if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 } };
+              if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
               state.myinvestor.cash += autoAmount;
             } else if (state.accounts[autoDestination] !== undefined) {
               state.accounts[autoDestination] += autoAmount;
@@ -1536,16 +1770,14 @@
           state = JSON.parse(saved);
           if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
           if (state.btcCash === undefined) state.btcCash = 0;
+          if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
+          if (!state.budgets) state.budgets = {};
           if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
-          if (state.accounts && state.accounts.myinvestor !== undefined) {
-            const oldMyInv = state.accounts.myinvestor;
-            delete state.accounts.myinvestor;
-            if (!state.myinvestor) {
-              state.myinvestor = { cash: 1200, funds: { fidelity_sp500: oldMyInv, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 } };
-            }
-          }
           if (!state.myinvestor) {
-            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 } };
+            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+          }
+          if (!state.myinvestor.fundsCost) {
+            state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
           }
           if (!state.accounts.trade_republic_liq) {
             state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
@@ -1752,7 +1984,6 @@
       const alertText = document.getElementById('dcaAlertText');
       if (!banner || !alertText) return;
 
-      // Buscar última transacción de inversión (transferencia a fondo o btc)
       const investmentTxs = state.transactions.filter(t => t.type === 'transfer' && (t.destination === 'myinvestor_fund' || t.destination === 'trade_republic_btc'));
       
       let lastDate = null;
@@ -1814,9 +2045,17 @@
         document.getElementById('inputFundFidelity').value = state.myinvestor.funds.fidelity_sp500 || 0;
         document.getElementById('inputFundEmerging').value = state.myinvestor.funds.vanguard_emerging || 0;
         document.getElementById('inputFundSmallCaps').value = state.myinvestor.funds.vanguard_smallcaps || 0;
+
+        if (state.myinvestor.fundsCost) {
+          document.getElementById('inputFundCostFidelity').value = state.myinvestor.fundsCost.fidelity_sp500 || 0;
+          document.getElementById('inputFundCostEmerging').value = state.myinvestor.fundsCost.vanguard_emerging || 0;
+          document.getElementById('inputFundCostSmallCaps').value = state.myinvestor.fundsCost.vanguard_smallcaps || 0;
+        }
       }
 
       updateAllTrends();
+      renderEmergencyFund();
+      renderBudgets();
       checkDcaAlert();
 
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
@@ -1865,7 +2104,7 @@
         baseline = sortedAsc[0];
       }
 
-      function setTrendBadge(elementId, currentVal, baseVal) {
+      function setTrendBadge(elementId, currentVal, baseVal, fallbackText = '+0,00 € (0,00%)') {
         const el = document.getElementById(elementId);
         if (!el) return;
 
@@ -1885,7 +2124,7 @@
           el.innerText = sign + diff.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € (' + sign + pct.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%)';
         } else {
           el.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500';
-          el.innerText = '+0,00 € (0,00%)';
+          el.innerText = fallbackText;
         }
       }
 
@@ -1900,6 +2139,12 @@
 
       const btcCost = parseFloat(state.btcInvestedCost) || 0;
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcCost > 0 ? btcCost : null);
+
+      if (state.myinvestor && state.myinvestor.funds && state.myinvestor.fundsCost) {
+        setTrendBadge('trendFundFidelity', state.myinvestor.funds.fidelity_sp500, state.myinvestor.fundsCost.fidelity_sp500, 'Sin coste registrado');
+        setTrendBadge('trendFundEmerging', state.myinvestor.funds.vanguard_emerging, state.myinvestor.fundsCost.vanguard_emerging, 'Sin coste registrado');
+        setTrendBadge('trendFundSmallCaps', state.myinvestor.funds.vanguard_smallcaps, state.myinvestor.fundsCost.vanguard_smallcaps, 'Sin coste registrado');
+      }
     }
 
     function renderTransactions() {
@@ -2250,7 +2495,7 @@
         if (destination === 'trade_republic_btc') {
           state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
         } else if (destination === 'myinvestor') {
-          if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+          if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
           state.myinvestor.cash += amount;
         } else if (state.accounts[destination] !== undefined) {
           state.accounts[destination] += amount;
@@ -2325,6 +2570,9 @@
         } else if (oldTx.destination === 'myinvestor_fund' && oldTx.fundKeyBought) {
           if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[oldTx.fundKeyBought] !== undefined) {
             state.myinvestor.funds[oldTx.fundKeyBought] = Math.max(0, state.myinvestor.funds[oldTx.fundKeyBought] - oldTx.fundEurInvested);
+            if (state.myinvestor.fundsCost) {
+              state.myinvestor.fundsCost[oldTx.fundKeyBought] = Math.max(0, (state.myinvestor.fundsCost[oldTx.fundKeyBought] || 0) - oldTx.fundEurInvested);
+            }
           }
         } else if (oldTx.destination === 'myinvestor') {
           state.myinvestor.cash -= oldTx.amount;
@@ -2427,6 +2675,9 @@
           } else if (tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
             if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
               state.myinvestor.funds[tx.fundKeyBought] = Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested);
+              if (state.myinvestor.fundsCost) {
+                state.myinvestor.fundsCost[tx.fundKeyBought] = Math.max(0, (state.myinvestor.fundsCost[tx.fundKeyBought] || 0) - tx.fundEurInvested);
+              }
             }
           } else if (tx.destination === 'myinvestor') {
             state.myinvestor.cash -= tx.amount;
@@ -2506,7 +2757,7 @@
       }
 
       if (!isNaN(val) && val >= 0) {
-        if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+        if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
         if (!state.myinvestor.funds) state.myinvestor.funds = {};
 
         state.myinvestor.funds[fundKey] = val;
@@ -2536,6 +2787,29 @@
       }
     }
 
+    function updateFundCost(fundKey) {
+      let val = 0;
+      let fundName = '';
+
+      if (fundKey === 'fidelity_sp500') {
+        val = parseFloat(document.getElementById('inputFundCostFidelity').value);
+        fundName = 'Fidelity S&P 500';
+      } else if (fundKey === 'vanguard_emerging') {
+        val = parseFloat(document.getElementById('inputFundCostEmerging').value);
+        fundName = 'Vanguard Emergentes';
+      } else if (fundKey === 'vanguard_smallcaps') {
+        val = parseFloat(document.getElementById('inputFundCostSmallCaps').value);
+        fundName = 'Vanguard Small Caps';
+      }
+
+      if (!isNaN(val) && val >= 0) {
+        if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+        state.myinvestor.fundsCost[fundKey] = val;
+        saveAndSync();
+        alert('Coste de adquisición de ' + fundName + ' guardado correctamente.');
+      }
+    }
+
     function importData(event) {
       const fileReader = new FileReader();
       fileReader.onload = function(e) {
@@ -2545,9 +2819,14 @@
             state = importedState;
             if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
             if (state.btcCash === undefined) state.btcCash = 0;
+            if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
+            if (!state.budgets) state.budgets = {};
             if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
             if (!state.myinvestor) {
-              state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 } };
+              state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+            }
+            if (!state.myinvestor.fundsCost) {
+              state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
             }
             if (!state.categories) {
               state.categories = {
@@ -2635,32 +2914,40 @@
     function calculateCompound() {
       const initial = parseFloat(document.getElementById('compInitial').value) || 0;
       const monthly = parseFloat(document.getElementById('compMonthly').value) || 0;
-      const rate = (parseFloat(document.getElementById('compRate').value) || 0) / 100;
+      const baseRate = (parseFloat(document.getElementById('compRate').value) || 0) / 100;
       const years = parseInt(document.getElementById('compYears').value) || 1;
+      const inflation = (parseFloat(document.getElementById('compInflation').value) || 0) / 100;
+      const taxRate = (parseFloat(document.getElementById('compTax').value) || 0) / 100;
 
-      const labels = ['Año 0'];
-      const dataTotal = [initial];
-      const dataContrib = [initial];
+      function simulateScenario(annualRate) {
+        let nomBal = initial;
+        let contrib = initial;
+        const mRate = annualRate / 12;
+        const arrRealNet = [initial];
 
-      let currentBalance = initial;
-      let totalContrib = initial;
-      const monthlyRate = rate / 12;
-
-      for (let y = 1; y <= years; y++) {
-        for (let m = 1; m <= 12; m++) {
-          currentBalance = (currentBalance + monthly) * (1 + monthlyRate);
-          totalContrib += monthly;
+        for (let y = 1; y <= years; y++) {
+          for (let m = 1; m <= 12; m++) {
+            nomBal = (nomBal + monthly) * (1 + mRate);
+            contrib += monthly;
+          }
+          const profit = Math.max(0, nomBal - contrib);
+          const afterTaxNominal = nomBal - (profit * taxRate);
+          const realPurchasingPower = afterTaxNominal / Math.pow(1 + inflation, y);
+          arrRealNet.push(Math.round(realPurchasingPower));
         }
-        labels.push('Año ' + y);
-        dataTotal.push(Math.round(currentBalance));
-        dataContrib.push(Math.round(totalContrib));
+        return { nominal: nomBal, contrib: contrib, series: arrRealNet };
       }
 
-      const totalInterest = Math.max(0, currentBalance - totalContrib);
+      const labels = ['Año 0'];
+      for (let y = 1; y <= years; y++) labels.push('Año ' + y);
 
-      document.getElementById('compFinalTotal').innerText = Math.round(currentBalance).toLocaleString('es-ES') + ' €';
-      document.getElementById('compTotalContributed').innerText = Math.round(totalContrib).toLocaleString('es-ES') + ' €';
-      document.getElementById('compTotalInterest').innerText = '+' + Math.round(totalInterest).toLocaleString('es-ES') + ' €';
+      const mod = simulateScenario(baseRate);
+      const pes = simulateScenario(Math.max(0, baseRate - 0.02));
+      const opt = simulateScenario(baseRate + 0.02);
+
+      document.getElementById('compFinalTotal').innerText = Math.round(mod.nominal).toLocaleString('es-ES') + ' €';
+      document.getElementById('compNetRealTotal').innerText = mod.series[mod.series.length - 1].toLocaleString('es-ES') + ' €';
+      document.getElementById('compTotalContributed').innerText = Math.round(mod.contrib).toLocaleString('es-ES') + ' €';
 
       const canvas = document.getElementById('compoundChart');
       if (!canvas) return;
@@ -2675,22 +2962,31 @@
           labels: labels,
           datasets: [
             {
-              label: 'Capital Total',
-              data: dataTotal,
+              label: 'Optimista (+2%)',
+              data: opt.series,
               borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.3
+            },
+            {
+              label: 'Moderado (Base)',
+              data: mod.series,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.15)',
               borderWidth: 3,
               fill: true,
               tension: 0.3
             },
             {
-              label: 'Total Aportado',
-              data: dataContrib,
-              borderColor: '#6366f1',
-              borderDash: [5, 5],
+              label: 'Pesimista (-2%)',
+              data: pes.series,
+              borderColor: '#f43f5e',
+              backgroundColor: 'transparent',
               borderWidth: 2,
-              fill: false,
-              tension: 0.1
+              borderDash: [4, 4],
+              tension: 0.3
             }
           ]
         },
@@ -2702,7 +2998,7 @@
             tooltip: {
               callbacks: {
                 label: function(context) {
-                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES') + ' €';
+                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES') + ' € (reales)';
                 }
               }
             }
@@ -2879,7 +3175,6 @@
         }
       });
 
-      // Gráfico Evolución por Fondo (2.C)
       const ctxFundEvol = document.getElementById('fundEvolutionChart').getContext('2d');
       if (chartFundEvol) chartFundEvol.destroy();
 
