@@ -929,6 +929,7 @@
     let fireSource = 'invested'; 
 
     let state = {
+      version: 5, // Versión actual para forzar migración automática si hace falta
       goal: 40000,
       theme: 'dark',
       btcUnits: 0,
@@ -1525,25 +1526,7 @@
 
         if (cloudState && cloudState.accounts) {
           state = cloudState;
-          if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
-          if (state.btcCash === undefined) state.btcCash = 0;
-          if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
-          if (!state.budgets) state.budgets = {};
-          if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
-          if (!state.myinvestor) {
-            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-          }
-          if (!state.myinvestor.fundsCost) {
-            state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-          }
-          if (!state.categories) {
-            state.categories = {
-              expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
-              income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
-            };
-          }
-          if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
-          if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+          runMigrations(); // Aplica correcciones automáticas si la versión es antigua
 
           const updatedFunds = await checkAndApplyDailyFundPerformance();
           if (updatedFunds) {
@@ -1560,6 +1543,37 @@
         setSyncStatus('⚠️ Sin conexión nube', 'error');
       }
       return false;
+    }
+
+    // OPCIÓN 1: Rutina de migración y recálculo automático para evitar datos congelados en caché
+    function runMigrations() {
+      if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
+      if (state.btcCash === undefined) state.btcCash = 0;
+      if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
+      if (!state.budgets) state.budgets = {};
+      if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
+      
+      if (!state.myinvestor) {
+        state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+      }
+      if (!state.myinvestor.fundsCost) {
+        state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+      }
+      if (!state.accounts.trade_republic_liq) {
+        state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
+        state.accounts.trade_republic_btc = 2500.00;
+      }
+      if (!state.categories) {
+        state.categories = {
+          expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
+          income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
+        };
+      }
+      if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
+      if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+
+      // Forzar actualización de versión si es necesario
+      state.version = 5;
     }
 
     async function syncToGitHub(isManual = false) {
@@ -1775,32 +1789,12 @@
       if (saved) {
         try {
           state = JSON.parse(saved);
-          if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
-          if (state.btcCash === undefined) state.btcCash = 0;
-          if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
-          if (!state.budgets) state.budgets = {};
-          if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
-          if (!state.myinvestor) {
-            state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-          }
-          if (!state.myinvestor.fundsCost) {
-            state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-          }
-          if (!state.accounts.trade_republic_liq) {
-            state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
-            state.accounts.trade_republic_btc = 2500.00;
-          }
-          if (!state.categories) {
-            state.categories = {
-              expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
-              income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
-            };
-          }
-          if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
-          if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+          runMigrations(); // Ejecuta migración para corregir valores antiguos en caché
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
+      } else {
+        runMigrations();
       }
 
       await checkAndApplyDailyFundPerformance();
@@ -2826,25 +2820,7 @@
           const importedState = JSON.parse(e.target.result);
           if (importedState && (importedState.accounts || importedState.myinvestor)) {
             state = importedState;
-            if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
-            if (state.btcCash === undefined) state.btcCash = 0;
-            if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
-            if (!state.budgets) state.budgets = {};
-            if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
-            if (!state.myinvestor) {
-              state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-            }
-            if (!state.myinvestor.fundsCost) {
-              state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-            }
-            if (!state.categories) {
-              state.categories = {
-                expense: ['Supermercado', 'Ocio', 'Vivienda', 'Transporte', 'Suscripciones', 'Otros'],
-                income: ['Nomina', 'Bizum', 'Paga extra', 'Otros']
-              };
-            }
-            if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
-            if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+            runMigrations();
             saveAndSync();
             populateCategoryDropdowns();
             alert('¡Copia de seguridad importada y sincronizada con la nube!');
