@@ -31,7 +31,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-10T10:40:09.849Z",
+  "lastCloudSync": "2026-11-10T10:40:31.139Z",
   "btcUnits": 0.010744,
   "btcPrice": 66069.31,
   "categories": {
@@ -65,7 +65,7 @@
     },
     "fundsVlBase": {
       "fidelity_sp500": 15.22,
-      "vanguard_emerging": 0,
+      "vanguard_emerging": 281.8,
       "vanguard_smallcaps": 0
     },
     "fundsCurrentVl": {
