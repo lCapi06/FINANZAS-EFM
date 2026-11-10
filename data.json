@@ -5,7 +5,7 @@
     "bbva": 2553.43,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
-    "trade_republic_btc": 709.4555974000001
+    "trade_republic_btc": 709.49347
   },
   "transactions": [
     {
@@ -31,9 +31,9 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-10T10:45:15.622Z",
+  "lastCloudSync": "2026-11-10T11:08:36.599Z",
   "btcUnits": 0.010744,
-  "btcPrice": 66032.725,
+  "btcPrice": 66036.25,
   "categories": {
     "expense": [
       "Supermercado",
@@ -93,6 +93,6 @@
     "targetMonths": 6
   },
   "budgets": {},
-  "version": 6,
+  "version": 7,
   "lastExportDate": "2026-11-10T10:15:02.260Z"
 }
