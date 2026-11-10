@@ -270,62 +270,83 @@
 
       </section>
 
-      <!-- Panel Desplegable de Fondos Indexados de MyInvestor -->
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Con botones de VL diario) -->
       <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-rose-500 shadow-md transition-all space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
-            <p class="text-xs text-slate-500">Valor Liquidativo actualizado y rentabilidad real ponderada frente al capital aportado.</p>
+            <p class="text-xs text-slate-500">Actualiza el Valor Liquidativo (VL) diario de cada fondo para calcular tu rentabilidad real basada en tu precio medio y capital aportado.</p>
           </div>
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-              ✨ VL Diario Activo
+              ✨ VL Diario Manual / Activo
             </span>
             <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Fondo 1 -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 1</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
               <p id="fundFidelityVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
-              <div class="mt-1.5">
+              <div class="mt-1.5 flex items-center justify-between">
                 <span id="trendFundFidelity" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+                <span id="fundFidelityVLSub" class="text-[10px] text-slate-400">VL Actual: --</span>
               </div>
             </div>
-            <button onclick="investInFund('fidelity_sp500', 'Fidelity S&P 500')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
-              Invertir en Fidelity SP500
-            </button>
+            <div class="space-y-2">
+              <button onclick="promptUpdateVL('fidelity_sp500', 'Fidelity S&P 500')" class="w-full py-2 bg-rose-600 text-white font-semibold text-xs rounded-lg hover:bg-rose-700 transition shadow-sm flex items-center justify-center gap-1">
+                <span>📊</span> Actualizar VL de hoy
+              </button>
+              <button onclick="investInFund('fidelity_sp500', 'Fidelity S&P 500')" class="w-full py-1.5 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+                Invertir más saldo
+              </button>
+            </div>
           </div>
 
+          <!-- Fondo 2 -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 2</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Mercados Emergentes</h4>
               <p id="fundEmergingVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
-              <div class="mt-1.5">
+              <div class="mt-1.5 flex items-center justify-between">
                 <span id="trendFundEmerging" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+                <span id="fundEmergingVLSub" class="text-[10px] text-slate-400">VL Actual: --</span>
               </div>
             </div>
-            <button onclick="investInFund('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
-              Invertir en Vanguard Emergentes
-            </button>
+            <div class="space-y-2">
+              <button onclick="promptUpdateVL('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="w-full py-2 bg-rose-600 text-white font-semibold text-xs rounded-lg hover:bg-rose-700 transition shadow-sm flex items-center justify-center gap-1">
+                <span>📊</span> Actualizar VL de hoy
+              </button>
+              <button onclick="investInFund('vanguard_emerging', 'Vanguard Mercados Emergentes')" class="w-full py-1.5 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+                Invertir más saldo
+              </button>
+            </div>
           </div>
 
+          <!-- Fondo 3 -->
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-rose-200 dark:border-rose-900/40 flex flex-col justify-between space-y-3">
             <div>
               <span class="text-[11px] font-bold text-rose-500 uppercase">Fondo 3</span>
               <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
               <p id="fundSmallCapsVal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0,00 €</p>
-              <div class="mt-1.5">
+              <div class="mt-1.5 flex items-center justify-between">
                 <span id="trendFundSmallCaps" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Sin coste registrado</span>
+                <span id="fundSmallCapsVLSub" class="text-[10px] text-slate-400">VL Actual: --</span>
               </div>
             </div>
-            <button onclick="investInFund('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="w-full py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
-              Invertir en Vanguard Small Caps
-            </button>
+            <div class="space-y-2">
+              <button onclick="promptUpdateVL('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="w-full py-2 bg-rose-600 text-white font-semibold text-xs rounded-lg hover:bg-rose-700 transition shadow-sm flex items-center justify-center gap-1">
+                <span>📊</span> Actualizar VL de hoy
+              </button>
+              <button onclick="investInFund('vanguard_smallcaps', 'Vanguard Global Small Caps')" class="w-full py-1.5 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition shadow-sm">
+                Invertir más saldo
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -644,14 +665,14 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Fondos Indexados (Minimizado por defecto) -->
+      <!-- Ajuste Directo de Fondos Indexados (Configuración de Costes y Precio Medio Inicial) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
         <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>📈 Ajuste Directo de Fondos Indexados</span>
+              <span>📈 Ajuste Directo de Fondos Indexados y Costes Iniciales</span>
             </h3>
-            <p class="text-xs text-slate-500">Actualiza saldos y el coste de adquisición inicial para calcular tu rentabilidad real.</p>
+            <p class="text-xs text-slate-500">Introduce tu capital invertido (coste de adquisición) y tu VL medio inicial para que los botones de VL diario calculen tu rentabilidad real.</p>
           </div>
           <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
         </div>
@@ -659,40 +680,58 @@
         <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (€)</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (Valor Actual €)</label>
               <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
               <button onclick="updateFundBalance('fidelity_sp500')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor S&P 500</button>
             </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición S&P 500 (€)</label>
-              <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundCost('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste S&P 500</button>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseFidelity" placeholder="Ej: 150.25" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base S&P</button>
             </div>
           </div>
 
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (€)</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (Valor Actual €)</label>
               <input type="number" step="0.01" id="inputFundEmerging" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
               <button onclick="updateFundBalance('vanguard_emerging')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Emergentes</button>
             </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición Emergentes (€)</label>
-              <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundCost('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste Emergentes</button>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseEmerging" placeholder="Ej: 25.50" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Emergentes</button>
             </div>
           </div>
 
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (€)</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (Valor Actual €)</label>
               <input type="number" step="0.01" id="inputFundSmallCaps" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
               <button onclick="updateFundBalance('vanguard_smallcaps')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Small Caps</button>
             </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición Small Caps (€)</label>
-              <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Lo que pusiste de tu bolsillo" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundCost('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste Small Caps</button>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseSmallCaps" placeholder="Ej: 40.10" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Small Caps</button>
             </div>
           </div>
         </div>
@@ -825,7 +864,7 @@
         </div>
       </section>
 
-      <!-- Simulador Avanzado de Interés Compuesto (Escenarios, Inflación e Impuestos) -->
+      <!-- Simulador Avanzado de Interés Compuesto -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
           <div>
@@ -929,7 +968,7 @@
     let fireSource = 'invested'; 
 
     let state = {
-      version: 5, // Versión actual para forzar migración automática si hace falta
+      version: 6,
       goal: 40000,
       theme: 'dark',
       btcUnits: 0,
@@ -957,6 +996,16 @@
           fidelity_sp500: 0,
           vanguard_emerging: 0,
           vanguard_smallcaps: 0
+        },
+        fundsVlBase: {
+          fidelity_sp500: 0,
+          vanguard_emerging: 0,
+          vanguard_smallcaps: 0
+        },
+        fundsCurrentVl: {
+          fidelity_sp500: 0,
+          vanguard_emerging: 0,
+          vanguard_smallcaps: 0
         }
       },
       categories: {
@@ -966,7 +1015,6 @@
       transactions: [],
       monthlySnapshots: [],
       fundSnapshots: [],
-      lastFundPerformanceDate: null,
       lastExportDate: null,
       lastCloudSync: null
     };
@@ -1132,59 +1180,6 @@
       }
     }
 
-    async function checkAndApplyDailyFundPerformance() {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      if (state.lastFundPerformanceDate === todayStr) return false;
-
-      if (!state.myinvestor || !state.myinvestor.funds) return false;
-
-      let fidelityChange = 0.010;  
-      let emergingChange = 0.007;  
-      let smallCapsChange = 0.008; 
-
-      try {
-        const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&range=2d');
-        if (res.ok) {
-          const data = await res.json();
-          const quotes = data.chart.result[0].indicators.quote[0].close;
-          const prices = quotes.filter(p => p !== null);
-          if (prices.length >= 2) {
-            fidelityChange = (prices[prices.length - 1] - prices[prices.length - 2]) / prices[prices.length - 2];
-          }
-        }
-      } catch (e) {
-        console.warn('Usando estimación de VL de mercado basada en cierre anterior:', e);
-      }
-
-      state.myinvestor.funds.fidelity_sp500 *= (1 + fidelityChange);
-      state.myinvestor.funds.vanguard_emerging *= (1 + emergingChange);
-      state.myinvestor.funds.vanguard_smallcaps *= (1 + smallCapsChange);
-
-      state.lastFundPerformanceDate = todayStr;
-
-      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
-        state.fundSnapshots = [createFundSnapshotObject(new Date())];
-      } else {
-        const now = new Date();
-        const curY = now.getFullYear();
-        const curM = now.getMonth();
-        let currentSnap = state.fundSnapshots.find(function(s) {
-          const sd = new Date(s.date);
-          return sd.getFullYear() === curY && sd.getMonth() === curM;
-        });
-        if (currentSnap) {
-          currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
-          currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
-          currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
-          currentSnap.total = getFundsTotal();
-        } else {
-          state.fundSnapshots.push(createFundSnapshotObject(now));
-        }
-      }
-
-      return true;
-    }
-
     function investInBitcoin() {
       const pendingCash = parseFloat(state.btcCash) || 0;
       const defaultAmount = pendingCash > 0 ? pendingCash.toFixed(2) : '30';
@@ -1255,18 +1250,74 @@
       return cash + funds;
     }
 
-    function getFundsTotal() {
-      if (!state.myinvestor || !state.myinvestor.funds) return 0;
-      return (state.myinvestor.funds.fidelity_sp500 || 0) + 
-             (state.myinvestor.funds.vanguard_emerging || 0) + 
-             (state.myinvestor.funds.vanguard_smallcaps || 0);
-    }
-
     function getFundsTotalCost() {
       if (!state.myinvestor || !state.myinvestor.fundsCost) return 0;
       return (state.myinvestor.fundsCost.fidelity_sp500 || 0) + 
              (state.myinvestor.fundsCost.vanguard_emerging || 0) + 
              (state.myinvestor.fundsCost.vanguard_smallcaps || 0);
+    }
+
+    // NUEVO: Función para actualizar el VL diario introducido por el usuario y recalcular saldo y rentabilidad
+    function promptUpdateVL(fundKey, fundName) {
+      if (!state.myinvestor || !state.myinvestor.fundsVlBase || state.myinvestor.fundsVlBase[fundKey] <= 0) {
+        alert('Por favor, configura primero el "VL Medio / Inicial" y el "Coste de Adquisición" en el apartado de Ajuste Directo de Fondos Indexados.');
+        return;
+      }
+
+      const currentVL = state.myinvestor.fundsCurrentVl && state.myinvestor.fundsCurrentVl[fundKey] ? state.myinvestor.fundsCurrentVl[fundKey] : state.myinvestor.fundsVlBase[fundKey];
+      const input = prompt('Introduce el Valor Liquidativo (VL) de hoy para ' + fundName + ':', currentVL);
+      if (input === null) return;
+
+      const newVl = parseFloat(input.replace(',', '.'));
+      if (isNaN(newVl) || newVl <= 0) {
+        alert('Introduce un VL válido.');
+        return;
+      }
+
+      const vlBase = state.myinvestor.fundsVlBase[fundKey];
+      const cost = state.myinvestor.fundsCost[fundKey] || 0;
+
+      if (cost <= 0) {
+        alert('Falta configurar el coste de adquisición para este fondo.');
+        return;
+      }
+
+      // Cálculo de participaciones estimadas basado en el VL base y coste aportado
+      const participations = cost / vlBase;
+      const newFundValue = participations * newVl;
+
+      state.myinvestor.funds[fundKey] = newFundValue;
+      if (!state.myinvestor.fundsCurrentVl) state.myinvestor.fundsCurrentVl = {};
+      state.myinvestor.fundsCurrentVl[fundKey] = newVl;
+
+      // Actualizar instantáneamente la foto mensual de fondos
+      const now = new Date();
+      const curY = now.getFullYear();
+      const curM = now.getMonth();
+      if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+      let currentSnap = state.fundSnapshots.find(function(s) {
+        const sd = new Date(s.date);
+        return sd.getFullYear() === curY && sd.getMonth() === curM;
+      });
+      if (currentSnap) {
+        currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
+        currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
+        currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
+        currentSnap.total = getMyInvestorTotal() - state.myinvestor.cash;
+      } else {
+        state.fundSnapshots.push({
+          id: Date.now(),
+          date: now.toISOString(),
+          dateLabel: formatDateDDMMYYYY(now),
+          fidelity_sp500: state.myinvestor.funds.fidelity_sp500 || 0,
+          vanguard_emerging: state.myinvestor.funds.vanguard_emerging || 0,
+          vanguard_smallcaps: state.myinvestor.funds.vanguard_smallcaps || 0,
+          total: getMyInvestorTotal() - state.myinvestor.cash
+        });
+      }
+
+      saveAndSync();
+      alert('¡VL actualizado con éxito!\nNuevo valor del fondo: ' + newFundValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
     }
 
     function investInFund(fundKey, fundName) {
@@ -1304,10 +1355,6 @@
         fundKeyBought: fundKey,
         fundEurInvested: amountToInvest
       });
-
-      if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
-        state.fundSnapshots = [createFundSnapshotObject(new Date())];
-      }
 
       saveAndSync();
       alert('¡Se han invertido ' + amountToInvest.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € en ' + fundName + ' con éxito!');
@@ -1526,13 +1573,7 @@
 
         if (cloudState && cloudState.accounts) {
           state = cloudState;
-          runMigrations(); // Aplica correcciones automáticas si la versión es antigua
-
-          const updatedFunds = await checkAndApplyDailyFundPerformance();
-          if (updatedFunds) {
-            localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
-            syncToGitHub(false);
-          }
+          runMigrations();
 
           const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
           setSyncStatus('☁️ Sincronizado (' + syncDate + ')', 'ok');
@@ -1545,20 +1586,19 @@
       return false;
     }
 
-    // OPCIÓN 1: Rutina de migración y recálculo automático para evitar datos congelados en caché
     function runMigrations() {
       if (state.btcInvestedCost === undefined) state.btcInvestedCost = 0;
       if (state.btcCash === undefined) state.btcCash = 0;
       if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
       if (!state.budgets) state.budgets = {};
-      if (state.lastFundPerformanceDate === undefined) state.lastFundPerformanceDate = null;
       
       if (!state.myinvestor) {
-        state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+        state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
       }
-      if (!state.myinvestor.fundsCost) {
-        state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-      }
+      if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+      if (!state.myinvestor.fundsVlBase) state.myinvestor.fundsVlBase = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+      if (!state.myinvestor.fundsCurrentVl) state.myinvestor.fundsCurrentVl = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+
       if (!state.accounts.trade_republic_liq) {
         state.accounts.trade_republic_liq = state.accounts.trade_republic || 6000.00;
         state.accounts.trade_republic_btc = 2500.00;
@@ -1572,8 +1612,7 @@
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
-      // Forzar actualización de versión si es necesario
-      state.version = 5;
+      state.version = 6;
     }
 
     async function syncToGitHub(isManual = false) {
@@ -1611,7 +1650,7 @@
 
         const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
         const bodyData = {
-          message: 'Actualización automática desde Finanzas App',
+          message: 'Actualización de VL y fondos desde Finanzas App',
           content: base64Content
         };
         if (currentFileSha) bodyData.sha = currentFileSha;
@@ -1755,7 +1794,7 @@
             if (autoDestination === 'trade_republic_btc') {
               state.btcCash = (parseFloat(state.btcCash) || 0) + autoAmount;
             } else if (autoDestination === 'myinvestor') {
-              if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+              if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
               state.myinvestor.cash += autoAmount;
             } else if (state.accounts[autoDestination] !== undefined) {
               state.accounts[autoDestination] += autoAmount;
@@ -1789,15 +1828,13 @@
       if (saved) {
         try {
           state = JSON.parse(saved);
-          runMigrations(); // Ejecuta migración para corregir valores antiguos en caché
+          runMigrations();
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
       } else {
         runMigrations();
       }
-
-      await checkAndApplyDailyFundPerformance();
 
       applyTheme();
       updateYearFilterOptions();
@@ -2051,6 +2088,18 @@
           document.getElementById('inputFundCostFidelity').value = state.myinvestor.fundsCost.fidelity_sp500 || 0;
           document.getElementById('inputFundCostEmerging').value = state.myinvestor.fundsCost.vanguard_emerging || 0;
           document.getElementById('inputFundCostSmallCaps').value = state.myinvestor.fundsCost.vanguard_smallcaps || 0;
+        }
+
+        if (state.myinvestor.fundsVlBase) {
+          document.getElementById('inputFundVlBaseFidelity').value = state.myinvestor.fundsVlBase.fidelity_sp500 || '';
+          document.getElementById('inputFundVlBaseEmerging').value = state.myinvestor.fundsVlBase.vanguard_emerging || '';
+          document.getElementById('inputFundVlBaseSmallCaps').value = state.myinvestor.fundsVlBase.vanguard_smallcaps || '';
+        }
+
+        if (state.myinvestor.fundsCurrentVl) {
+          document.getElementById('fundFidelityVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.fidelity_sp500 || '--');
+          document.getElementById('fundEmergingVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.vanguard_emerging || '--');
+          document.getElementById('fundSmallCapsVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.vanguard_smallcaps || '--');
         }
       }
 
@@ -2498,7 +2547,7 @@
         if (destination === 'trade_republic_btc') {
           state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
         } else if (destination === 'myinvestor') {
-          if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
+          if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
           state.myinvestor.cash += amount;
         } else if (state.accounts[destination] !== undefined) {
           state.accounts[destination] += amount;
@@ -2779,7 +2828,7 @@
             currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
             currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
             currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
-            currentSnap.total = getFundsTotal();
+            currentSnap.total = getMyInvestorTotal() - state.myinvestor.cash;
           } else {
             state.fundSnapshots.push(createFundSnapshotObject(now));
           }
@@ -2790,27 +2839,38 @@
       }
     }
 
-    function updateFundCost(fundKey) {
-      let val = 0;
+    // NUEVO: Guardar costes y VL base inicial para habilitar el cálculo automático posterior
+    function updateFundConfig(fundKey) {
+      let costVal = 0;
+      let vlBaseVal = 0;
       let fundName = '';
 
       if (fundKey === 'fidelity_sp500') {
-        val = parseFloat(document.getElementById('inputFundCostFidelity').value);
+        costVal = parseFloat(document.getElementById('inputFundCostFidelity').value);
+        vlBaseVal = parseFloat(document.getElementById('inputFundVlBaseFidelity').value);
         fundName = 'Fidelity S&P 500';
       } else if (fundKey === 'vanguard_emerging') {
-        val = parseFloat(document.getElementById('inputFundCostEmerging').value);
+        costVal = parseFloat(document.getElementById('inputFundCostEmerging').value);
+        vlBaseVal = parseFloat(document.getElementById('inputFundVlBaseEmerging').value);
         fundName = 'Vanguard Emergentes';
       } else if (fundKey === 'vanguard_smallcaps') {
-        val = parseFloat(document.getElementById('inputFundCostSmallCaps').value);
+        costVal = parseFloat(document.getElementById('inputFundCostSmallCaps').value);
+        vlBaseVal = parseFloat(document.getElementById('inputFundVlBaseSmallCaps').value);
         fundName = 'Vanguard Small Caps';
       }
 
-      if (!isNaN(val) && val >= 0) {
-        if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-        state.myinvestor.fundsCost[fundKey] = val;
-        saveAndSync();
-        alert('Coste de adquisición de ' + fundName + ' guardado correctamente.');
+      if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = {};
+      if (!state.myinvestor.fundsVlBase) state.myinvestor.fundsVlBase = {};
+
+      if (!isNaN(costVal) && costVal >= 0) {
+        state.myinvestor.fundsCost[fundKey] = costVal;
       }
+      if (!isNaN(vlBaseVal) && vlBaseVal > 0) {
+        state.myinvestor.fundsVlBase[fundKey] = vlBaseVal;
+      }
+
+      saveAndSync();
+      alert('Configuración de coste y VL base guardada para ' + fundName + '. ¡Ahora puedes usar el botón de VL diario!');
     }
 
     function importData(event) {
