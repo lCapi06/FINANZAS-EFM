@@ -270,7 +270,7 @@
 
       </section>
 
-      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Con botones de VL diario) -->
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor -->
       <section id="myinvestorDetailsPanel" class="hidden bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-rose-500 shadow-md transition-all space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
@@ -665,7 +665,7 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Fondos Indexados (Configuración de Costes y Precio Medio Inicial) -->
+      <!-- Ajuste Directo de Fondos Indexados (Limpiado sin Valor Actual) -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
         <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
           <div>
@@ -678,13 +678,10 @@
         </div>
 
         <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <!-- Fondo 1 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fidelity S&P 500 (Valor Actual €)</label>
-              <input type="number" step="0.01" id="inputFundFidelity" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundBalance('fidelity_sp500')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor S&P 500</button>
-            </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
+            <div class="space-y-2">
               <div>
                 <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
                 <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
@@ -697,13 +694,10 @@
             </div>
           </div>
 
+          <!-- Fondo 2 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Emergentes (Valor Actual €)</label>
-              <input type="number" step="0.01" id="inputFundEmerging" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundBalance('vanguard_emerging')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Emergentes</button>
-            </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Emergentes</h4>
+            <div class="space-y-2">
               <div>
                 <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
                 <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
@@ -716,13 +710,10 @@
             </div>
           </div>
 
+          <!-- Fondo 3 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vanguard Small Caps (Valor Actual €)</label>
-              <input type="number" step="0.01" id="inputFundSmallCaps" class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-              <button onclick="updateFundBalance('vanguard_smallcaps')" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-lg hover:bg-slate-300">Actualizar Valor Small Caps</button>
-            </div>
-            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
+            <div class="space-y-2">
               <div>
                 <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
                 <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
@@ -968,7 +959,7 @@
     let fireSource = 'invested'; 
 
     let state = {
-      version: 6,
+      version: 7,
       goal: 40000,
       theme: 'dark',
       btcUnits: 0,
@@ -1257,7 +1248,6 @@
              (state.myinvestor.fundsCost.vanguard_smallcaps || 0);
     }
 
-    // NUEVO: Función para actualizar el VL diario introducido por el usuario y recalcular saldo y rentabilidad
     function promptUpdateVL(fundKey, fundName) {
       if (!state.myinvestor || !state.myinvestor.fundsVlBase || state.myinvestor.fundsVlBase[fundKey] <= 0) {
         alert('Por favor, configura primero el "VL Medio / Inicial" y el "Coste de Adquisición" en el apartado de Ajuste Directo de Fondos Indexados.');
@@ -1282,7 +1272,6 @@
         return;
       }
 
-      // Cálculo de participaciones estimadas basado en el VL base y coste aportado
       const participations = cost / vlBase;
       const newFundValue = participations * newVl;
 
@@ -1290,7 +1279,6 @@
       if (!state.myinvestor.fundsCurrentVl) state.myinvestor.fundsCurrentVl = {};
       state.myinvestor.fundsCurrentVl[fundKey] = newVl;
 
-      // Actualizar instantáneamente la foto mensual de fondos
       const now = new Date();
       const curY = now.getFullYear();
       const curM = now.getMonth();
@@ -1326,38 +1314,74 @@
         return;
       }
 
-      const input = prompt('Tienes ' + state.myinvestor.cash.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € apartados.\n¿Qué % de ese efectivo quieres destinar a ' + fundName + '?', '100');
-      if (input === null) return;
+      const inputPct = prompt(
+        'Tienes ' + state.myinvestor.cash.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € apartados en MyInvestor.\n¿Qué % de ese efectivo quieres destinar a ' + fundName + '?',
+        '100'
+      );
+      if (inputPct === null) return;
 
-      const pct = parseFloat(input);
+      const pct = parseFloat(inputPct.replace(',', '.'));
       if (isNaN(pct) || pct <= 0 || pct > 100) {
         alert('Por favor, introduce un porcentaje válido entre 1 y 100.');
         return;
       }
 
+      const lastKnownVl = (state.myinvestor.fundsCurrentVl && state.myinvestor.fundsCurrentVl[fundKey]) ||
+                          (state.myinvestor.fundsVlBase && state.myinvestor.fundsVlBase[fundKey]) || '';
+      const inputVl = prompt(
+        '¿A qué Valor Liquidativo (VL) has comprado las participaciones de ' + fundName + '?',
+        lastKnownVl
+      );
+      if (inputVl === null) return;
+
+      const buyVl = parseFloat(inputVl.replace(',', '.'));
+      if (isNaN(buyVl) || buyVl <= 0) {
+        alert('Por favor, introduce un VL de compra válido.');
+        return;
+      }
+
       const amountToInvest = state.myinvestor.cash * (pct / 100);
 
-      state.myinvestor.cash -= amountToInvest;
-      state.myinvestor.funds[fundKey] += amountToInvest;
-
       if (!state.myinvestor.fundsCost) state.myinvestor.fundsCost = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
-      state.myinvestor.fundsCost[fundKey] = (state.myinvestor.fundsCost[fundKey] || 0) + amountToInvest;
+      if (!state.myinvestor.fundsVlBase) state.myinvestor.fundsVlBase = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+      if (!state.myinvestor.fundsCurrentVl) state.myinvestor.fundsCurrentVl = { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 };
+
+      const oldCost = state.myinvestor.fundsCost[fundKey] || 0;
+      const oldVlBase = state.myinvestor.fundsVlBase[fundKey] || 0;
+      const oldParticipations = (oldCost > 0 && oldVlBase > 0) ? (oldCost / oldVlBase) : 0;
+
+      const newParticipations = amountToInvest / buyVl;
+      const totalParticipations = oldParticipations + newParticipations;
+      const newTotalCost = oldCost + amountToInvest;
+      const newAvgVl = newTotalCost / totalParticipations;
+
+      state.myinvestor.cash -= amountToInvest;
+      state.myinvestor.fundsCost[fundKey] = newTotalCost;
+      state.myinvestor.fundsVlBase[fundKey] = newAvgVl;
+      state.myinvestor.fundsCurrentVl[fundKey] = buyVl;
+      state.myinvestor.funds[fundKey] = totalParticipations * buyVl;
 
       state.transactions.push({
         id: Date.now(),
         date: new Date().toISOString(),
         type: 'transfer',
-        concept: 'Inversión en ' + fundName,
+        concept: 'Inversión en ' + fundName + ' (VL: ' + buyVl.toLocaleString('es-ES') + ' €)',
         amount: amountToInvest,
         category: null,
         account: 'myinvestor_cash',
         destination: 'myinvestor_fund',
         fundKeyBought: fundKey,
-        fundEurInvested: amountToInvest
+        fundEurInvested: amountToInvest,
+        fundBuyVl: buyVl
       });
 
       saveAndSync();
-      alert('¡Se han invertido ' + amountToInvest.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' € en ' + fundName + ' con éxito!');
+      alert(
+        '¡Inversión registrada en ' + fundName + '!\n' +
+        '• Importe: ' + amountToInvest.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €\n' +
+        '• Nuevas participaciones: +' + newParticipations.toFixed(4) + '\n' +
+        '• Nuevo VL medio: ' + newAvgVl.toFixed(4) + ' €'
+      );
     }
 
     function populateCategoryDropdowns() {
@@ -1612,7 +1636,7 @@
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
-      state.version = 6;
+      state.version = 7;
     }
 
     async function syncToGitHub(isManual = false) {
@@ -2079,10 +2103,6 @@
         document.getElementById('fundFidelityVal').innerText = (state.myinvestor.funds.fidelity_sp500 || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundEmergingVal').innerText = (state.myinvestor.funds.vanguard_emerging || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         document.getElementById('fundSmallCapsVal').innerText = (state.myinvestor.funds.vanguard_smallcaps || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-
-        document.getElementById('inputFundFidelity').value = state.myinvestor.funds.fidelity_sp500 || 0;
-        document.getElementById('inputFundEmerging').value = state.myinvestor.funds.vanguard_emerging || 0;
-        document.getElementById('inputFundSmallCaps').value = state.myinvestor.funds.vanguard_smallcaps || 0;
 
         if (state.myinvestor.fundsCost) {
           document.getElementById('inputFundCostFidelity').value = state.myinvestor.fundsCost.fidelity_sp500 || 0;
@@ -2793,53 +2813,6 @@
       }
     }
 
-    function updateFundBalance(fundKey) {
-      let val = 0;
-      let fundName = '';
-
-      if (fundKey === 'fidelity_sp500') {
-        val = parseFloat(document.getElementById('inputFundFidelity').value);
-        fundName = 'Fidelity S&P 500';
-      } else if (fundKey === 'vanguard_emerging') {
-        val = parseFloat(document.getElementById('inputFundEmerging').value);
-        fundName = 'Vanguard Emergentes';
-      } else if (fundKey === 'vanguard_smallcaps') {
-        val = parseFloat(document.getElementById('inputFundSmallCaps').value);
-        fundName = 'Vanguard Small Caps';
-      }
-
-      if (!isNaN(val) && val >= 0) {
-        if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-        if (!state.myinvestor.funds) state.myinvestor.funds = {};
-
-        state.myinvestor.funds[fundKey] = val;
-
-        if (!Array.isArray(state.fundSnapshots) || state.fundSnapshots.length === 0) {
-          state.fundSnapshots = [createFundSnapshotObject(new Date())];
-        } else {
-          const now = new Date();
-          const curY = now.getFullYear();
-          const curM = now.getMonth();
-          let currentSnap = state.fundSnapshots.find(function(s) {
-            const sd = new Date(s.date);
-            return sd.getFullYear() === curY && sd.getMonth() === curM;
-          });
-          if (currentSnap) {
-            currentSnap.fidelity_sp500 = state.myinvestor.funds.fidelity_sp500 || 0;
-            currentSnap.vanguard_emerging = state.myinvestor.funds.vanguard_emerging || 0;
-            currentSnap.vanguard_smallcaps = state.myinvestor.funds.vanguard_smallcaps || 0;
-            currentSnap.total = getMyInvestorTotal() - state.myinvestor.cash;
-          } else {
-            state.fundSnapshots.push(createFundSnapshotObject(now));
-          }
-        }
-
-        saveAndSync();
-        alert('Has actualizado el saldo de ' + fundName);
-      }
-    }
-
-    // NUEVO: Guardar costes y VL base inicial para habilitar el cálculo automático posterior
     function updateFundConfig(fundKey) {
       let costVal = 0;
       let vlBaseVal = 0;
