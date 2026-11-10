@@ -357,33 +357,58 @@
     <div id="tab-resumen" class="tab-content hidden space-y-6">
       
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Balance de Flujo de Caja (Periodo Seleccionado en Movimientos)</h3>
+        
+        <!-- Balance de Flujo de Caja (Con formato de fondo dinámico y selector independiente) -->
+        <div id="cashFlowCard" class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl border border-indigo-500/20 shadow-lg transition-all flex flex-col justify-between space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Balance de Flujo de Caja</span>
+              <h3 class="text-lg font-bold text-white mt-1">Resumen de Ingresos y Gastos</h3>
+            </div>
+            <!-- Selector de tiempo independiente para el Flujo de Caja -->
+            <select id="cashFlowPeriod" onchange="renderCashFlow()" class="px-2.5 py-1 text-xs font-semibold bg-white/10 text-white rounded-lg border border-white/20 focus:outline-none">
+              <option value="current_month" class="bg-slate-900 text-white">Este Mes</option>
+              <option value="last_3_months" class="bg-slate-900 text-white">Últimos 3 Meses</option>
+              <option value="last_year" class="bg-slate-900 text-white">Último Año</option>
+              <option value="all" class="bg-slate-900 text-white">Histórico Completo</option>
+            </select>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
-              <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">➕ Ingresos Totales</p>
-              <h4 id="periodIncome" class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">0,00 €</h4>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+              <p class="text-xs text-emerald-300 font-medium">➕ Ingresos Totales</p>
+              <h4 id="periodIncome" class="text-xl font-bold text-emerald-300 mt-1">0,00 €</h4>
             </div>
-            <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
-              <p class="text-xs text-rose-700 dark:text-rose-400 font-medium">➖ Gastos Totales</p>
-              <h4 id="periodExpense" class="text-xl font-bold text-rose-700 dark:text-rose-300 mt-1">0,00 €</h4>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+              <p class="text-xs text-rose-300 font-medium">➖ Gastos Totales</p>
+              <h4 id="periodExpense" class="text-xl font-bold text-rose-300 mt-1">0,00 €</h4>
             </div>
-            <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
-              <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">⚖️ Capacidad de Ahorro</p>
-              <h4 id="periodSavings" class="text-xl font-bold text-indigo-700 dark:text-indigo-300 mt-1">0,00 €</h4>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+              <p class="text-xs text-indigo-200 font-medium">⚖️ Capacidad de Ahorro</p>
+              <h4 id="periodSavings" class="text-xl font-bold text-white mt-1">0,00 €</h4>
+            </div>
+          </div>
+
+          <!-- Indicador extra de Gasto Destacado -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-white/10 text-xs">
+            <div>
+              <span class="text-slate-300">💡 Mayor categoría de gasto: <strong id="topCategoryName" class="text-white">Ninguna</strong></span>
+            </div>
+            <div>
+              <span class="text-slate-300"><strong id="topCategoryAmount" class="text-white">0,00 €</strong> (<span id="topCategoryShare" class="text-indigo-200">0%</span>)</span>
             </div>
           </div>
 
           <!-- Previsión Inteligente de Fin de Mes -->
-          <div class="p-4 rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-indigo-500/20">
+          <div class="p-4 rounded-xl bg-black/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-white/10">
             <div>
               <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">🔮 Previsión Inteligente de Fin de Mes</span>
-              <h4 id="forecastTitle" class="text-sm font-bold mt-1">Estimación de ahorro a fin de mes</h4>
+              <h4 id="forecastTitle" class="text-sm font-bold mt-1 text-white">Estimación de ahorro a fin de mes</h4>
               <p id="forecastDesc" class="text-xs text-slate-300 mt-0.5">Calculando ritmo de gasto diario...</p>
             </div>
             <div class="text-left sm:text-right shrink-0">
               <span id="forecastAmount" class="text-xl font-extrabold text-emerald-400">0,00 €</span>
-              <p class="text-[10px] text-slate-400">Ahorro proyectado</p>
+              <p class="text-[10px] text-slate-300">Ahorro proyectado</p>
             </div>
           </div>
         </div>
@@ -403,8 +428,8 @@
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría (Mes Actual)</h3>
-            <p class="text-xs text-slate-500">Fija un límite mensual para cada categoría. Recibirás alertas visuales al superar el 80% o el 100%.</p>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría</h3>
+            <p id="budgetMonthSubtitle" class="text-xs text-slate-500">Fija un límite mensual para cada categoría. Recibirás alertas al superar el 80% o el 100%.</p>
           </div>
         </div>
         <div id="budgetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -963,7 +988,7 @@
 
     let currentFileSha = null;
     let fireSource = 'invested'; 
-    let contribMode = 'monthly'; // 'monthly' o 'yearly'
+    let contribMode = 'monthly';
 
     let state = {
       version: 7,
@@ -1097,6 +1122,13 @@
       const curM = now.getMonth();
       const curY = now.getFullYear();
 
+      // Actualizar el subtítulo con el mes y año actual exactos
+      const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const subtitleEl = document.getElementById('budgetMonthSubtitle');
+      if (subtitleEl) {
+        subtitleEl.innerText = `Límite mensual correspondiente a ${monthNames[curM]} de ${curY}.`;
+      }
+
       const spentByCat = {};
       state.transactions.forEach(function(t) {
         if (t.type === 'expense') {
@@ -1209,7 +1241,7 @@
         const remaining = amountEur - pendingCash;
         state.btcCash = 0;
         if (state.accounts.trade_republic_liq < remaining) {
-          if (!confirm('Atención: No hay suficiente saldo apartado y Trade Republic quedará en negativo. ¿Continuar?')) {
+          if (!confirm('Atención: No suficiente saldo apartado y Trade Republic quedará en negativo. ¿Continuar?')) {
             state.btcCash = pendingCash;
             return;
           }
@@ -1553,6 +1585,7 @@
       }
 
       if (tabId === 'resumen') {
+        renderCashFlow();
         renderBudgets();
         updateCharts();
       } else if (tabId === 'herramientas') {
@@ -2133,6 +2166,7 @@
       updateAllTrends();
       renderEmergencyFund();
       renderBudgets();
+      renderCashFlow();
       checkDcaAlert();
 
       const liqPct = total > 0 ? Math.round((liquid / total) * 100) : 0;
@@ -2245,6 +2279,118 @@
       }
     }
 
+    function renderCashFlow() {
+      const period = document.getElementById('cashFlowPeriod').value;
+      const now = new Date();
+      const curM = now.getMonth();
+      const curY = now.getFullYear();
+
+      let filteredTxs = state.transactions;
+
+      if (period === 'current_month') {
+        filteredTxs = filteredTxs.filter(t => {
+          const d = new Date(t.date);
+          return d.getMonth() === curM && d.getFullYear() === curY;
+        });
+      } else if (period === 'last_3_months') {
+        const limitDate = new Date();
+        limitDate.setMonth(limitDate.getMonth() - 3);
+        filteredTxs = filteredTxs.filter(t => new Date(t.date) >= limitDate);
+      } else if (period === 'last_year') {
+        const limitDate = new Date();
+        limitDate.setFullYear(limitDate.getFullYear() - 1);
+        filteredTxs = filteredTxs.filter(t => new Date(t.date) >= limitDate);
+      }
+
+      let pInc = 0;
+      let pExp = 0;
+      const catExpenses = {};
+
+      filteredTxs.forEach(function(t) {
+        if (t.type === 'income') pInc += t.amount;
+        if (t.type === 'expense') {
+          pExp += t.amount;
+          catExpenses[t.category] = (catExpenses[t.category] || 0) + t.amount;
+        }
+      });
+
+      document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+      document.getElementById('periodExpense').innerText = '-' + pExp.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+      
+      const pSavings = pInc - pExp;
+      const savingsEl = document.getElementById('periodSavings');
+      savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+
+      // Dinámica de colores de la tarjeta de Flujo de Caja
+      const card = document.getElementById('cashFlowCard');
+      card.classList.remove(
+        'from-indigo-900', 'via-slate-900', 'to-indigo-950', 'border-indigo-500/20',
+        'from-emerald-950', 'to-emerald-900', 'border-emerald-500/30',
+        'from-rose-950', 'to-rose-900', 'border-rose-500/30'
+      );
+
+      if (pSavings > 0.005) {
+        card.classList.add('from-emerald-950', 'via-slate-900', 'to-emerald-900', 'border-emerald-500/30');
+      } else if (pSavings < -0.005) {
+        card.classList.add('from-rose-950', 'via-slate-900', 'to-rose-900', 'border-rose-500/30');
+      } else {
+        card.classList.add('from-indigo-900', 'via-slate-900', 'to-indigo-950', 'border-indigo-500/20');
+      }
+
+      // Calcular Top Categoría de Gasto
+      let topCat = 'Sin gastos';
+      let topAmt = 0;
+      for (const [cat, amt] of Object.entries(catExpenses)) {
+        if (amt > topAmt) {
+          topAmt = amt;
+          topCat = cat;
+        }
+      }
+      const topShare = pExp > 0 ? (topAmt / pExp) * 100 : 0;
+      document.getElementById('topCategoryName').innerText = topCat;
+      document.getElementById('topCategoryAmount').innerText = topAmt.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('topCategoryShare').innerText = topShare.toFixed(0) + '% del total de gastos';
+
+      // Previsión y salud
+      const currentDay = now.getDate();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const forecastAmtEl = document.getElementById('forecastAmount');
+      const forecastDescEl = document.getElementById('forecastDesc');
+
+      if (period === 'current_month' && currentDay > 2 && pInc > 0) {
+        const dailyBurnRate = pExp / currentDay;
+        const projectedMonthExpense = dailyBurnRate * daysInMonth;
+        const projectedSavings = pInc - projectedMonthExpense;
+        forecastAmtEl.innerText = (projectedSavings >= 0 ? '+' : '') + projectedSavings.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        forecastDescEl.innerText = 'Basado en tu ritmo de gasto actual (' + dailyBurnRate.toFixed(1) + ' €/día).';
+      } else {
+        forecastAmtEl.innerText = pInc > 0 ? 'Periodo Completo' : 'Sin datos';
+        forecastDescEl.innerText = 'Resultado neto acumulado del filtro seleccionado.';
+      }
+
+      const healthBadge = document.getElementById('healthBadge');
+      const healthText = document.getElementById('healthText');
+      if (pInc > 0) {
+        const savingsRate = (pSavings / pInc) * 100;
+        if (savingsRate >= 30) {
+          healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          healthText.innerText = 'Excelente (' + savingsRate.toFixed(0) + '% ahorro)';
+        } else if (savingsRate >= 10) {
+          healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
+          healthText.innerText = 'Saludable (' + savingsRate.toFixed(0) + '% ahorro)';
+        } else if (savingsRate >= 0) {
+          healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          healthText.innerText = 'Precaución (Ahorro bajo)';
+        } else {
+          healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+          healthText.innerText = 'Déficit (Gastos > Ingresos)';
+        }
+      } else {
+        healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
+        healthText.innerText = 'Sin ingresos';
+      }
+    }
+
     function renderTransactions() {
       const tbody = document.getElementById('transactionsTableBody');
       if (!tbody) return;
@@ -2285,66 +2431,6 @@
 
         return matchMonth && matchYear && matchDateRange && matchCategory && matchAccount && matchConcept;
       });
-
-      let pInc = 0;
-      let pExp = 0;
-      list.forEach(function(t) {
-        if (t.type === 'income') pInc += t.amount;
-        if (t.type === 'expense') pExp += t.amount;
-      });
-
-      document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-      document.getElementById('periodExpense').innerText = '-' + pExp.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-      
-      const pSavings = pInc - pExp;
-      const savingsEl = document.getElementById('periodSavings');
-      savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-      savingsEl.className = 'text-xl font-bold mt-1 ' + (pSavings >= 0 ? 'text-indigo-700 dark:text-indigo-300' : 'text-rose-600 dark:text-rose-400');
-
-      const now = new Date();
-      const currentDay = now.getDate();
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      const forecastAmtEl = document.getElementById('forecastAmount');
-      const forecastDescEl = document.getElementById('forecastDesc');
-
-      if (currentDay > 2 && pInc > 0) {
-        const dailyBurnRate = pExp / currentDay;
-        const projectedMonthExpense = dailyBurnRate * daysInMonth;
-        const projectedSavings = pInc - projectedMonthExpense;
-        forecastAmtEl.innerText = (projectedSavings >= 0 ? '+' : '') + projectedSavings.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-        forecastDescEl.innerText = 'Basado en tu ritmo de gasto actual (' + dailyBurnRate.toFixed(1) + ' €/día).';
-      } else {
-        forecastAmtEl.innerText = 'Calculando...';
-        forecastDescEl.innerText = 'Se necesitan al menos 3 días de registro este mes.';
-      }
-
-      const healthBadge = document.getElementById('healthBadge');
-      const healthText = document.getElementById('healthText');
-      const healthDesc = document.getElementById('healthDesc');
-      if (pInc > 0) {
-        const savingsRate = (pSavings / pInc) * 100;
-        if (savingsRate >= 30) {
-          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
-          healthText.innerText = 'Excelente (' + savingsRate.toFixed(0) + '% ahorro)';
-          healthDesc.innerText = 'Tasa de ahorro muy sólida este periodo.';
-        } else if (savingsRate >= 10) {
-          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
-          healthText.innerText = 'Saludable (' + savingsRate.toFixed(0) + '% ahorro)';
-          healthDesc.innerText = 'Buen margen de ahorro registrado.';
-        } else if (savingsRate >= 0) {
-          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
-          healthText.innerText = 'Precaución (Ahorro bajo)';
-          healthDesc.innerText = 'Los gastos se acercan peligrosamente a los ingresos.';
-        } else {
-          healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
-          healthText.innerText = 'Déficit (Gastos > Ingresos)';
-          healthDesc.innerText = 'Estás gastando más de lo que ingresas este mes.';
-        }
-      } else {
-        healthBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
-        healthText.innerText = 'Sin ingresos';
-        healthDesc.innerText = 'Registra ingresos para evaluar la salud financiera.';
-      }
 
       if (list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay movimientos registrados para este filtro.</td></tr>';
