@@ -275,11 +275,11 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Fondos indexados</h3>
-            <p class="text-xs text-slate-500">Valor Liquidativo actualizado automáticamente y rentabilidad real frente al capital aportado.</p>
+            <p class="text-xs text-slate-500">Valor Liquidativo actualizado y rentabilidad real ponderada frente al capital aportado.</p>
           </div>
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-              ✨ VL Diario Automático Activo
+              ✨ VL Diario Activo
             </span>
             <button onclick="toggleMyInvestorDetails()" class="text-xs text-slate-400 hover:text-slate-600 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">✕ Cerrar</button>
           </div>
@@ -1137,9 +1137,9 @@
 
       if (!state.myinvestor || !state.myinvestor.funds) return false;
 
-      let fidelityChange = 0.012;  
-      let emergingChange = 0.009;  
-      let smallCapsChange = 0.010; 
+      let fidelityChange = 0.010;  
+      let emergingChange = 0.007;  
+      let smallCapsChange = 0.008; 
 
       try {
         const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&range=2d');
@@ -1259,6 +1259,13 @@
       return (state.myinvestor.funds.fidelity_sp500 || 0) + 
              (state.myinvestor.funds.vanguard_emerging || 0) + 
              (state.myinvestor.funds.vanguard_smallcaps || 0);
+    }
+
+    function getFundsTotalCost() {
+      if (!state.myinvestor || !state.myinvestor.fundsCost) return 0;
+      return (state.myinvestor.fundsCost.fidelity_sp500 || 0) + 
+             (state.myinvestor.fundsCost.vanguard_emerging || 0) + 
+             (state.myinvestor.fundsCost.vanguard_smallcaps || 0);
     }
 
     function investInFund(fundKey, fundName) {
@@ -2135,7 +2142,9 @@
       setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null);
       setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null);
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null);
-      setTrendBadge('trendMyinvestor', myInvTotal, baseline ? baseline.myinvestor : null);
+      
+      const fundsTotalCost = getFundsTotalCost();
+      setTrendBadge('trendMyinvestor', myInvTotal, fundsTotalCost > 0 ? fundsTotalCost : null, 'Sin coste total de fondos');
 
       const btcCost = parseFloat(state.btcInvestedCost) || 0;
       setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcCost > 0 ? btcCost : null);
