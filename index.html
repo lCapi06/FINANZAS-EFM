@@ -104,11 +104,11 @@
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Filtro Global de Fechas Ultra-Compacto en Una Sola Línea -->
+      <!-- Filtro Global Compacto de Fechas (En una sola línea) -->
       <section class="bg-white dark:bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-2 transition-colors">
         <div class="flex items-center gap-2">
           <span class="text-sm">📅</span>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Filtro Panel:</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Filtro Global Panel:</span>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-1">
@@ -119,7 +119,7 @@
             <label class="text-[10px] text-slate-500 font-medium">Hasta:</label>
             <input type="date" id="panelDateTo" onchange="render()" class="px-2 py-1 text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
           </div>
-          <button onclick="resetPanelDates()" class="text-xs px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-semibold">Limpiar</button>
+          <button onclick="resetPanelDates()" class="text-[11px] px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-semibold">Limpiar</button>
         </div>
       </section>
 
@@ -1011,7 +1011,7 @@
     let contribMode = 'monthly';
 
     let state = {
-      version: 8,
+      version: 9,
       goal: 40000,
       theme: 'dark',
       btcUnits: 0,
@@ -1695,7 +1695,7 @@
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
-      state.version = 8;
+      state.version = 9;
     }
 
     async function syncToGitHub(isManual = false) {
@@ -2144,7 +2144,9 @@
 
       let effectiveBbva = state.accounts.bbva;
       let effectiveTrLiq = state.accounts.trade_republic_liq;
-      let effectiveMyInvTotal = getMyInvestorTotal();
+      let effectiveMyInvCash = state.myinvestor ? (state.myinvestor.cash || 0) : 0;
+      let effectiveFundsVal = state.myinvestor && state.myinvestor.funds ? 
+        ((state.myinvestor.funds.fidelity_sp500 || 0) + (state.myinvestor.funds.vanguard_emerging || 0) + (state.myinvestor.funds.vanguard_smallcaps || 0)) : 0;
       let effectiveBtcVal = state.accounts.trade_republic_btc;
       let effectiveBtcCost = parseFloat(state.btcInvestedCost) || 0;
 
@@ -2159,18 +2161,20 @@
 
         let periodBbvaNet = 0;
         let periodTrLiqNet = 0;
-        let periodMyInvNet = 0;
-        let periodBtcNet = 0;
+        let periodMyInvCashNet = 0;
+        let periodFundsInflow = 0;
+        let periodBtcInflow = 0;
+        let periodBtcUnitsBought = 0;
 
         filteredTxs.forEach(t => {
           if (t.type === 'income') {
             if (t.account === 'bbva') periodBbvaNet += t.amount;
             if (t.account === 'trade_republic_liq') periodTrLiqNet += t.amount;
-            if (t.account === 'myinvestor') periodMyInvNet += t.amount;
+            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet += t.amount;
           } else if (t.type === 'expense') {
             if (t.account === 'bbva') periodBbvaNet -= t.amount;
             if (t.account === 'trade_republic_liq') periodTrLiqNet -= t.amount;
-            if (t.account === 'myinvestor') periodMyInvNet -= t.amount;
+            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet -= t.amount;
           } else if (t.type === 'transfer') {
             if (t.account === 'bbva') periodBbvaNet -= t.amount;
             if (t.destination === 'bbva') periodBbvaNet += t.amount;
@@ -2178,27 +2182,40 @@
             if (t.account === 'trade_republic_liq') periodTrLiqNet -= t.amount;
             if (t.destination === 'trade_republic_liq') periodTrLiqNet += t.amount;
 
-            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvNet -= t.amount;
-            if (t.destination === 'myinvestor' || t.destination === 'myinvestor_fund') periodMyInvNet += t.amount;
+            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet -= t.amount;
+            if (t.destination === 'myinvestor' || t.destination === 'myinvestor_cash') periodMyInvCashNet += t.amount;
 
-            if (t.destination === 'trade_republic_btc') periodBtcNet += t.amount;
+            if (t.destination === 'myinvestor_fund') {
+              periodFundsInflow += t.amount;
+            }
+            if (t.destination === 'trade_republic_btc') {
+              periodBtcInflow += t.amount;
+              if (t.btcUnitsBought) periodBtcUnitsBought += t.btcUnitsBought;
+            }
           }
         });
 
         effectiveBbva = Math.max(0, periodBbvaNet);
         effectiveTrLiq = Math.max(0, periodTrLiqNet);
-        if (periodMyInvNet !== 0 || filteredTxs.length > 0) {
-          effectiveMyInvTotal = Math.max(0, periodMyInvNet > 0 ? periodMyInvNet : getMyInvestorTotal());
+        effectiveMyInvCash = Math.max(0, periodMyInvCashNet);
+
+        if (periodFundsInflow > 0) {
+          effectiveFundsVal = periodFundsInflow;
+        } else {
+          effectiveFundsVal = effectiveFundsVal;
         }
-        if (periodBtcNet !== 0 || filteredTxs.length > 0) {
-          effectiveBtcVal = Math.max(0, periodBtcNet > 0 ? periodBtcNet : state.accounts.trade_republic_btc);
-          effectiveBtcCost = effectiveBtcVal;
+
+        if (periodBtcInflow > 0) {
+          effectiveBtcCost = periodBtcInflow;
+          const currentUnitPrice = state.btcUnits > 0 ? (state.accounts.trade_republic_btc / state.btcUnits) : (state.btcPrice || 0);
+          effectiveBtcVal = periodBtcUnitsBought > 0 ? (periodBtcUnitsBought * currentUnitPrice) : periodBtcInflow;
         }
       }
 
+      const effectiveMyInvTotal = effectiveMyInvCash + effectiveFundsVal;
       const btcCashVal = parseFloat(state.btcCash) || 0;
-      const liquid = effectiveBbva + effectiveTrLiq + (state.myinvestor ? state.myinvestor.cash : 0) + btcCashVal;
-      const invested = effectiveMyInvTotal - (state.myinvestor ? state.myinvestor.cash : 0) + effectiveBtcVal;
+      const liquid = effectiveBbva + effectiveTrLiq + effectiveMyInvCash + btcCashVal;
+      const invested = effectiveFundsVal + effectiveBtcVal;
       const total = effectiveBbva + effectiveMyInvTotal + effectiveTrLiq + effectiveBtcVal + btcCashVal;
 
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -2206,9 +2223,7 @@
       document.getElementById('trLiquidityBalance').innerText = effectiveTrLiq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = effectiveMyInvTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       
-      const cashApartado = state.myinvestor ? state.myinvestor.cash : 0;
-      const fundsTotal = effectiveMyInvTotal - cashApartado;
-      document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + effectiveFundsVal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + effectiveMyInvCash.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
 
       document.getElementById('trBtcBalance').innerText = effectiveBtcVal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
@@ -3317,4 +3332,244 @@
 
     function updateCharts() {
       const myInvTotal = getMyInvestorTotal();
-      const btcTotal = state.accounts.trade_republic_btc + (parseFloat(state.btcCash
+      const btcTotal = state.accounts.trade_republic_btc + (parseFloat(state.btcCash) || 0);
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcTotal;
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+
+      const ctxDist = document.getElementById('distributionChart').getContext('2d');
+      if (chartDist) chartDist.destroy();
+      chartDist = new Chart(ctxDist, {
+        type: 'doughnut',
+        data: {
+          labels: ['BBVA', 'Trade Republic', 'MyInvestor', 'Bitcoin'],
+          datasets: [{
+            data: [state.accounts.bbva, state.accounts.trade_republic_liq, myInvTotal, btcTotal],
+            backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#f59e0b'],
+            borderWidth: isDark ? 0 : 2,
+            borderColor: isDark ? 'transparent' : '#ffffff'
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw || 0;
+                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const ctxCat = document.getElementById('categoryChart').getContext('2d');
+      if (chartCat) chartCat.destroy();
+
+      const catTotals = {};
+      let totalGastos = 0;
+      state.transactions.filter(function(t) { return t.type === 'expense'; }).forEach(function(t) {
+        catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+        totalGastos += t.amount;
+      });
+
+      const catLabels = Object.keys(catTotals).length ? Object.keys(catTotals) : ['Sin Gastos'];
+      const catData = Object.keys(catTotals).length ? Object.values(catTotals) : [1];
+      const catColors = ['#f43f5e', '#8b5cf6', '#ec4899', '#f59e0b', '#06b6d4', '#84cc16', '#64748b'];
+
+      chartCat = new Chart(ctxCat, {
+        type: 'pie',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catData,
+            backgroundColor: catColors,
+            borderWidth: isDark ? 0 : 2,
+            borderColor: isDark ? 'transparent' : '#ffffff'
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw || 0;
+                  const pct = totalGastos > 0 ? ((val / totalGastos) * 100).toFixed(1) : 0;
+                  return ' ' + context.label + ': ' + val.toLocaleString('es-ES') + ' € (' + pct + '%)';
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
+      if (chartEvol) chartEvol.destroy();
+      
+      let evolLabels = [];
+      let evolData = [];
+
+      if (Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0) {
+        let sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        const rangeVal = document.getElementById('timeRangeSelect').value;
+        if (rangeVal !== 'all') {
+          const limit = parseInt(rangeVal);
+          if (sorted.length > limit) {
+            sorted = sorted.slice(sorted.length - limit);
+          }
+        }
+
+        sorted.forEach(function(s) {
+          evolLabels.push(formatDateDDMMYYYY(new Date(s.date)));
+          evolData.push(s.total);
+        });
+      } else {
+        evolLabels.push(formatDateDDMMYYYY(new Date()));
+        evolData.push(total);
+      }
+
+      chartEvol = new Chart(ctxEvol, {
+        type: 'line',
+        data: {
+          labels: evolLabels,
+          datasets: [{
+            label: 'Patrimonio Total',
+            data: evolData,
+            borderColor: '#6366f1',
+            backgroundColor: function(context) {
+              const chart = context.chart;
+              const {ctx, chartArea} = chart;
+              if (!chartArea) return null;
+              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+              gradient.addColorStop(0, 'rgba(99, 102, 241, 0.0)');
+              gradient.addColorStop(1, 'rgba(99, 102, 241, 0.25)');
+              return gradient;
+            },
+            borderWidth: 3,
+            tension: 0.35,
+            fill: true,
+            pointBackgroundColor: '#6366f1',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' Patrimonio: ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
+      });
+
+      const ctxFundEvol = document.getElementById('fundEvolutionChart').getContext('2d');
+      if (chartFundEvol) chartFundEvol.destroy();
+
+      let fundLabels = [];
+      let fidelityData = [];
+      let emergingData = [];
+      let smallCapsData = [];
+
+      if (Array.isArray(state.fundSnapshots) && state.fundSnapshots.length > 0) {
+        let sortedFunds = state.fundSnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        sortedFunds.forEach(function(s) {
+          fundLabels.push(formatDateDDMMYYYY(new Date(s.date)));
+          fidelityData.push(s.fidelity_sp500 || 0);
+          emergingData.push(s.vanguard_emerging || 0);
+          smallCapsData.push(s.vanguard_smallcaps || 0);
+        });
+      } else {
+        fundLabels.push(formatDateDDMMYYYY(new Date()));
+        fidelityData.push(state.myinvestor.funds.fidelity_sp500);
+        emergingData.push(state.myinvestor.funds.vanguard_emerging);
+        smallCapsData.push(state.myinvestor.funds.vanguard_smallcaps);
+      }
+
+      chartFundEvol = new Chart(ctxFundEvol, {
+        type: 'line',
+        data: {
+          labels: fundLabels,
+          datasets: [
+            {
+              label: 'Fidelity S&P 500',
+              data: fidelityData,
+              borderColor: '#6366f1',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: 'Vanguard Emergentes',
+              data: emergingData,
+              borderColor: '#10b981',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: 'Vanguard Small Caps',
+              data: smallCapsData,
+              borderColor: '#f59e0b',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
