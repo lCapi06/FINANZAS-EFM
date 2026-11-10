@@ -31,7 +31,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-10T10:14:47.059Z",
+  "lastCloudSync": "2026-11-10T10:15:04.494Z",
   "btcUnits": 0.010744,
   "btcPrice": 66069.31,
   "categories": {
@@ -83,5 +83,6 @@
     "targetMonths": 6
   },
   "budgets": {},
-  "version": 5
+  "version": 5,
+  "lastExportDate": "2026-11-10T10:15:02.260Z"
 }
