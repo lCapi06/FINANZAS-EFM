@@ -158,7 +158,7 @@
 
       </section>
 
-      <!-- Summary Cards (Con degradado dinámico según rendimiento) -->
+      <!-- Summary Cards -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         <!-- Patrimonio Total -->
@@ -236,7 +236,7 @@
 
       </section>
 
-      <!-- Panel Desplegable de Fondos Indexados de MyInvestor (Por encima con z-50) -->
+      <!-- Panel Desplegable de Fondos Indexados de MyInvestor -->
       <section id="myinvestorDetailsPanel" class="hidden relative z-50 bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-rose-500 shadow-2xl transition-all space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
@@ -317,7 +317,7 @@
         </div>
       </section>
 
-      <!-- Fondo de Emergencia (Solo BBVA) - Movido al final del Panel -->
+      <!-- Fondo de Emergencia (Solo BBVA) -->
       <section class="relative z-10 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="space-y-1">
@@ -358,34 +358,43 @@
       
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <!-- Balance de Flujo de Caja (Con formato de fondo dinámico y selector independiente) -->
+        <!-- Balance de Flujo de Caja (Con filtros Desde - Hasta y comparativa con periodo anterior) -->
         <div id="cashFlowCard" class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl border border-indigo-500/20 shadow-lg transition-all flex flex-col justify-between space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Balance de Flujo de Caja</span>
               <h3 class="text-lg font-bold text-white mt-1">Resumen de Ingresos y Gastos</h3>
             </div>
-            <!-- Selector de tiempo independiente para el Flujo de Caja -->
-            <select id="cashFlowPeriod" onchange="renderCashFlow()" class="px-2.5 py-1 text-xs font-semibold bg-white/10 text-white rounded-lg border border-white/20 focus:outline-none">
-              <option value="current_month" class="bg-slate-900 text-white">Este Mes</option>
-              <option value="last_3_months" class="bg-slate-900 text-white">Últimos 3 Meses</option>
-              <option value="last_year" class="bg-slate-900 text-white">Último Año</option>
-              <option value="all" class="bg-slate-900 text-white">Histórico Completo</option>
-            </select>
+            
+            <!-- Filtros Desde - Hasta específicos para el Flujo de Caja -->
+            <div class="flex flex-wrap items-center gap-2 bg-black/20 p-2 rounded-xl border border-white/10">
+              <div class="flex items-center gap-1">
+                <label class="text-[10px] text-slate-300 font-medium">Desde:</label>
+                <input type="date" id="cfDateFrom" onchange="renderCashFlow()" class="px-2 py-1 text-xs bg-slate-900 text-white rounded-lg border border-white/20 focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1">
+                <label class="text-[10px] text-slate-300 font-medium">Hasta:</label>
+                <input type="date" id="cfDateTo" onchange="renderCashFlow()" class="px-2 py-1 text-xs bg-slate-900 text-white rounded-lg border border-white/20 focus:outline-none">
+              </div>
+              <button onclick="resetCashFlowDates()" class="text-[10px] px-2 py-1 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg transition" title="Limpiar fechas">Limpiar</button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
               <p class="text-xs text-emerald-300 font-medium">➕ Ingresos Totales</p>
-              <h4 id="periodIncome" class="text-xl font-bold text-emerald-300 mt-1">0,00 €</h4>
+              <h4 id="periodIncome" class="text-xl font-bold text-emerald-300">0,00 €</h4>
+              <p id="trendIncome" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
             </div>
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
               <p class="text-xs text-rose-300 font-medium">➖ Gastos Totales</p>
-              <h4 id="periodExpense" class="text-xl font-bold text-rose-300 mt-1">0,00 €</h4>
+              <h4 id="periodExpense" class="text-xl font-bold text-rose-300">0,00 €</h4>
+              <p id="trendExpense" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
             </div>
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm">
+            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
               <p class="text-xs text-indigo-200 font-medium">⚖️ Capacidad de Ahorro</p>
-              <h4 id="periodSavings" class="text-xl font-bold text-white mt-1">0,00 €</h4>
+              <h4 id="periodSavings" class="text-xl font-bold text-white">0,00 €</h4>
+              <p id="trendSavings" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
             </div>
           </div>
 
@@ -657,7 +666,7 @@
         </div>
       </section>
 
-      <!-- Ajuste Directo de Saldos General (Minimizado por defecto) -->
+      <!-- Ajuste Directo de Saldos General -->
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -1122,7 +1131,6 @@
       const curM = now.getMonth();
       const curY = now.getFullYear();
 
-      // Actualizar el subtítulo con el mes y año actual exactos
       const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
       const subtitleEl = document.getElementById('budgetMonthSubtitle');
       if (subtitleEl) {
@@ -2279,27 +2287,55 @@
       }
     }
 
+    function resetCashFlowDates() {
+      document.getElementById('cfDateFrom').value = '';
+      document.getElementById('cfDateTo').value = '';
+      renderCashFlow();
+    }
+
     function renderCashFlow() {
-      const period = document.getElementById('cashFlowPeriod').value;
-      const now = new Date();
-      const curM = now.getMonth();
-      const curY = now.getFullYear();
+      const dateFromVal = document.getElementById('cfDateFrom').value;
+      const dateToVal = document.getElementById('cfDateTo').value;
 
       let filteredTxs = state.transactions;
+      let prevFilteredTxs = [];
+      let hasCustomRange = Boolean(dateFromVal || dateToVal);
 
-      if (period === 'current_month') {
+      if (hasCustomRange) {
+        let fromD = dateFromVal ? new Date(dateFromVal + 'T00:00:00') : new Date('2020-01-01');
+        let toD = dateToVal ? new Date(dateToVal + 'T23:59:59') : new Date();
+
+        filteredTxs = filteredTxs.filter(t => {
+          const d = new Date(t.date);
+          return d >= fromD && d <= toD;
+        });
+
+        // Calcular periodo anterior equivalente para la comparativa
+        const diffTime = Math.abs(toD - fromD);
+        const prevToD = new Date(fromD.getTime() - 1);
+        const prevFromD = new Date(prevToD.getTime() - diffTime);
+
+        prevFilteredTxs = state.transactions.filter(t => {
+          const d = new Date(t.date);
+          return d >= prevFromD && d <= prevToD;
+        });
+      } else {
+        // Por defecto si no hay fechas, tomamos el mes actual
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+
         filteredTxs = filteredTxs.filter(t => {
           const d = new Date(t.date);
           return d.getMonth() === curM && d.getFullYear() === curY;
         });
-      } else if (period === 'last_3_months') {
-        const limitDate = new Date();
-        limitDate.setMonth(limitDate.getMonth() - 3);
-        filteredTxs = filteredTxs.filter(t => new Date(t.date) >= limitDate);
-      } else if (period === 'last_year') {
-        const limitDate = new Date();
-        limitDate.setFullYear(limitDate.getFullYear() - 1);
-        filteredTxs = filteredTxs.filter(t => new Date(t.date) >= limitDate);
+
+        const prevM = curM === 0 ? 11 : curM - 1;
+        const prevY = curM === 0 ? curY - 1 : curY;
+        prevFilteredTxs = state.transactions.filter(t => {
+          const d = new Date(t.date);
+          return d.getMonth() === prevM && d.getFullYear() === prevY;
+        });
       }
 
       let pInc = 0;
@@ -2314,12 +2350,45 @@
         }
       });
 
+      let prevInc = 0;
+      let prevExp = 0;
+      prevFilteredTxs.forEach(function(t) {
+        if (t.type === 'income') prevInc += t.amount;
+        if (t.type === 'expense') prevExp += t.amount;
+      });
+      const prevSavings = prevInc - prevExp;
+
       document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
       document.getElementById('periodExpense').innerText = '-' + pExp.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
       
       const pSavings = pInc - pExp;
       const savingsEl = document.getElementById('periodSavings');
       savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
+
+      // Función auxiliar para formatear la comparativa con el periodo anterior
+      function setTrendLabel(elementId, currVal, prevVal, isExpense = false) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        if (prevVal === 0) {
+          el.innerText = 'Sin datos periodo ant.';
+          el.className = 'text-[10px] text-slate-300';
+          return;
+        }
+        const diff = currVal - prevVal;
+        const pct = (diff / prevVal) * 100;
+        const sign = diff >= 0 ? '+' : '';
+        
+        // Para gastos, subir es rojo (malo) y bajar es verde (bueno). Para ingresos/ahorro al revés.
+        let isGood = isExpense ? (diff <= 0) : (diff >= 0);
+        let colorClass = isGood ? 'text-emerald-300' : 'text-rose-300';
+
+        el.className = 'text-[10px] font-semibold ' + colorClass;
+        el.innerText = sign + pct.toFixed(1).replace('.', ',') + '% vs periodo ant.';
+      }
+
+      setTrendLabel('trendIncome', pInc, prevInc, false);
+      setTrendLabel('trendExpense', pExp, prevExp, true);
+      setTrendLabel('trendSavings', pSavings, prevSavings, false);
 
       // Dinámica de colores de la tarjeta de Flujo de Caja
       const card = document.getElementById('cashFlowCard');
@@ -2352,20 +2421,21 @@
       document.getElementById('topCategoryShare').innerText = topShare.toFixed(0) + '% del total de gastos';
 
       // Previsión y salud
+      const now = new Date();
       const currentDay = now.getDate();
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       const forecastAmtEl = document.getElementById('forecastAmount');
       const forecastDescEl = document.getElementById('forecastDesc');
 
-      if (period === 'current_month' && currentDay > 2 && pInc > 0) {
+      if (!hasCustomRange && currentDay > 2 && pInc > 0) {
         const dailyBurnRate = pExp / currentDay;
         const projectedMonthExpense = dailyBurnRate * daysInMonth;
         const projectedSavings = pInc - projectedMonthExpense;
         forecastAmtEl.innerText = (projectedSavings >= 0 ? '+' : '') + projectedSavings.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
         forecastDescEl.innerText = 'Basado en tu ritmo de gasto actual (' + dailyBurnRate.toFixed(1) + ' €/día).';
       } else {
-        forecastAmtEl.innerText = pInc > 0 ? 'Periodo Completo' : 'Sin datos';
-        forecastDescEl.innerText = 'Resultado neto acumulado del filtro seleccionado.';
+        forecastAmtEl.innerText = pInc > 0 ? 'Periodo Seleccionado' : 'Sin datos';
+        forecastDescEl.innerText = 'Resultado neto acumulado del rango de fechas.';
       }
 
       const healthBadge = document.getElementById('healthBadge');
