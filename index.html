@@ -13,7 +13,7 @@
   </script>
   <style>
     body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    
+
     @media (max-width: 768px) {
       .mobile-cards-grid {
         display: grid;
@@ -47,7 +47,7 @@
           <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="syncStatusText">Sincronizando...</p>
         </div>
       </div>
-      
+
       <div class="flex items-center gap-1 shrink-0">
         <button onclick="toggleTheme()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
@@ -87,6 +87,7 @@
     </div>
   </header>
 
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
   <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
     <!-- Alerta DCA (Aportación Periódica) -->
@@ -103,29 +104,31 @@
 
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
-      
-      <!-- Filtro Global Compacto de Fechas (En una sola línea) -->
-      <section class="bg-white dark:bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-2 transition-colors">
+
+      <!-- Filtro Global de Fechas para la Pestaña Panel -->
+      <section class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-colors">
         <div class="flex items-center gap-2">
-          <span class="text-sm">📅</span>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Filtro Global Panel:</span>
+          <span class="text-base">📅</span>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Filtro Global del Panel (Rango Temporal)</h3>
+            <p class="text-[11px] text-slate-500">Acoje el periodo para evaluar saldos e inversiones netas en este intervalo.</p>
+          </div>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <div class="flex items-center gap-1">
             <label class="text-[10px] text-slate-500 font-medium">Desde:</label>
-            <input type="date" id="panelDateFrom" onchange="render()" class="px-2 py-1 text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+            <input type="date" id="panelDateFrom" onchange="render()" class="px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
           </div>
           <div class="flex items-center gap-1">
             <label class="text-[10px] text-slate-500 font-medium">Hasta:</label>
-            <input type="date" id="panelDateTo" onchange="render()" class="px-2 py-1 text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+            <input type="date" id="panelDateTo" onchange="render()" class="px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
           </div>
-          <button onclick="resetPanelDates()" class="text-[11px] px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-semibold">Limpiar</button>
+          <button onclick="resetPanelDates()" class="text-xs px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-semibold">Limpiar</button>
         </div>
       </section>
-
       <!-- Objetivo Patrimonial & Distribución -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        
+
         <!-- Objetivo Patrimonial -->
         <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
@@ -137,7 +140,7 @@
               🎉 ¡Hito superado!
             </div>
           </div>
-          
+
           <div class="space-y-2">
             <div class="flex justify-between text-xs text-slate-300 font-medium">
               <span id="goalCurrentText">Actual: 0 €</span>
@@ -179,7 +182,7 @@
 
       <!-- Summary Cards -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        
+
         <!-- Patrimonio Total -->
         <div id="cardTotal" class="mobile-card-full bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl border border-indigo-500/20 shadow-md relative overflow-hidden flex flex-col justify-between transition-all">
           <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-400/60"></div>
@@ -346,7 +349,7 @@
             </div>
             <p id="efStatusText" class="text-xs text-slate-500 dark:text-slate-400">Calculando cobertura según tu saldo en BBVA...</p>
           </div>
-          
+
           <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <div class="flex items-center gap-1.5">
               <label class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Gasto/mes (€):</label>
@@ -374,9 +377,10 @@
 
     <!-- ==================== PESTAÑA 2: RESUMEN ==================== -->
     <div id="tab-resumen" class="tab-content hidden space-y-6">
-      
+
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        
+
+        <!-- Balance de Flujo de Caja (Con filtros Desde - Hasta y comparativa con periodo anterior) -->
         <!-- Balance de Flujo de Caja -->
         <div id="cashFlowCard" class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl border border-indigo-500/20 shadow-lg transition-all flex flex-col justify-between space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -384,7 +388,8 @@
               <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Balance de Flujo de Caja</span>
               <h3 class="text-lg font-bold text-white mt-1">Resumen de Ingresos y Gastos</h3>
             </div>
-            
+
+            <!-- Filtros Desde - Hasta específicos para el Flujo de Caja -->
             <!-- Filtros Desde - Hasta -->
             <div class="flex flex-wrap items-center gap-2 bg-black/20 p-2 rounded-xl border border-white/10">
               <div class="flex items-center gap-1">
@@ -417,6 +422,7 @@
             </div>
           </div>
 
+          <!-- Indicador extra de Gasto Destacado -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-white/10 text-xs">
             <div>
               <span class="text-slate-300">💡 Mayor categoría de gasto: <strong id="topCategoryName" class="text-white">Ninguna</strong></span>
@@ -426,6 +432,7 @@
             </div>
           </div>
 
+          <!-- Previsión Inteligente de Fin de Mes -->
           <div class="p-4 rounded-xl bg-black/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-white/10">
             <div>
               <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">🔮 Previsión Inteligente de Fin de Mes</span>
@@ -459,6 +466,7 @@
           </div>
         </div>
         <div id="budgetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Generado por JS -->
         </div>
       </section>
 
@@ -491,6 +499,7 @@
           </div>
         </div>
 
+        <!-- Gráfico de Evolución Histórica por Fondo Indexado -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-3 transition-colors space-y-4">
           <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">Evolución Histórica por Fondo Indexado</h3>
           <div class="h-64">
@@ -509,7 +518,7 @@
           <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4" id="formTitle">Registrar Movimiento</h3>
           <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4" onsubmit="handleTxSubmit(event)">
             <input type="hidden" id="editTxId" value="">
-            
+
             <div>
               <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
               <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
@@ -593,7 +602,7 @@
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Historial de Movimientos</h3>
-          
+
           <div class="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
             <button onclick="filterType('all')" id="filterType-all" class="px-2.5 py-1 text-xs font-bold bg-indigo-600 text-white rounded-lg transition">Todos</button>
             <button onclick="filterType('expense')" id="filterType-expense" class="px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">Gastos</button>
@@ -689,7 +698,7 @@
           </h3>
           <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
         </div>
-        
+
         <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
             <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
@@ -727,6 +736,7 @@
         </div>
 
         <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <!-- Fondo 1 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
             <div class="space-y-2">
@@ -742,6 +752,7 @@
             </div>
           </div>
 
+          <!-- Fondo 2 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Emergentes</h4>
             <div class="space-y-2">
@@ -757,6 +768,7 @@
             </div>
           </div>
 
+          <!-- Fondo 3 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
             <div class="space-y-2">
@@ -826,6 +838,7 @@
     <!-- ==================== PESTAÑA 4: LIBERTAD ==================== -->
     <div id="tab-herramientas" class="tab-content hidden space-y-6">
 
+      <!-- Mensaje Informativo España: Inflación & Impuestos -->
       <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex items-start gap-3">
         <span class="text-xl">🇪🇸</span>
         <div class="text-xs space-y-1">
@@ -932,7 +945,7 @@
                 <input type="number" id="compMonthly" value="500" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
-            
+
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad anual (%)</label>
@@ -1011,7 +1024,8 @@
     let contribMode = 'monthly';
 
     let state = {
-      version: 9,
+      version: 7,
+      version: 8,
       goal: 40000,
       theme: 'dark',
       btcUnits: 0,
@@ -1105,7 +1119,7 @@
 
       document.getElementById('efMonthsCovered').innerText = monthsCovered.toFixed(1).replace('.', ',') + ' meses cubiertos';
       document.getElementById('efTargetAmount').innerText = 'Meta: ' + targetAmount.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
-      
+
       const bar = document.getElementById('efProgressBar');
       bar.style.width = pct + '%';
 
@@ -1216,7 +1230,7 @@
             state.accounts.trade_republic_btc = 0;
           }
           saveAndSync();
-          
+
           if (isManual) {
             alert('Has actualizado el precio de Bitcoin a ' + priceEur.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €');
           }
@@ -1465,7 +1479,7 @@
       const currentSelected = filterCatSelect.value;
 
       filterCatSelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-      
+
       let availableCats = new Set();
       if (currentTypeFilter === 'all') {
         (state.categories.expense || []).forEach(function(c) { availableCats.add(c); });
@@ -1674,7 +1688,7 @@
       if (state.btcCash === undefined) state.btcCash = 0;
       if (!state.emergencyFund) state.emergencyFund = { monthlyCost: 1200, targetMonths: 6 };
       if (!state.budgets) state.budgets = {};
-      
+
       if (!state.myinvestor) {
         state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
       }
@@ -1695,7 +1709,8 @@
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
-      state.version = 9;
+      state.version = 7;
+      state.version = 8;
     }
 
     async function syncToGitHub(isManual = false) {
@@ -2005,7 +2020,7 @@
       const yearSelect = document.getElementById('filterYear');
       if (!yearSelect) return;
       const yearsSet = new Set();
-      
+
       const currentYear = new Date().getFullYear();
       yearsSet.add(currentYear);
 
@@ -2029,7 +2044,7 @@
       }
 
       const sortedYears = Array.from(yearsSet).sort(function(a, b) { return b - a; });
-      
+
       yearSelect.innerHTML = '<option value="all">Todos los Años</option>';
       sortedYears.forEach(function(y) {
         const opt = document.createElement('option');
@@ -2106,7 +2121,7 @@
       if (!banner || !alertText) return;
 
       const investmentTxs = state.transactions.filter(t => t.type === 'transfer' && (t.destination === 'myinvestor_fund' || t.destination === 'trade_republic_btc'));
-      
+
       let lastDate = null;
       if (investmentTxs.length > 0) {
         const sortedInv = investmentTxs.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -2136,57 +2151,43 @@
       document.getElementById('panelDateTo').value = '';
       render();
     }
-
     function render() {
+      const myInvTotal = getMyInvestorTotal();
       const dateFromVal = document.getElementById('panelDateFrom') ? document.getElementById('panelDateFrom').value : '';
       const dateToVal = document.getElementById('panelDateTo') ? document.getElementById('panelDateTo').value : '';
       const hasPanelFilter = Boolean(dateFromVal || dateToVal);
-
       let effectiveBbva = state.accounts.bbva;
       let effectiveTrLiq = state.accounts.trade_republic_liq;
-      let effectiveMyInvCash = state.myinvestor ? (state.myinvestor.cash || 0) : 0;
-      let effectiveFundsVal = state.myinvestor && state.myinvestor.funds ? 
-        ((state.myinvestor.funds.fidelity_sp500 || 0) + (state.myinvestor.funds.vanguard_emerging || 0) + (state.myinvestor.funds.vanguard_smallcaps || 0)) : 0;
+      let effectiveMyInvTotal = getMyInvestorTotal();
       let effectiveBtcVal = state.accounts.trade_republic_btc;
       let effectiveBtcCost = parseFloat(state.btcInvestedCost) || 0;
-
+      let effectiveFundsCost = getFundsTotalCost();
       if (hasPanelFilter) {
         const fromD = dateFromVal ? new Date(dateFromVal + 'T00:00:00') : new Date('2020-01-01');
         const toD = dateToVal ? new Date(dateToVal + 'T23:59:59') : new Date();
-
         const filteredTxs = state.transactions.filter(t => {
           const d = new Date(t.date);
           return d >= fromD && d <= toD;
         });
-
         let periodBbvaNet = 0;
         let periodTrLiqNet = 0;
-        let periodMyInvCashNet = 0;
-        let periodFundsInflow = 0;
+        let periodMyInvInflow = 0;
         let periodBtcInflow = 0;
         let periodBtcUnitsBought = 0;
-
         filteredTxs.forEach(t => {
           if (t.type === 'income') {
             if (t.account === 'bbva') periodBbvaNet += t.amount;
             if (t.account === 'trade_republic_liq') periodTrLiqNet += t.amount;
-            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet += t.amount;
           } else if (t.type === 'expense') {
             if (t.account === 'bbva') periodBbvaNet -= t.amount;
             if (t.account === 'trade_republic_liq') periodTrLiqNet -= t.amount;
-            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet -= t.amount;
           } else if (t.type === 'transfer') {
             if (t.account === 'bbva') periodBbvaNet -= t.amount;
             if (t.destination === 'bbva') periodBbvaNet += t.amount;
-
             if (t.account === 'trade_republic_liq') periodTrLiqNet -= t.amount;
             if (t.destination === 'trade_republic_liq') periodTrLiqNet += t.amount;
-
-            if (t.account === 'myinvestor' || t.account === 'myinvestor_cash') periodMyInvCashNet -= t.amount;
-            if (t.destination === 'myinvestor' || t.destination === 'myinvestor_cash') periodMyInvCashNet += t.amount;
-
-            if (t.destination === 'myinvestor_fund') {
-              periodFundsInflow += t.amount;
+            if (t.destination === 'myinvestor_fund' || t.destination === 'myinvestor') {
+              periodMyInvInflow += t.amount;
             }
             if (t.destination === 'trade_republic_btc') {
               periodBtcInflow += t.amount;
@@ -2194,37 +2195,38 @@
             }
           }
         });
-
         effectiveBbva = Math.max(0, periodBbvaNet);
         effectiveTrLiq = Math.max(0, periodTrLiqNet);
-        effectiveMyInvCash = Math.max(0, periodMyInvCashNet);
-
-        if (periodFundsInflow > 0) {
-          effectiveFundsVal = periodFundsInflow;
-        } else {
-          effectiveFundsVal = effectiveFundsVal;
-        }
-
+        if (periodMyInvInflow > 0) effectiveMyInvTotal = periodMyInvInflow;
         if (periodBtcInflow > 0) {
           effectiveBtcCost = periodBtcInflow;
           const currentUnitPrice = state.btcUnits > 0 ? (state.accounts.trade_republic_btc / state.btcUnits) : (state.btcPrice || 0);
           effectiveBtcVal = periodBtcUnitsBought > 0 ? (periodBtcUnitsBought * currentUnitPrice) : periodBtcInflow;
         }
+        effectiveFundsCost = periodMyInvInflow > 0 ? periodMyInvInflow : effectiveFundsCost;
       }
-
-      const effectiveMyInvTotal = effectiveMyInvCash + effectiveFundsVal;
       const btcCashVal = parseFloat(state.btcCash) || 0;
-      const liquid = effectiveBbva + effectiveTrLiq + effectiveMyInvCash + btcCashVal;
-      const invested = effectiveFundsVal + effectiveBtcVal;
+      const liquid = state.accounts.bbva + state.accounts.trade_republic_liq + (state.myinvestor ? state.myinvestor.cash : 0) + btcCashVal;
+      const invested = myInvTotal - (state.myinvestor ? state.myinvestor.cash : 0) + state.accounts.trade_republic_btc;
+      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + btcCashVal;
+      const liquid = effectiveBbva + effectiveTrLiq + (state.myinvestor ? state.myinvestor.cash : 0) + btcCashVal;
+      const invested = effectiveMyInvTotal - (state.myinvestor ? state.myinvestor.cash : 0) + effectiveBtcVal;
       const total = effectiveBbva + effectiveMyInvTotal + effectiveTrLiq + effectiveBtcVal + btcCashVal;
 
       document.getElementById('totalBalance').innerText = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('bbvaBalance').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('trLiquidityBalance').innerText = state.accounts.trade_republic_liq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('myinvestorBalance').innerText = myInvTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('bbvaBalance').innerText = effectiveBbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('trLiquidityBalance').innerText = effectiveTrLiq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('myinvestorBalance').innerText = effectiveMyInvTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-      
-      document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + effectiveFundsVal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + effectiveMyInvCash.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
 
+      const cashApartado = state.myinvestor ? state.myinvestor.cash : 0;
+      const fundsTotal = myInvTotal - cashApartado;
+      const fundsTotal = effectiveMyInvTotal - cashApartado;
+      document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+
+      document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('trBtcBalance').innerText = effectiveBtcVal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
       const units = parseFloat(state.btcUnits) || 0;
@@ -2260,6 +2262,7 @@
         }
       }
 
+      updateAllTrends();
       updateAllTrends(effectiveBbva, effectiveTrLiq, effectiveMyInvTotal, effectiveBtcVal, effectiveBtcCost);
       renderEmergencyFund();
       renderBudgets();
@@ -2277,7 +2280,7 @@
       const currentMilestoneIndex = Math.floor(total / step);
       const milestoneStart = currentMilestoneIndex * step;
       const milestoneTarget = (currentMilestoneIndex + 1) * step;
-      
+
       const currentInMilestone = total - milestoneStart;
       const milestonePercent = Math.min(Math.max((currentInMilestone / step) * 100, 0), 100);
 
@@ -2303,12 +2306,14 @@
       calculateCompound();
     }
 
+    function updateAllTrends() {
     function updateAllTrends(effBbva = null, effTrLiq = null, effMyInv = null, effBtcVal = null, effBtcCost = null) {
       const hasSnapshots = Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0;
       let baseline = null;
 
       if (hasSnapshots) {
         const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        baseline = sortedAsc[0];
         if (sortedAsc.length > 0) {
           baseline = sortedAsc[sortedAsc.length - 1];
         }
@@ -2339,7 +2344,7 @@
           const diff = currentVal - baseVal;
           const pct = (diff / baseVal) * 100;
           const sign = diff >= 0 ? '+' : '';
-          
+
           let color = 'bg-white/10 text-slate-200';
           if (diff > 0.005) {
             color = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
@@ -2357,21 +2362,26 @@
         }
       }
 
+      const myInvTotal = getMyInvestorTotal();
       const bbvaVal = effBbva !== null ? effBbva : state.accounts.bbva;
       const trLiqVal = effTrLiq !== null ? effTrLiq : state.accounts.trade_republic_liq;
       const myInvTotal = effMyInv !== null ? effMyInv : getMyInvestorTotal();
       const btcVal = effBtcVal !== null ? effBtcVal : state.accounts.trade_republic_btc;
       const btcCostVal = effBtcCost !== null ? effBtcCost : (parseFloat(state.btcInvestedCost) || 0);
-
       const btcCashVal = parseFloat(state.btcCash) || 0;
+      const totalCurrent = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + btcCashVal;
       const totalCurrent = bbvaVal + myInvTotal + trLiqVal + btcVal + btcCashVal;
 
       setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null, '+0,00 € (0,00%)', 'cardTotal');
+      setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null, '+0,00 € (0,00%)', 'cardBbva');
+      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null, '+0,00 € (0,00%)', 'cardTrLiq');
       setTrendBadge('trendBbva', bbvaVal, baseline ? baseline.bbva : null, '+0,00 € (0,00%)', 'cardBbva');
       setTrendBadge('trendTrLiq', trLiqVal, baseline ? baseline.trade_republic_liq : null, '+0,00 € (0,00%)', 'cardTrLiq');
-      
+
       const fundsTotalCost = getFundsTotalCost();
       setTrendBadge('trendMyinvestor', myInvTotal, fundsTotalCost > 0 ? fundsTotalCost : null, 'Sin coste total de fondos', 'cardMyinvestor');
+      const btcCost = parseFloat(state.btcInvestedCost) || 0;
+      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcCost > 0 ? btcCost : null, '+0,00 € (0,00%)', 'cardBtc');
       setTrendBadge('trendTrBtc', btcVal, btcCostVal > 0 ? btcCostVal : null, '+0,00 € (0,00%)', 'cardBtc');
 
       if (state.myinvestor && state.myinvestor.funds && state.myinvestor.fundsCost) {
@@ -2404,6 +2414,7 @@
           return d >= fromD && d <= toD;
         });
 
+        // Calcular periodo anterior equivalente para la comparativa
         const diffTime = Math.abs(toD - fromD);
         const prevToD = new Date(fromD.getTime() - 1);
         const prevFromD = new Date(prevToD.getTime() - diffTime);
@@ -2413,6 +2424,7 @@
           return d >= prevFromD && d <= prevToD;
         });
       } else {
+        // Por defecto si no hay fechas, tomamos el mes actual
         const now = new Date();
         const curM = now.getMonth();
         const curY = now.getFullYear();
@@ -2452,11 +2464,12 @@
 
       document.getElementById('periodIncome').innerText = '+' + pInc.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
       document.getElementById('periodExpense').innerText = '-' + pExp.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-      
+
       const pSavings = pInc - pExp;
       const savingsEl = document.getElementById('periodSavings');
       savingsEl.innerText = (pSavings >= 0 ? '+' : '') + pSavings.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
 
+      // Función auxiliar para formatear la comparativa con el periodo anterior
       function setTrendLabel(elementId, currVal, prevVal, isExpense = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -2468,7 +2481,8 @@
         const diff = currVal - prevVal;
         const pct = (diff / prevVal) * 100;
         const sign = diff >= 0 ? '+' : '';
-        
+
+        // Para gastos, subir es rojo (malo) y bajar es verde (bueno). Para ingresos/ahorro al revés.
         let isGood = isExpense ? (diff <= 0) : (diff >= 0);
         let colorClass = isGood ? 'text-emerald-300' : 'text-rose-300';
 
@@ -2480,6 +2494,7 @@
       setTrendLabel('trendExpense', pExp, prevExp, true);
       setTrendLabel('trendSavings', pSavings, prevSavings, false);
 
+      // Dinámica de colores de la tarjeta de Flujo de Caja
       const card = document.getElementById('cashFlowCard');
       card.classList.remove(
         'from-indigo-900', 'via-slate-900', 'to-indigo-950', 'border-indigo-500/20',
@@ -2495,6 +2510,7 @@
         card.classList.add('from-indigo-900', 'via-slate-900', 'to-indigo-950', 'border-indigo-500/20');
       }
 
+      // Calcular Top Categoría de Gasto
       let topCat = 'Sin gastos';
       let topAmt = 0;
       for (const [cat, amt] of Object.entries(catExpenses)) {
@@ -2508,6 +2524,7 @@
       document.getElementById('topCategoryAmount').innerText = topAmt.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
       document.getElementById('topCategoryShare').innerText = topShare.toFixed(0) + '% del total de gastos';
 
+      // Previsión y salud
       const now = new Date();
       const currentDay = now.getDate();
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -2571,7 +2588,7 @@
         const d = new Date(t.date);
         const matchMonth = (monthVal === 'all') || (d.getMonth() === parseInt(monthVal));
         const matchYear = (yearVal === 'all') || (d.getFullYear() === parseInt(yearVal));
-        
+
         let matchDateRange = true;
         if (dateFromVal) {
           const fromD = new Date(dateFromVal + 'T00:00:00');
@@ -2598,7 +2615,7 @@
       sorted.forEach(function(tx) {
         const tr = document.createElement('tr');
         const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        
+
         function getAccountName(accKey) {
           if (accKey === 'bbva') return 'BBVA';
           if (accKey === 'myinvestor' || accKey === 'myinvestor_cash') return 'MyInvestor';
@@ -2651,7 +2668,7 @@
 
         const tdActions = document.createElement('td');
         tdActions.className = 'p-3 text-center space-x-1';
-        
+
         const btnEdit = document.createElement('button');
         btnEdit.className = 'text-xs text-sky-500 hover:text-sky-700 font-medium px-2 py-1 bg-sky-50 dark:bg-sky-950/40 rounded';
         btnEdit.textContent = 'Editar';
@@ -2797,7 +2814,7 @@
       const concept = document.getElementById('txConcept').value;
       const amount = parseFloat(document.getElementById('txAmount').value);
       const account = document.getElementById('txAccount').value;
-      
+
       let category = null;
       let destination = null;
 
@@ -2926,7 +2943,7 @@
       const concept = document.getElementById('txConcept').value;
       const amount = parseFloat(document.getElementById('txAmount').value);
       const account = document.getElementById('txAccount').value;
-      
+
       let category = null;
       let destination = null;
 
@@ -3155,7 +3172,7 @@
     function calculate4Percent() {
       const monthlyExp = parseFloat(document.getElementById('fireMonthlyExpense').value) || 0;
       const rate = parseFloat(document.getElementById('fireWithdrawRate').value) || 4.0;
-      
+
       const myInvFunds = getMyInvestorTotal() - (state.myinvestor ? state.myinvestor.cash : 0);
       const invested = myInvFunds + state.accounts.trade_republic_btc;
       const total = state.accounts.bbva + getMyInvestorTotal() + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + (parseFloat(state.btcCash) || 0);
@@ -3413,13 +3430,13 @@
 
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
-      
+
       let evolLabels = [];
       let evolData = [];
 
       if (Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0) {
         let sorted = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        
+
         const rangeVal = document.getElementById('timeRangeSelect').value;
         if (rangeVal !== 'all') {
           const limit = parseInt(rangeVal);
