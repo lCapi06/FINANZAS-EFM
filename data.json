@@ -31,7 +31,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-10T12:15:29.754Z",
+  "lastCloudSync": "2026-11-10T12:15:40.888Z",
   "btcUnits": 0.010744,
   "btcPrice": 66295.565,
   "categories": {
@@ -96,7 +96,8 @@
     "Supermercado": 150,
     "Ocio": 100,
     "Vivienda": 800,
-    "Transporte": 200
+    "Transporte": 200,
+    "Suscripciones": 150
   },
   "version": 7,
   "lastExportDate": "2026-11-10T10:15:02.260Z"
