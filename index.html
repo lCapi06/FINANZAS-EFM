@@ -880,14 +880,17 @@
                 <input type="number" id="compInitial" value="0" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
               <div>
-                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Aportación/mes (€)</label>
+                <div class="flex justify-between items-center mb-1">
+                  <label id="labelContribFreq" class="text-xs font-medium text-slate-600 dark:text-slate-400">Aportación/mes (€)</label>
+                  <button type="button" onclick="toggleContribFreq()" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">Cambiar</button>
+                </div>
                 <input type="number" id="compMonthly" value="500" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
             </div>
             
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad Base (%)</label>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Rentabilidad anual (%)</label>
                 <input type="number" step="0.5" id="compRate" value="8" oninput="calculateCompound()" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
               <div>
@@ -909,22 +912,25 @@
 
             <div class="grid grid-cols-1 gap-2.5 pt-2">
               <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center">
-                <span class="text-xs font-medium text-indigo-700 dark:text-indigo-400">💰 Moderado (Nominal):</span>
+                <span id="textLabelCapitalBruto" class="text-xs font-medium text-indigo-700 dark:text-indigo-400">💰 Capital bruto en 15 años:</span>
                 <span id="compFinalTotal" class="text-base font-extrabold text-indigo-700 dark:text-indigo-300">0 €</span>
               </div>
               <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex justify-between items-center">
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">🛡️ Neto Real (Tras IPC e IRPF):</span>
+                <div>
+                  <span id="textLabelCapitalNeto" class="text-xs font-medium text-emerald-700 dark:text-emerald-400 block">🛡️ Capital neto en 15 años</span>
+                  <span class="text-[10px] text-emerald-600 dark:text-emerald-500 block">Trás IPC e IRPF</span>
+                </div>
                 <span id="compNetRealTotal" class="text-base font-extrabold text-emerald-700 dark:text-emerald-300">0 €</span>
               </div>
               <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">💵 Total Aportado:</span>
+                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">💵 Capital total aportado:</span>
                 <span id="compTotalContributed" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 €</span>
               </div>
             </div>
           </div>
 
           <div class="lg:col-span-2 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Escenarios Reales (Poder Adquisitivo descontando Inflación)</h4>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Evolución de inversiones real (Descontando inflación)</h4>
             <div class="h-80 w-full">
               <canvas id="compoundChart"></canvas>
             </div>
@@ -957,6 +963,7 @@
 
     let currentFileSha = null;
     let fireSource = 'invested'; 
+    let contribMode = 'monthly'; // 'monthly' o 'yearly'
 
     let state = {
       version: 7,
@@ -2923,6 +2930,23 @@
       calculateCompound();
     }
 
+    function toggleContribFreq() {
+      const label = document.getElementById('labelContribFreq');
+      const input = document.getElementById('compMonthly');
+      const val = parseFloat(input.value) || 0;
+
+      if (contribMode === 'monthly') {
+        contribMode = 'yearly';
+        label.innerText = 'Aportación media/año (€)';
+        input.value = Math.round(val * 12);
+      } else {
+        contribMode = 'monthly';
+        label.innerText = 'Aportación/mes (€)';
+        input.value = Math.round(val / 12);
+      }
+      calculateCompound();
+    }
+
     let chartDist = null;
     let chartCat = null;
     let chartEvol = null;
@@ -2931,11 +2955,15 @@
 
     function calculateCompound() {
       const initial = parseFloat(document.getElementById('compInitial').value) || 0;
-      const monthly = parseFloat(document.getElementById('compMonthly').value) || 0;
+      const rawInputContrib = parseFloat(document.getElementById('compMonthly').value) || 0;
       const baseRate = (parseFloat(document.getElementById('compRate').value) || 0) / 100;
       const years = parseInt(document.getElementById('compYears').value) || 1;
       const inflation = (parseFloat(document.getElementById('compInflation').value) || 0) / 100;
       const taxRate = (parseFloat(document.getElementById('compTax').value) || 0) / 100;
+
+      // Actualizar dinámicamente los textos de los años
+      document.getElementById('textLabelCapitalBruto').innerText = '💰 Capital bruto en ' + years + ' años:';
+      document.getElementById('textLabelCapitalNeto').innerText = '🛡️ Capital neto en ' + years + ' años';
 
       function simulateScenario(annualRate) {
         let nomBal = initial;
@@ -2944,10 +2972,17 @@
         const arrRealNet = [initial];
 
         for (let y = 1; y <= years; y++) {
-          for (let m = 1; m <= 12; m++) {
-            nomBal = (nomBal + monthly) * (1 + mRate);
-            contrib += monthly;
+          if (contribMode === 'monthly') {
+            for (let m = 1; m <= 12; m++) {
+              nomBal = (nomBal + rawInputContrib) * (1 + mRate);
+              contrib += rawInputContrib;
+            }
+          } else {
+            // Aportación anual: se aporta al inicio o repartida mensualmente. Lo sumamos anual.
+            nomBal = (nomBal + rawInputContrib) * Math.pow(1 + mRate, 12);
+            contrib += rawInputContrib;
           }
+
           const profit = Math.max(0, nomBal - contrib);
           const afterTaxNominal = nomBal - (profit * taxRate);
           const realPurchasingPower = afterTaxNominal / Math.pow(1 + inflation, y);
@@ -2989,7 +3024,7 @@
               tension: 0.3
             },
             {
-              label: 'Moderado (Base)',
+              label: 'Nominal',
               data: mod.series,
               borderColor: '#6366f1',
               backgroundColor: 'rgba(99, 102, 241, 0.15)',
