@@ -116,11 +116,11 @@
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-1.5">
             <label for="panelDateFrom" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Desde:</label>
-            <input type="date" id="panelDateFrom" onchange="updateCharts()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
+            <input type="date" id="panelDateFrom" onchange="onPanelDateChange()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
           </div>
           <div class="flex items-center gap-1.5">
             <label for="panelDateTo" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Hasta:</label>
-            <input type="date" id="panelDateTo" onchange="updateCharts()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
+            <input type="date" id="panelDateTo" onchange="onPanelDateChange()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
           </div>
           <button onclick="resetPanelDates()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 transition">Limpiar</button>
         </div>
@@ -2279,12 +2279,24 @@
     }
 
     function updateAllTrends() {
+      const panelFromEl = document.getElementById('panelDateFrom');
+      const panelToEl = document.getElementById('panelDateTo');
+      const panelFromVal = panelFromEl ? panelFromEl.value : '';
+      const panelToVal = panelToEl ? panelToEl.value : '';
+      const hasDateFilter = Boolean(panelFromVal || panelToVal);
+
       const hasSnapshots = Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length > 0;
       let baseline = null;
+      let endSnapshot = null;
 
       if (hasSnapshots) {
-        const sortedDesc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-        baseline = sortedDesc[0];
+        if (hasDateFilter) {
+          baseline = panelFromVal ? getSnapshotAtOrBefore(state.monthlySnapshots, panelFromVal) : state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); })[0];
+          endSnapshot = panelToVal ? getSnapshotAtOrBefore(state.monthlySnapshots, panelToVal) : null;
+        } else {
+          const sortedDesc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+          baseline = sortedDesc[0];
+        }
       }
 
       function applyCardGradient(cardId, diff) {
@@ -2334,21 +2346,57 @@
       const btcCashVal = parseFloat(state.btcCash) || 0;
       const totalCurrent = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + state.accounts.trade_republic_btc + btcCashVal;
 
-      setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null, '+0,00 € (0,00%)', 'cardTotal');
-      setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null, '+0,00 € (0,00%)', 'cardBbva');
-      setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null, '+0,00 € (0,00%)', 'cardTrLiq');
+      const evalTotal = (hasDateFilter && endSnapshot) ? endSnapshot.total : totalCurrent;
+      const evalBbva = (hasDateFilter && endSnapshot) ? endSnapshot.bbva : state.accounts.bbva;
+      const evalTrLiq = (hasDateFilter && endSnapshot) ? endSnapshot.trade_republic_liq : state.accounts.trade_republic_liq;
+      const evalMyInv = (hasDateFilter && endSnapshot) ? endSnapshot.myinvestor : myInvTotal;
+      const evalBtc = (hasDateFilter && endSnapshot) ? endSnapshot.trade_republic_btc : state.accounts.trade_republic_btc;
+
+      if (hasDateFilter && endSnapshot) {
+        document.getElementById('totalBalance').innerText = evalTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('bbvaBalance').innerText = evalBbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('trLiquidityBalance').innerText = evalTrLiq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('myinvestorBalance').innerText = evalMyInv.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('trBtcBalance').innerText = evalBtc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      }
+
+      setTrendBadge('trendTotal', evalTotal, baseline ? baseline.total : null, '+0,00 € (0,00%)', 'cardTotal');
+      setTrendBadge('trendBbva', evalBbva, baseline ? baseline.bbva : null, '+0,00 € (0,00%)', 'cardBbva');
+      setTrendBadge('trendTrLiq', evalTrLiq, baseline ? baseline.trade_republic_liq : null, '+0,00 € (0,00%)', 'cardTrLiq');
       
       const fundsTotalCost = getFundsTotalCost();
-      setTrendBadge('trendMyinvestor', myInvTotal, fundsTotalCost > 0 ? fundsTotalCost : null, 'Sin coste total de fondos', 'cardMyinvestor');
+      const myInvBase = hasDateFilter ? (baseline ? baseline.myinvestor : null) : (fundsTotalCost > 0 ? fundsTotalCost : null);
+      setTrendBadge('trendMyinvestor', evalMyInv, myInvBase, hasDateFilter ? 'Sin datos en rango' : 'Sin coste total de fondos', 'cardMyinvestor');
 
       const btcCost = parseFloat(state.btcInvestedCost) || 0;
-      setTrendBadge('trendTrBtc', state.accounts.trade_republic_btc, btcCost > 0 ? btcCost : null, '+0,00 € (0,00%)', 'cardBtc');
+      const btcBase = hasDateFilter ? (baseline ? baseline.trade_republic_btc : null) : (btcCost > 0 ? btcCost : null);
+      setTrendBadge('trendTrBtc', evalBtc, btcBase, '+0,00 € (0,00%)', 'cardBtc');
 
       if (state.myinvestor && state.myinvestor.funds && state.myinvestor.fundsCost) {
-        setTrendBadge('trendFundFidelity', state.myinvestor.funds.fidelity_sp500, state.myinvestor.fundsCost.fidelity_sp500, 'Sin coste registrado');
-        setTrendBadge('trendFundEmerging', state.myinvestor.funds.vanguard_emerging, state.myinvestor.fundsCost.vanguard_emerging, 'Sin coste registrado');
-        setTrendBadge('trendFundSmallCaps', state.myinvestor.funds.vanguard_smallcaps, state.myinvestor.fundsCost.vanguard_smallcaps, 'Sin coste registrado');
+        if (hasDateFilter && Array.isArray(state.fundSnapshots) && state.fundSnapshots.length > 0) {
+          const fundStart = panelFromVal ? getSnapshotAtOrBefore(state.fundSnapshots, panelFromVal) : state.fundSnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); })[0];
+          const fundEnd = panelToVal ? getSnapshotAtOrBefore(state.fundSnapshots, panelToVal) : null;
+          const valFid = fundEnd ? fundEnd.fidelity_sp500 : state.myinvestor.funds.fidelity_sp500;
+          const valEm = fundEnd ? fundEnd.vanguard_emerging : state.myinvestor.funds.vanguard_emerging;
+          const valSc = fundEnd ? fundEnd.vanguard_smallcaps : state.myinvestor.funds.vanguard_smallcaps;
+          if (fundEnd) {
+            document.getElementById('fundFidelityVal').innerText = valFid.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('fundEmergingVal').innerText = valEm.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('fundSmallCapsVal').innerText = valSc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+          }
+          setTrendBadge('trendFundFidelity', valFid, fundStart ? fundStart.fidelity_sp500 : null, 'Sin datos en rango');
+          setTrendBadge('trendFundEmerging', valEm, fundStart ? fundStart.vanguard_emerging : null, 'Sin datos en rango');
+          setTrendBadge('trendFundSmallCaps', valSc, fundStart ? fundStart.vanguard_smallcaps : null, 'Sin datos en rango');
+        } else {
+          setTrendBadge('trendFundFidelity', state.myinvestor.funds.fidelity_sp500, state.myinvestor.fundsCost.fidelity_sp500, 'Sin coste registrado');
+          setTrendBadge('trendFundEmerging', state.myinvestor.funds.vanguard_emerging, state.myinvestor.fundsCost.vanguard_emerging, 'Sin coste registrado');
+          setTrendBadge('trendFundSmallCaps', state.myinvestor.funds.vanguard_smallcaps, state.myinvestor.fundsCost.vanguard_smallcaps, 'Sin coste registrado');
+        }
       }
+    }
+
+    function onPanelDateChange() {
+      render();
     }
 
     function resetPanelDates() {
@@ -2356,7 +2404,39 @@
       const toEl = document.getElementById('panelDateTo');
       if (fromEl) fromEl.value = '';
       if (toEl) toEl.value = '';
-      updateCharts();
+      render();
+    }
+
+    function getSnapshotAtOrBefore(snapshots, targetDateStr) {
+      if (!Array.isArray(snapshots) || snapshots.length === 0) return null;
+      const sorted = snapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+      if (!targetDateStr) return sorted[sorted.length - 1];
+      const targetEnd = new Date(targetDateStr + 'T23:59:59');
+      let found = null;
+      for (let i = 0; i < sorted.length; i++) {
+        if (new Date(sorted[i].date) <= targetEnd) {
+          found = sorted[i];
+        } else {
+          break;
+        }
+      }
+      return found || sorted[0];
+    }
+
+    function getPriceAtOrBefore(priceMap, targetDateStr) {
+      if (!priceMap) return null;
+      const keys = Object.keys(priceMap).sort();
+      if (keys.length === 0) return null;
+      if (!targetDateStr) return priceMap[keys[keys.length - 1]];
+      let foundKey = null;
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] <= targetDateStr) {
+          foundKey = keys[i];
+        } else {
+          break;
+        }
+      }
+      return foundKey ? priceMap[foundKey] : priceMap[keys[0]];
     }
 
     function resetCashFlowDates() {
