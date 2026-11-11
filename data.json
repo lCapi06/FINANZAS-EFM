@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 2553.43,
+    "bbva": 1553.4299999999998,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
     "trade_republic_btc": 720.12766632
@@ -15,6 +15,16 @@
       "concept": "Regalos",
       "amount": 18,
       "category": "Regalos",
+      "account": "bbva",
+      "destination": null
+    },
+    {
+      "id": 1794426277470,
+      "date": "2026-11-11T19:44:37.470Z",
+      "type": "expense",
+      "concept": "Prueba",
+      "amount": 1000,
+      "category": "Ocio",
       "account": "bbva",
       "destination": null
     }
@@ -31,7 +41,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-11T19:19:13.101Z",
+  "lastCloudSync": "2026-11-11T19:44:37.488Z",
   "btcUnits": 0.010744,
   "btcPrice": 67026.03,
   "categories": {
