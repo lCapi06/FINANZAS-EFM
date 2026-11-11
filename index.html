@@ -83,6 +83,9 @@
         <button onclick="switchTab('herramientas')" id="tab-btn-herramientas" class="tab-btn px-3 py-1.5 text-xs font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
           <span>🎯</span> Libertad
         </button>
+        <button onclick="switchTab('basedatos')" id="tab-btn-basedatos" class="tab-btn px-3 py-1.5 text-xs font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
+          <span>🗄️</span> Base de Datos
+        </button>
       </nav>
     </div>
   </header>
@@ -475,20 +478,7 @@
           </div>
         </div>
 
-        <!-- Gráfico de Evolución Histórica por Fondo Indexado -->
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-3 transition-colors space-y-4">
-          <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución Histórica (VL Fondos y Bitcoin)</h3>
-            <select id="fundTimeRangeSelect" onchange="updateCharts()" class="px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
-              <option value="all">Todo el Histórico</option>
-              <option value="30">Últimos 30 Días</option>
-              <option value="7">Últimos 7 Días</option>
-            </select>
-          </div>
-          <div class="h-64">
-            <canvas id="fundEvolutionChart"></canvas>
-          </div>
-        </div>
+
       </section>
 
     </div>
@@ -979,6 +969,26 @@
         </div>
       </section>
 
+    </div>
+
+    <!-- ==================== PESTAÑA 5: BASE DE DATOS ==================== -->
+    <div id="tab-basedatos" class="tab-content hidden space-y-6">
+      <section class="grid grid-cols-1 gap-6">
+        <!-- Gráfico de Evolución Histórica por Fondo Indexado y Bitcoin -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Evolución Histórica (VL Fondos y Bitcoin)</h3>
+            <select id="fundTimeRangeSelect" onchange="updateCharts()" class="px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none">
+              <option value="all">Todo el Histórico</option>
+              <option value="30">Últimos 30 Días</option>
+              <option value="7">Últimos 7 Días</option>
+            </select>
+          </div>
+          <div class="h-80">
+            <canvas id="fundEvolutionChart"></canvas>
+          </div>
+        </div>
+      </section>
     </div>
 
   </main>
@@ -1611,6 +1621,8 @@
       if (tabId === 'resumen') {
         renderCashFlow();
         renderBudgets();
+        updateCharts();
+      } else if (tabId === 'basedatos') {
         updateCharts();
       } else if (tabId === 'herramientas') {
         calculate4Percent();
@@ -2257,8 +2269,8 @@
       let baseline = null;
 
       if (hasSnapshots) {
-        const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        baseline = sortedAsc[0];
+        const sortedDesc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+        baseline = sortedDesc[0];
       }
 
       function applyCardGradient(cardId, diff) {
