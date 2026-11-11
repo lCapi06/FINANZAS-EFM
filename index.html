@@ -1845,16 +1845,21 @@
       setSyncStatus('☁️ Guardando...', 'loading');
 
       try {
-        if (!currentFileSha) {
-          const checkUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?t=${Date.now()}`;
-          const checkRes = await fetch(checkUrl, {
-            headers: { 'Authorization': `token ${token}` },
-            cache: 'no-store'
-          });
-          if (checkRes.ok) {
-            const checkData = await checkRes.json();
-            currentFileSha = checkData.sha;
-          }
+        // SIEMPRE consultamos el SHA actual antes de hacer el PUT para evitar conflictos 409
+        const checkUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?t=${Date.now()}`;
+        const checkRes = await fetch(checkUrl, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          cache: 'no-store'
+        });
+
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          currentFileSha = checkData.sha;
+        } else {
+          currentFileSha = null;
         }
 
         state.lastCloudSync = new Date().toISOString();
@@ -1865,7 +1870,7 @@
 
         const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
         const bodyData = {
-          message: 'Actualización de VL y fondos desde Finanzas App',
+          message: 'Actualización de datos desde Finanzas App',
           content: base64Content
         };
         if (currentFileSha) bodyData.sha = currentFileSha;
@@ -1880,33 +1885,6 @@
           body: JSON.stringify(bodyData)
         });
 
-        if (putRes.status === 409) {
-          const retryCheck = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?t=${Date.now()}`, {
-            headers: { 'Authorization': `token ${token}` },
-            cache: 'no-store'
-          });
-          if (retryCheck.ok) {
-            const retryData = await retryCheck.json();
-            currentFileSha = retryData.sha;
-            bodyData.sha = currentFileSha;
-            const retryPut = await fetch(putUrl, {
-              method: 'PUT',
-              headers: {
-                'Authorization': `token ${token}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(bodyData)
-            });
-            if (!retryPut.ok) throw new Error('Error al subir tras reintento: ' + retryPut.status);
-            const retryPutData = await retryPut.json();
-            currentFileSha = retryPutData.content.sha;
-            const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-            setSyncStatus('☁️ Guardado (' + syncDate + ')', 'ok');
-            if (isManual) alert('¡Datos guardados en GitHub correctamente!');
-            return;
-          }
-        }
         if (!putRes.ok) throw new Error('Error al subir: ' + putRes.status);
 
         const putData = await putRes.json();
@@ -1918,7 +1896,7 @@
       } catch (err) {
         console.error('Error al guardar en GitHub:', err);
         setSyncStatus('❌ Error al guardar', 'error');
-        if (isManual) alert('Error al guardar en GitHub. Revisa tu Token.');
+        if (isManual) alert('Error al guardar en GitHub. Revisa tu Token y permisos.');
       } finally {
         if (btn) btn.innerHTML = '☁️ <span class="hidden sm:inline">Guardar</span>';
       }
@@ -2087,10 +2065,14 @@
       let needsCloudSync = false;
 
       if (getGitHubToken()) {
-        await syncFromGitHub();
-        applyTheme();
-        updateYearFilterOptions();
-        populateCategoryDropdowns();
+        const successCloud = await syncFromGitHub();
+        if (successCloud) {
+          applyTheme();
+          updateYearFilterOptions();
+          populateCategoryDropdowns();
+          render();
+          fillCompoundWith('invested');
+        }
       } else {
         setSyncStatus('⚠️ Configura Token', 'error');
       }
@@ -2107,9 +2089,8 @@
       updateYearFilterOptions();
       populateCategoryDropdowns();
       render();
-      fillCompoundWith('invested');
 
-      if (needsCloudSync) {
+      if (needsCloudSync && getGitHubToken()) {
         await syncToGitHub(false);
       }
     }
