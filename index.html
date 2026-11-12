@@ -464,42 +464,15 @@
       </section>
 
       <!-- Presupuesto Mensual por Categoría -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-5">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h3 class="text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría</h3>
-            <p id="budgetMonthSubtitle" class="text-xs text-slate-500">Fija un límite mensual para cada etiqueta y organiza su orden.</p>
-          </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <label for="budgetTypeFilter" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Vista:</label>
-            <select id="budgetTypeFilter" onchange="renderBudgets()" class="flex-1 sm:flex-initial px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="all">📋 Gasto e Ingreso</option>
-              <option value="expense">➖ Gasto</option>
-              <option value="income">➕ Ingreso</option>
-            </select>
+            <p id="budgetMonthSubtitle" class="text-xs text-slate-500">Fija un límite mensual para cada categoría. Recibirás alertas al superar el 80% o el 100%.</p>
           </div>
         </div>
-
-        <!-- Subtítulo y Etiquetas de GASTO -->
-        <div id="budgetExpenseWrapper" class="space-y-2.5">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">Gasto</h4>
-            <span class="text-[11px] text-slate-400">Tope mensual y orden</span>
-          </div>
-          <div id="budgetExpenseTags" class="flex flex-wrap gap-3">
-            <!-- Generado por JS -->
-          </div>
-        </div>
-
-        <!-- Subtítulo y Etiquetas de INGRESO -->
-        <div id="budgetIncomeWrapper" class="space-y-2.5 pt-2">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Ingreso</h4>
-            <span class="text-[11px] text-slate-400">Meta mensual y orden</span>
-          </div>
-          <div id="budgetIncomeTags" class="flex flex-wrap gap-3">
-            <!-- Generado por JS -->
-          </div>
+        <div id="budgetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Generado por JS -->
         </div>
       </section>
 
@@ -605,30 +578,32 @@
           </form>
         </section>
 
-        <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between space-y-4">
+        <section class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between space-y-3 self-start">
           <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Gestión de Categorías</h3>
-            <p class="text-xs text-slate-500 mb-3">Añade o reordena tus etiquetas visualmente.</p>
-            <form onsubmit="addNewCategory(event)" class="space-y-3">
-              <div>
-                <input type="text" id="newCatName" placeholder="Nombre nueva categoría..." required class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              </div>
-              <div class="flex gap-2">
-                <select id="newCatType" class="flex-1 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Gestión de Categorías</h3>
+              <select id="catManagerFilter" onchange="renderCategoryManagerList()" class="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-[11px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="all">Todo</option>
+                <option value="expense">Gasto</option>
+                <option value="income">Ingreso</option>
+              </select>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-2.5">Añade, fija topes/metas o reordena tus etiquetas.</p>
+            <form onsubmit="addNewCategory(event)" class="space-y-2">
+              <input type="text" id="newCatName" placeholder="Nueva categoría..." required class="w-full px-2.5 py-1.5 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <div class="flex gap-1.5">
+                <select id="newCatType" class="flex-1 px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none">
                   <option value="expense">➖ Gasto</option>
                   <option value="income">➕ Ingreso</option>
                 </select>
-                <button type="submit" class="px-4 py-1.5 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                <button type="submit" class="px-3 py-1 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition shadow-sm">
                   Añadir
                 </button>
               </div>
             </form>
           </div>
 
-          <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
-            <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Orden y Listado</h4>
-            <div id="categoryManagerList" class="space-y-2 max-h-44 overflow-y-auto pr-1 no-scrollbar">
-            </div>
+          <div id="categoryManagerList" class="border-t border-slate-100 dark:border-slate-800 pt-2.5 space-y-3 max-h-56 overflow-y-auto pr-0.5 no-scrollbar">
           </div>
         </section>
       </div>
@@ -1206,31 +1181,23 @@
       }
     }
 
-    function saveBudget(key, value) {
+    function saveBudget(category, value) {
       if (!state.budgets) state.budgets = {};
       const num = parseFloat(value);
       if (isNaN(num) || num <= 0) {
-        delete state.budgets[key];
+        delete state.budgets[category];
       } else {
-        state.budgets[key] = num;
+        state.budgets[category] = num;
       }
       saveAndSync();
     }
 
     function renderBudgets() {
-      const expenseWrapper = document.getElementById('budgetExpenseWrapper');
-      const incomeWrapper = document.getElementById('budgetIncomeWrapper');
-      const expenseContainer = document.getElementById('budgetExpenseTags');
-      const incomeContainer = document.getElementById('budgetIncomeTags');
-      if (!expenseContainer || !incomeContainer) return;
+      const grid = document.getElementById('budgetGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
 
       if (!state.budgets) state.budgets = {};
-      const filterEl = document.getElementById('budgetTypeFilter');
-      const filterVal = filterEl ? filterEl.value : 'all';
-
-      if (expenseWrapper) expenseWrapper.classList.toggle('hidden', filterVal === 'income');
-      if (incomeWrapper) incomeWrapper.classList.toggle('hidden', filterVal === 'expense');
-
       const now = new Date();
       const curM = now.getMonth();
       const curY = now.getFullYear();
@@ -1238,96 +1205,56 @@
       const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
       const subtitleEl = document.getElementById('budgetMonthSubtitle');
       if (subtitleEl) {
-        subtitleEl.innerText = `Presupuesto y objetivos correspondientes a ${monthNames[curM]} de ${curY}.`;
+        subtitleEl.innerText = `Límite mensual correspondiente a ${monthNames[curM]} de ${curY}.`;
       }
 
-      const totalsByTypeCat = { expense: {}, income: {} };
+      const spentByCat = {};
       state.transactions.forEach(function(t) {
-        if (t.type === 'expense' || t.type === 'income') {
+        if (t.type === 'expense') {
           const d = new Date(t.date);
           if (d.getMonth() === curM && d.getFullYear() === curY) {
-            totalsByTypeCat[t.type][t.category] = (totalsByTypeCat[t.type][t.category] || 0) + t.amount;
+            spentByCat[t.category] = (spentByCat[t.category] || 0) + t.amount;
           }
         }
       });
 
-      function buildTagGroup(type, container) {
-        container.innerHTML = '';
-        const list = (state.categories && state.categories[type]) ? state.categories[type] : [];
+      const expenseCats = (state.categories && state.categories.expense) ? state.categories.expense : [];
+      expenseCats.forEach(function(cat) {
+        const limit = state.budgets[cat] || 0;
+        const spent = spentByCat[cat] || 0;
+        const pct = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
 
-        if (list.length === 0) {
-          container.innerHTML = '<p class="text-xs text-slate-400 italic">No hay categorías en esta sección.</p>';
-          return;
+        let barColor = 'bg-emerald-500';
+        let alertBadge = '';
+        if (limit > 0) {
+          if (spent >= limit) {
+            barColor = 'bg-rose-500';
+            alertBadge = '<span class="text-[10px] font-bold text-rose-600 dark:text-rose-400">🚨 Límite superado</span>';
+          } else if (spent >= limit * 0.8) {
+            barColor = 'bg-amber-500';
+            alertBadge = '<span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">⚠️ Cerca del límite</span>';
+          }
         }
 
-        list.forEach(function(cat, idx) {
-          const budgetKey = type + ':' + cat;
-          const limit = state.budgets[budgetKey] !== undefined
-            ? state.budgets[budgetKey]
-            : (type === 'expense' ? (state.budgets[cat] || 0) : 0);
-
-          const actual = totalsByTypeCat[type][cat] || 0;
-          const pct = limit > 0 ? Math.min((actual / limit) * 100, 100) : 0;
-
-          let barColor = type === 'expense' ? 'bg-emerald-500' : 'bg-indigo-500';
-          let statusBadge = '';
-
-          if (limit > 0) {
-            if (type === 'expense') {
-              if (actual >= limit) {
-                barColor = 'bg-rose-500';
-                statusBadge = '<span class="text-[10px] font-bold text-rose-600 dark:text-rose-400">🚨 Superado</span>';
-              } else if (actual >= limit * 0.8) {
-                barColor = 'bg-amber-500';
-                statusBadge = '<span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">⚠️ >80%</span>';
-              }
-            } else {
-              if (actual >= limit) {
-                barColor = 'bg-emerald-500';
-                statusBadge = '<span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">🎯 Meta cumplida</span>';
-              }
-            }
-          }
-
-          const tag = document.createElement('div');
-          tag.className = 'flex flex-col justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 w-full sm:w-[calc(50%-0.375rem)] lg:w-[calc(33.333%-0.5rem)] transition';
-
-          const escapedKey = budgetKey.replace(/'/g, "\\'");
-          const pillBadgeClass = type === 'expense'
-            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800'
-            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
-
-          tag.innerHTML =
-            '<div class="flex items-center justify-between gap-2">' +
-              '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ' + pillBadgeClass + ' truncate">' +
-                cat +
-              '</span>' +
-              '<div class="flex items-center gap-1 shrink-0">' +
-                '<button type="button" title="Subir" onclick="moveCategory(\'' + type + '\', ' + idx + ', -1)" ' + (idx === 0 ? 'disabled' : '') + ' class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[10px]">▲</button>' +
-                '<button type="button" title="Bajar" onclick="moveCategory(\'' + type + '\', ' + idx + ', 1)" ' + (idx === list.length - 1 ? 'disabled' : '') + ' class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[10px]">▼</button>' +
-                '<button type="button" title="Eliminar" onclick="deleteCategory(\'' + type + '\', ' + idx + ')" class="w-6 h-6 flex items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition text-[10px]">✕</button>' +
-              '</div>' +
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-2.5';
+        card.innerHTML = 
+          '<div class="flex justify-between items-center gap-2">' +
+            '<span class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">' + cat + '</span>' +
+            '<div class="flex items-center gap-1">' +
+              '<span class="text-[10px] text-slate-400">Tope:</span>' +
+              '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Sin límite" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="w-20 px-2 py-1 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none">' +
             '</div>' +
-            '<div class="flex items-center justify-between gap-2 text-xs">' +
-              '<span class="text-slate-500 dark:text-slate-400 font-medium">' +
-                actual.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' +
-                (limit > 0 ? ' / ' + limit.toLocaleString('es-ES') + ' €' : '') +
-              '</span>' +
-              '<div class="flex items-center gap-1">' +
-                statusBadge +
-                '<input type="number" step="1" min="0" value="' + (limit > 0 ? limit : '') + '" placeholder="' + (type === 'expense' ? 'Tope €' : 'Meta €') + '" onchange="saveBudget(\'' + escapedKey + '\', this.value)" class="w-20 px-2 py-1 text-right bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">' +
-              '</div>' +
-            '</div>' +
-            (limit > 0
-              ? '<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"><div class="h-full ' + barColor + ' rounded-full transition-all duration-300" style="width:' + pct + '%"></div></div>'
-              : '');
-
-          container.appendChild(tag);
-        });
-      }
-
-      buildTagGroup('expense', expenseContainer);
-      buildTagGroup('income', incomeContainer);
+          '</div>' +
+          '<div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">' +
+            '<div class="h-full ' + barColor + ' transition-all duration-500" style="width: ' + pct + '%"></div>' +
+          '</div>' +
+          '<div class="flex justify-between items-center text-xs">' +
+            '<span class="text-slate-600 dark:text-slate-300 font-medium">Gastado: <strong>' + spent.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €</strong></span>' +
+            alertBadge +
+          '</div>';
+        grid.appendChild(card);
+      });
     }
 
     async function fetchBtcPrice(isManual = false) {
@@ -1621,60 +1548,159 @@
       filterCatSelect.value = availableCats.has(currentSelected) ? currentSelected : 'all';
     }
 
+    function saveCategoryGoal(type, cat, value) {
+      if (!state.budgets) state.budgets = {};
+      const num = parseFloat(value);
+      const key = type === 'expense' ? cat : ('income:' + cat);
+      if (isNaN(num) || num <= 0) {
+        delete state.budgets[key];
+      } else {
+        state.budgets[key] = num;
+      }
+      saveAndSync();
+    }
+
     function renderCategoryManagerList() {
       const container = document.getElementById('categoryManagerList');
       if (!container) return;
       container.innerHTML = '';
 
+      if (!state.budgets) state.budgets = {};
+      const filterEl = document.getElementById('catManagerFilter');
+      const filterVal = filterEl ? filterEl.value : 'all';
+
+      const now = new Date();
+      const curM = now.getMonth();
+      const curY = now.getFullYear();
+
+      const totalsByTypeCat = { expense: {}, income: {} };
+      state.transactions.forEach(function(t) {
+        if (t.type === 'expense' || t.type === 'income') {
+          const d = new Date(t.date);
+          if (d.getMonth() === curM && d.getFullYear() === curY) {
+            totalsByTypeCat[t.type][t.category] = (totalsByTypeCat[t.type][t.category] || 0) + t.amount;
+          }
+        }
+      });
+
       function buildSection(type, title) {
-        const list = state.categories[type] || [];
-        if (list.length === 0) return;
+        const list = (state.categories && state.categories[type]) ? state.categories[type] : [];
+
+        const sectionWrap = document.createElement('div');
+        sectionWrap.className = 'space-y-1.5';
 
         const header = document.createElement('div');
-        header.className = 'text-[11px] font-bold text-slate-400 mt-2 mb-1 uppercase';
+        header.className = 'text-[10px] font-extrabold uppercase tracking-wider ' +
+          (type === 'expense' ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400');
         header.textContent = title;
-        container.appendChild(header);
+        sectionWrap.appendChild(header);
+
+        if (list.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'text-[11px] text-slate-400 italic';
+          empty.textContent = 'Sin categorías.';
+          sectionWrap.appendChild(empty);
+          container.appendChild(sectionWrap);
+          return;
+        }
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'flex flex-wrap gap-1.5';
 
         list.forEach(function(cat, idx) {
-          const row = document.createElement('div');
-          row.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs';
+          const budgetKey = type === 'expense' ? cat : ('income:' + cat);
+          const limit = state.budgets[budgetKey] || 0;
+          const actual = totalsByTypeCat[type][cat] || 0;
+          const pct = limit > 0 ? Math.min((actual / limit) * 100, 100) : 0;
 
-          const span = document.createElement('span');
-          span.className = 'font-medium text-slate-800 dark:text-slate-200 truncate pr-2';
-          span.textContent = cat;
+          let barColor = type === 'expense' ? 'bg-emerald-500' : 'bg-indigo-500';
+          if (limit > 0) {
+            if (type === 'expense') {
+              if (actual >= limit) barColor = 'bg-rose-500';
+              else if (actual >= limit * 0.8) barColor = 'bg-amber-500';
+            } else if (actual >= limit) {
+              barColor = 'bg-emerald-500';
+            }
+          }
 
-          const btnGroup = document.createElement('div');
-          btnGroup.className = 'flex items-center gap-1 shrink-0';
+          const pill = document.createElement('div');
+          pill.className = 'inline-flex flex-col gap-1 px-2.5 py-1 rounded-full border text-[11px] transition ' +
+            (type === 'expense'
+              ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/70'
+              : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70');
+
+          const topRow = document.createElement('div');
+          topRow.className = 'flex items-center gap-1.5';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap';
+          nameSpan.textContent = cat;
+
+          const goalInput = document.createElement('input');
+          goalInput.type = 'number';
+          goalInput.step = '1';
+          goalInput.min = '0';
+          goalInput.value = limit > 0 ? limit : '';
+          goalInput.placeholder = type === 'expense' ? 'Tope €' : 'Meta €';
+          goalInput.title = type === 'expense' ? 'Tope mensual (€)' : 'Meta mensual (€)';
+          goalInput.className = 'w-14 px-1.5 py-0.5 text-[10px] text-right font-semibold bg-white/90 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500';
+          goalInput.onchange = function() {
+            saveCategoryGoal(type, cat, this.value);
+          };
 
           const btnUp = document.createElement('button');
-          btnUp.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
+          btnUp.type = 'button';
+          btnUp.title = 'Subir';
           btnUp.textContent = '▲';
+          btnUp.disabled = idx === 0;
+          btnUp.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[8px] leading-none';
           btnUp.onclick = function() { moveCategory(type, idx, -1); };
-          if (idx === 0) btnUp.disabled = true;
 
           const btnDown = document.createElement('button');
-          btnDown.className = 'p-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded hover:bg-indigo-600 hover:text-white transition text-[10px]';
+          btnDown.type = 'button';
+          btnDown.title = 'Bajar';
           btnDown.textContent = '▼';
+          btnDown.disabled = idx === list.length - 1;
+          btnDown.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[8px] leading-none';
           btnDown.onclick = function() { moveCategory(type, idx, 1); };
-          if (idx === list.length - 1) btnDown.disabled = true;
 
           const btnDel = document.createElement('button');
-          btnDel.className = 'p-1 bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded hover:bg-rose-600 hover:text-white transition text-[10px]';
+          btnDel.type = 'button';
+          btnDel.title = 'Eliminar';
           btnDel.textContent = '✕';
+          btnDel.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-rose-200/80 dark:bg-rose-900/70 text-rose-700 dark:text-rose-300 hover:bg-rose-600 hover:text-white transition text-[8px] leading-none';
           btnDel.onclick = function() { deleteCategory(type, idx); };
 
-          btnGroup.appendChild(btnUp);
-          btnGroup.appendChild(btnDown);
-          btnGroup.appendChild(btnDel);
+          topRow.appendChild(nameSpan);
+          topRow.appendChild(goalInput);
+          topRow.appendChild(btnUp);
+          topRow.appendChild(btnDown);
+          topRow.appendChild(btnDel);
+          pill.appendChild(topRow);
 
-          row.appendChild(span);
-          row.appendChild(btnGroup);
-          container.appendChild(row);
+          if (limit > 0) {
+            const barTrack = document.createElement('div');
+            barTrack.className = 'w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden';
+            const barFill = document.createElement('div');
+            barFill.className = 'h-full ' + barColor + ' rounded-full transition-all duration-300';
+            barFill.style.width = pct + '%';
+            barTrack.appendChild(barFill);
+            pill.appendChild(barTrack);
+          }
+
+          tagsWrap.appendChild(pill);
         });
+
+        sectionWrap.appendChild(tagsWrap);
+        container.appendChild(sectionWrap);
       }
 
-      buildSection('expense', 'Gastos');
-      buildSection('income', 'Ingresos');
+      if (filterVal === 'all' || filterVal === 'expense') {
+        buildSection('expense', 'Gasto');
+      }
+      if (filterVal === 'all' || filterVal === 'income') {
+        buildSection('income', 'Ingreso');
+      }
     }
 
     function moveCategory(type, index, direction) {
@@ -1687,7 +1713,6 @@
 
       saveAndSync();
       populateCategoryDropdowns();
-      renderBudgets();
     }
 
     function addNewCategory(e) {
@@ -1718,7 +1743,6 @@
       state.categories[type].splice(index, 1);
       saveAndSync();
       populateCategoryDropdowns();
-      renderBudgets();
     }
 
     function switchTab(tabId) {
@@ -1741,6 +1765,7 @@
       if (tabId === 'resumen') {
         renderCashFlow();
         renderBudgets();
+      renderCategoryManagerList();
         updateCharts();
       } else if (tabId === 'herramientas') {
         calculate4Percent();
