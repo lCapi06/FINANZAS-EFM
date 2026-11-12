@@ -114,8 +114,17 @@
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
       
-      <!-- Objetivo Patrimonial & Distribución -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Objetivo Patrimonial & Distribución Colapsable -->
+      <section class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('goalDistributionSection', 'toggleIconGoalDist')">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🎯</span>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Objetivo Patrimonial & Distribución</h3>
+          </div>
+          <span id="toggleIconGoalDist" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
+        </div>
+
+        <div id="goalDistributionSection" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
         
         <!-- Objetivo Patrimonial -->
         <div class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-indigo-500/20 flex flex-col justify-between">
@@ -166,6 +175,9 @@
           </div>
         </div>
 
+      </section>
+
+      </div>
       </section>
 
       <!-- Summary Cards -->
@@ -418,18 +430,7 @@
             </div>
           </div>
 
-          <!-- Previsión Inteligente de Fin de Mes -->
-          <div class="p-4 rounded-xl bg-black/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-white/10">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">🔮 Previsión Inteligente de Fin de Mes</span>
-              <h4 id="forecastTitle" class="text-sm font-bold mt-1 text-white">Estimación de ahorro a fin de mes</h4>
-              <p id="forecastDesc" class="text-xs text-slate-300 mt-0.5">Calculando ritmo de gasto diario...</p>
-            </div>
-            <div class="text-left sm:text-right shrink-0">
-              <span id="forecastAmount" class="text-xl font-extrabold text-emerald-400">0,00 €</span>
-              <p class="text-[10px] text-slate-300">Ahorro proyectado</p>
-            </div>
-          </div>
+
         </div>
 
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
@@ -440,6 +441,19 @@
             </div>
           </div>
           <p id="healthDesc" class="text-xs text-slate-500 text-center">Basado en tu tasa de ahorro neta del periodo.</p>
+        </div>
+
+        <!-- Módulo Independiente: Previsión Inteligente de Fin de Mes -->
+        <div class="lg:col-span-3 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl border border-indigo-500/30 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">🔮 Previsión Inteligente de Fin de Mes</span>
+            <h4 id="forecastTitle" class="text-base font-bold text-white mt-1">Estimación de ahorro al cierre del mes</h4>
+            <p id="forecastDesc" class="text-xs text-slate-300">Calculando ritmo de gasto diario...</p>
+          </div>
+          <div class="text-left sm:text-right shrink-0 bg-black/25 px-4 py-2.5 rounded-xl border border-white/10">
+            <span id="forecastAmount" class="text-2xl font-extrabold text-emerald-400 block">0,00 €</span>
+            <span class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Ahorro proyectado</span>
+          </div>
         </div>
       </section>
 
@@ -505,13 +519,14 @@
           <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4" onsubmit="handleTxSubmit(event)">
             <input type="hidden" id="editTxId" value="">
             
-            <div>
-              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo</label>
-              <select id="txType" onchange="handleTypeChange()" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white font-semibold">
-                <option value="expense">➖ Gasto</option>
-                <option value="income">➕ Ingreso</option>
-                <option value="transfer">🔄 Traspaso</option>
-              </select>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo de Movimiento</label>
+              <div class="grid grid-cols-3 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <button type="button" onclick="setTxTypeTab('expense')" id="txTabExpense" class="py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition shadow-sm">➖ Gasto</button>
+                <button type="button" onclick="setTxTypeTab('income')" id="txTabIncome" class="py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">➕ Ingreso</button>
+                <button type="button" onclick="setTxTypeTab('transfer')" id="txTabTransfer" class="py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">🔄 Traspaso</button>
+              </div>
+              <input type="hidden" id="txType" value="expense">
             </div>
 
             <div>
@@ -597,7 +612,14 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
+        <!-- Filtros avanzados colapsables -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center cursor-pointer select-none px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60" onclick="toggleSection('advancedFiltersSection', 'toggleIconFilters')">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🔍 Filtros avanzados de búsqueda y fechas</span>
+            <span id="toggleIconFilters" class="text-xs font-bold text-slate-400">▼ Desplegar</span>
+          </div>
+
+          <div id="advancedFiltersSection" class="hidden grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
           <div>
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mes</label>
             <select id="filterMonth" onchange="renderTransactions()" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
@@ -656,6 +678,7 @@
             <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Buscar por concepto</label>
             <input type="text" id="filterConcept" oninput="renderTransactions()" placeholder="Escribe para buscar concepto..." class="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
+        </div>
         </div>
 
         <div class="max-h-[320px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl relative">
@@ -1979,6 +2002,21 @@
       calculateCompound();
     }
 
+    
+    function setTxTypeTab(type) {
+      document.getElementById('txType').value = type;
+      ['expense', 'income', 'transfer'].forEach(t => {
+        const btn = document.getElementById('txTab' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (!btn) return;
+        if (t === type) {
+          btn.className = 'py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition shadow-sm';
+        } else {
+          btn.className = 'py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition';
+        }
+      });
+      handleTypeChange();
+    }
+
     function handleTypeChange() {
       const type = document.getElementById('txType').value;
       const catSelect = document.getElementById('txCategory');
@@ -2786,7 +2824,7 @@
       if (!tx) return;
 
       document.getElementById('editTxId').value = tx.id;
-      document.getElementById('txType').value = tx.type;
+      document.getElementById('txType').value = tx.type; setTxTypeTab(tx.type);
       handleTypeChange();
 
       document.getElementById('txConcept').value = tx.concept;
@@ -2900,7 +2938,7 @@
 
     function resetTxForm() {
       document.getElementById('editTxId').value = '';
-      document.getElementById('txForm').reset();
+      document.getElementById('txForm').reset(); setTxTypeTab('expense');
       document.getElementById('formTitle').innerText = 'Registrar Movimiento';
       document.getElementById('txSubmitBtn').innerText = 'Guardar Movimiento';
       document.getElementById('txCancelBtn').classList.add('hidden');
