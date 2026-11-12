@@ -31,13 +31,13 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-12T13:56:40.598Z",
+  "lastCloudSync": "2026-11-12T17:20:52.376Z",
   "btcUnits": 0.010744,
   "btcPrice": 65423.315,
   "categories": {
     "expense": [
-      "Supermercado",
       "Ocio",
+      "Supermercado",
       "Vivienda",
       "Transporte",
       "Suscripciones",
