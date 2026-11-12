@@ -49,22 +49,32 @@
       </div>
       
       <div class="flex items-center gap-1 shrink-0">
-        <button onclick="toggleTheme()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Cambiar Tema">
+        <!-- Tema y Token siempre visibles fuera del desplegable para total tranquilidad -->
+        <button onclick="toggleTheme()" class="p-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
         </button>
-        <button onclick="promptToken()" class="p-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition" title="Configurar Token">
-          ⚙️
+        <button onclick="promptToken()" class="p-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1" title="Configurar Token de GitHub">
+          <span>⚙️</span> <span class="hidden md:inline font-bold">Token</span>
         </button>
-        <button onclick="syncToGitHub(true)" id="btnSaveCloud" class="px-2 py-1.5 text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-lg hover:bg-sky-100 transition flex items-center gap-1">
-          ☁️ <span class="hidden sm:inline">Guardar</span>
-        </button>
-        <button onclick="exportData()" class="px-2 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition flex items-center gap-1">
-          💾 <span class="hidden sm:inline">Exportar</span>
-        </button>
-        <label for="importFile" class="px-2 py-1.5 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 cursor-pointer transition flex items-center gap-1">
-          📂 <span class="hidden sm:inline">Importar</span>
-        </label>
-        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+
+        <!-- Menú desplegable para acciones de datos -->
+        <div class="relative">
+          <button onclick="toggleHeaderActionsMenu()" class="px-3 py-2 text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition flex items-center gap-1 shadow-sm">
+            <span>⚡ Acciones</span> <span>▾</span>
+          </button>
+          <div id="headerActionsMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 p-1.5 space-y-1">
+            <button onclick="syncToGitHub(true); toggleHeaderActionsMenu();" id="btnSaveCloud" class="w-full text-left px-3 py-2 text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 rounded-xl hover:bg-sky-100 dark:hover:bg-sky-900/50 transition flex items-center gap-2">
+              ☁️ Guardar en Nube
+            </button>
+            <button onclick="exportData(); toggleHeaderActionsMenu();" class="w-full text-left px-3 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition flex items-center gap-2">
+              💾 Exportar JSON
+            </button>
+            <label for="importFile" onclick="toggleHeaderActionsMenu();" class="w-full text-left px-3 py-2 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 cursor-pointer transition flex items-center gap-2 block">
+              📂 Importar Copia
+            </label>
+            <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3481,6 +3491,18 @@
         }
       });
     }
+
+    
+    function toggleHeaderActionsMenu() {
+      const menu = document.getElementById('headerActionsMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+    window.addEventListener('click', function(e) {
+      const menu = document.getElementById('headerActionsMenu');
+      if (menu && !menu.classList.contains('hidden') && !e.target.closest('button[onclick*="toggleHeaderActionsMenu"]') && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
 
     init();
   </script>
