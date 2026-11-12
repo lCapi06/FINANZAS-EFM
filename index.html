@@ -464,14 +464,14 @@
       </section>
 
       <!-- Presupuesto Mensual por Categoría -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+      <section class="bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-2.5">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría</h3>
-            <p id="budgetMonthSubtitle" class="text-xs text-slate-500">Fija un límite mensual para cada categoría. Recibirás alertas al superar el 80% o el 100%.</p>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Presupuesto Mensual por Categoría</h3>
+            <p id="budgetMonthSubtitle" class="text-[11px] text-slate-500">Fija un límite mensual para cada categoría.</p>
           </div>
         </div>
-        <div id="budgetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="budgetGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
           <!-- Generado por JS -->
         </div>
       </section>
@@ -588,7 +588,7 @@
                 <option value="income">Ingreso</option>
               </select>
             </div>
-            <p class="text-[11px] text-slate-500 mb-2.5">Añade, fija topes/metas o reordena tus etiquetas.</p>
+            <p class="text-[11px] text-slate-500 mb-2">Añade o reordena tus etiquetas.</p>
             <form onsubmit="addNewCategory(event)" class="space-y-2">
               <input type="text" id="newCatName" placeholder="Nueva categoría..." required class="w-full px-2.5 py-1.5 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <div class="flex gap-1.5">
@@ -1205,7 +1205,7 @@
       const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
       const subtitleEl = document.getElementById('budgetMonthSubtitle');
       if (subtitleEl) {
-        subtitleEl.innerText = `Límite mensual correspondiente a ${monthNames[curM]} de ${curY}.`;
+        subtitleEl.innerText = `Límite mensual (${monthNames[curM]} ${curY}).`;
       }
 
       const spentByCat = {};
@@ -1229,28 +1229,25 @@
         if (limit > 0) {
           if (spent >= limit) {
             barColor = 'bg-rose-500';
-            alertBadge = '<span class="text-[10px] font-bold text-rose-600 dark:text-rose-400">🚨 Límite superado</span>';
+            alertBadge = '<span class="text-[9px] font-bold text-rose-600 dark:text-rose-400">🚨 +100%</span>';
           } else if (spent >= limit * 0.8) {
             barColor = 'bg-amber-500';
-            alertBadge = '<span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">⚠️ Cerca del límite</span>';
+            alertBadge = '<span class="text-[9px] font-bold text-amber-600 dark:text-amber-400">⚠️ +80%</span>';
           }
         }
 
         const card = document.createElement('div');
-        card.className = 'p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-2.5';
+        card.className = 'p-2.5 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1.5';
         card.innerHTML = 
-          '<div class="flex justify-between items-center gap-2">' +
-            '<span class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">' + cat + '</span>' +
-            '<div class="flex items-center gap-1">' +
-              '<span class="text-[10px] text-slate-400">Tope:</span>' +
-              '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Sin límite" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="w-20 px-2 py-1 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none">' +
-            '</div>' +
+          '<div class="flex justify-between items-center gap-1">' +
+            '<span class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">' + cat + '</span>' +
+            '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Tope €" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="w-14 sm:w-16 px-1.5 py-0.5 text-[10px] text-right font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-white focus:outline-none">' +
           '</div>' +
-          '<div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">' +
+          '<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">' +
             '<div class="h-full ' + barColor + ' transition-all duration-500" style="width: ' + pct + '%"></div>' +
           '</div>' +
-          '<div class="flex justify-between items-center text-xs">' +
-            '<span class="text-slate-600 dark:text-slate-300 font-medium">Gastado: <strong>' + spent.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €</strong></span>' +
+          '<div class="flex justify-between items-center text-[10px] leading-tight">' +
+            '<span class="text-slate-600 dark:text-slate-300 font-medium"><strong>' + spent.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €</strong>' + (limit > 0 ? ' / ' + limit.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €' : '') + '</span>' +
             alertBadge +
           '</div>';
         grid.appendChild(card);
@@ -1548,46 +1545,19 @@
       filterCatSelect.value = availableCats.has(currentSelected) ? currentSelected : 'all';
     }
 
-    function saveCategoryGoal(type, cat, value) {
-      if (!state.budgets) state.budgets = {};
-      const num = parseFloat(value);
-      const key = type === 'expense' ? cat : ('income:' + cat);
-      if (isNaN(num) || num <= 0) {
-        delete state.budgets[key];
-      } else {
-        state.budgets[key] = num;
-      }
-      saveAndSync();
-    }
-
     function renderCategoryManagerList() {
       const container = document.getElementById('categoryManagerList');
       if (!container) return;
       container.innerHTML = '';
 
-      if (!state.budgets) state.budgets = {};
       const filterEl = document.getElementById('catManagerFilter');
       const filterVal = filterEl ? filterEl.value : 'all';
-
-      const now = new Date();
-      const curM = now.getMonth();
-      const curY = now.getFullYear();
-
-      const totalsByTypeCat = { expense: {}, income: {} };
-      state.transactions.forEach(function(t) {
-        if (t.type === 'expense' || t.type === 'income') {
-          const d = new Date(t.date);
-          if (d.getMonth() === curM && d.getFullYear() === curY) {
-            totalsByTypeCat[t.type][t.category] = (totalsByTypeCat[t.type][t.category] || 0) + t.amount;
-          }
-        }
-      });
 
       function buildSection(type, title) {
         const list = (state.categories && state.categories[type]) ? state.categories[type] : [];
 
         const sectionWrap = document.createElement('div');
-        sectionWrap.className = 'space-y-1.5';
+        sectionWrap.className = 'space-y-1';
 
         const header = document.createElement('div');
         header.className = 'text-[10px] font-extrabold uppercase tracking-wider ' +
@@ -1597,7 +1567,7 @@
 
         if (list.length === 0) {
           const empty = document.createElement('p');
-          empty.className = 'text-[11px] text-slate-400 italic';
+          empty.className = 'text-[10px] text-slate-400 italic';
           empty.textContent = 'Sin categorías.';
           sectionWrap.appendChild(empty);
           container.appendChild(sectionWrap);
@@ -1605,55 +1575,25 @@
         }
 
         const tagsWrap = document.createElement('div');
-        tagsWrap.className = 'flex flex-wrap gap-1.5';
+        tagsWrap.className = 'flex flex-wrap gap-1';
 
         list.forEach(function(cat, idx) {
-          const budgetKey = type === 'expense' ? cat : ('income:' + cat);
-          const limit = state.budgets[budgetKey] || 0;
-          const actual = totalsByTypeCat[type][cat] || 0;
-          const pct = limit > 0 ? Math.min((actual / limit) * 100, 100) : 0;
-
-          let barColor = type === 'expense' ? 'bg-emerald-500' : 'bg-indigo-500';
-          if (limit > 0) {
-            if (type === 'expense') {
-              if (actual >= limit) barColor = 'bg-rose-500';
-              else if (actual >= limit * 0.8) barColor = 'bg-amber-500';
-            } else if (actual >= limit) {
-              barColor = 'bg-emerald-500';
-            }
-          }
-
           const pill = document.createElement('div');
-          pill.className = 'inline-flex flex-col gap-1 px-2.5 py-1 rounded-full border text-[11px] transition ' +
+          pill.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] leading-none transition ' +
             (type === 'expense'
-              ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/70'
-              : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70');
-
-          const topRow = document.createElement('div');
-          topRow.className = 'flex items-center gap-1.5';
+              ? 'bg-rose-50/80 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/70'
+              : 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70');
 
           const nameSpan = document.createElement('span');
-          nameSpan.className = 'font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap';
+          nameSpan.className = 'font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap';
           nameSpan.textContent = cat;
-
-          const goalInput = document.createElement('input');
-          goalInput.type = 'number';
-          goalInput.step = '1';
-          goalInput.min = '0';
-          goalInput.value = limit > 0 ? limit : '';
-          goalInput.placeholder = type === 'expense' ? 'Tope €' : 'Meta €';
-          goalInput.title = type === 'expense' ? 'Tope mensual (€)' : 'Meta mensual (€)';
-          goalInput.className = 'w-14 px-1.5 py-0.5 text-[10px] text-right font-semibold bg-white/90 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500';
-          goalInput.onchange = function() {
-            saveCategoryGoal(type, cat, this.value);
-          };
 
           const btnUp = document.createElement('button');
           btnUp.type = 'button';
           btnUp.title = 'Subir';
           btnUp.textContent = '▲';
           btnUp.disabled = idx === 0;
-          btnUp.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[8px] leading-none';
+          btnUp.className = 'w-3.5 h-3.5 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[7px] leading-none';
           btnUp.onclick = function() { moveCategory(type, idx, -1); };
 
           const btnDown = document.createElement('button');
@@ -1661,32 +1601,20 @@
           btnDown.title = 'Bajar';
           btnDown.textContent = '▼';
           btnDown.disabled = idx === list.length - 1;
-          btnDown.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[8px] leading-none';
+          btnDown.className = 'w-3.5 h-3.5 flex items-center justify-center rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-600 hover:text-white disabled:opacity-30 transition text-[7px] leading-none';
           btnDown.onclick = function() { moveCategory(type, idx, 1); };
 
           const btnDel = document.createElement('button');
           btnDel.type = 'button';
           btnDel.title = 'Eliminar';
           btnDel.textContent = '✕';
-          btnDel.className = 'w-4 h-4 flex items-center justify-center rounded-full bg-rose-200/80 dark:bg-rose-900/70 text-rose-700 dark:text-rose-300 hover:bg-rose-600 hover:text-white transition text-[8px] leading-none';
+          btnDel.className = 'w-3.5 h-3.5 flex items-center justify-center rounded-full bg-rose-200/80 dark:bg-rose-900/70 text-rose-700 dark:text-rose-300 hover:bg-rose-600 hover:text-white transition text-[7px] leading-none';
           btnDel.onclick = function() { deleteCategory(type, idx); };
 
-          topRow.appendChild(nameSpan);
-          topRow.appendChild(goalInput);
-          topRow.appendChild(btnUp);
-          topRow.appendChild(btnDown);
-          topRow.appendChild(btnDel);
-          pill.appendChild(topRow);
-
-          if (limit > 0) {
-            const barTrack = document.createElement('div');
-            barTrack.className = 'w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden';
-            const barFill = document.createElement('div');
-            barFill.className = 'h-full ' + barColor + ' rounded-full transition-all duration-300';
-            barFill.style.width = pct + '%';
-            barTrack.appendChild(barFill);
-            pill.appendChild(barTrack);
-          }
+          pill.appendChild(nameSpan);
+          pill.appendChild(btnUp);
+          pill.appendChild(btnDown);
+          pill.appendChild(btnDel);
 
           tagsWrap.appendChild(pill);
         });
