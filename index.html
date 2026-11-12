@@ -175,23 +175,43 @@
           </div>
         </div>
 
-      </section>
-
-      </div>
+        </div>
       </section>
 
       <!-- Summary Cards -->
       <section class="mobile-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
-        <!-- Patrimonio Total -->
-        <div id="cardTotal" class="mobile-card-full bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl border border-indigo-500/20 shadow-md relative overflow-hidden flex flex-col justify-between transition-all">
+        <!-- Patrimonio Total con Desplegable de Cuentas -->
+        <div id="cardTotal" onclick="toggleTotalAccountsDropdown()" class="mobile-card-full bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl border border-indigo-500/20 shadow-md relative overflow-hidden flex flex-col justify-between transition-all cursor-pointer hover:border-indigo-400/60 group">
           <div class="absolute top-0 right-0 w-1.5 h-full bg-indigo-400/60"></div>
           <div>
-            <p class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Patrimonio Total</p>
+            <div class="flex justify-between items-center">
+              <p class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Patrimonio Total</p>
+              <span id="toggleIconTotalAccounts" class="text-xs text-indigo-300 font-bold bg-white/10 px-2 py-0.5 rounded-lg group-hover:bg-white/20 transition">▼ Cuentas</span>
+            </div>
             <h2 id="totalBalance" class="card-title-mobile text-2xl font-extrabold text-white mt-1">0,00 €</h2>
           </div>
           <div class="mt-3">
             <span id="trendTotal" class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-white/10 text-slate-200">+0,00 € (0,00%)</span>
+          </div>
+          <!-- Desplegable con todas las cuentas -->
+          <div id="totalAccountsDropdown" onclick="event.stopPropagation()" class="hidden mt-3 pt-3 border-t border-white/15 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center py-1 px-2 rounded-lg bg-black/20">
+              <span class="text-slate-300 font-medium">🏦 BBVA</span>
+              <span id="dropdownBbvaVal" class="font-bold text-white">0,00 €</span>
+            </div>
+            <div class="flex justify-between items-center py-1 px-2 rounded-lg bg-black/20">
+              <span class="text-slate-300 font-medium">💶 Trade Republic</span>
+              <span id="dropdownTrVal" class="font-bold text-white">0,00 €</span>
+            </div>
+            <div class="flex justify-between items-center py-1 px-2 rounded-lg bg-black/20">
+              <span class="text-slate-300 font-medium">📈 MyInvestor</span>
+              <span id="dropdownMyinvVal" class="font-bold text-white">0,00 €</span>
+            </div>
+            <div class="flex justify-between items-center py-1 px-2 rounded-lg bg-black/20">
+              <span class="text-slate-300 font-medium">₿ Bitcoin</span>
+              <span id="dropdownBtcVal" class="font-bold text-amber-300">0,00 €</span>
+            </div>
           </div>
         </div>
 
@@ -1085,6 +1105,17 @@
     };
 
     let currentTypeFilter = 'all';
+
+    
+    function toggleTotalAccountsDropdown() {
+      const dd = document.getElementById('totalAccountsDropdown');
+      const icon = document.getElementById('toggleIconTotalAccounts');
+      if (!dd) return;
+      dd.classList.toggle('hidden');
+      if (icon) {
+        icon.innerText = dd.classList.contains('hidden') ? '▼ Cuentas' : '▲ Cuentas';
+      }
+    }
 
     function toggleMyInvestorDetails() {
       const panel = document.getElementById('myinvestorDetailsPanel');
@@ -2185,6 +2216,13 @@
       document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
 
       document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+      if (document.getElementById('dropdownBbvaVal')) {
+        document.getElementById('dropdownBbvaVal').innerText = state.accounts.bbva.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('dropdownTrVal').innerText = state.accounts.trade_republic_liq.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('dropdownMyinvVal').innerText = myInvTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        document.getElementById('dropdownBtcVal').innerText = (state.accounts.trade_republic_btc + btcCashVal).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      }
 
       const units = parseFloat(state.btcUnits) || 0;
       const unitsLabel = units > 0 ? units.toLocaleString('es-ES', { maximumFractionDigits: 8 }) + ' BTC' : '0 BTC';
