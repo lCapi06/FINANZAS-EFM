@@ -31,7 +31,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-12T17:20:52.376Z",
+  "lastCloudSync": "2026-11-12T17:53:26.874Z",
   "btcUnits": 0.010744,
   "btcPrice": 65423.315,
   "categories": {
@@ -45,8 +45,8 @@
       "Otros"
     ],
     "income": [
-      "Nomina",
       "Bizum",
+      "Nomina",
       "Paga extra",
       "Otros"
     ]
