@@ -2,7 +2,11 @@
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Finanzas Personales - Dashboard Avanzado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,6 +36,56 @@
       .card-title-mobile {
         font-size: 1.25rem !important;
       }
+    }
+
+    /* ===== Optimización móvil ===== */
+    #fabQuickAdd { display: none; }
+    @media (max-width: 768px) {
+      header { z-index: 55 !important; }
+      body { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)) !important; }
+      input, select, textarea { font-size: 16px !important; }
+      #budgetGrid input { width: 4.5rem !important; }
+      .max-h-\[320px\] { max-height: 65vh !important; }
+
+      #tabBar {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 56;
+        max-width: none !important; margin: 0 !important;
+        padding: 0.25rem 0.5rem calc(0.25rem + env(safe-area-inset-bottom)) !important;
+        background: #ffffff; border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+      }
+      .dark #tabBar { background: #0f172a; border-top-color: #1e293b; }
+      #tabBar nav { padding: 0 !important; gap: 0.25rem; overflow: visible; }
+      #tabBar .tab-btn {
+        flex: 1 1 0; flex-direction: column; justify-content: center;
+        gap: 0 !important; padding: 0.4rem 0.25rem !important;
+        font-size: 10px !important; line-height: 1.2;
+      }
+      #tabBar .tab-btn span:first-child { font-size: 1.25rem; line-height: 1.4; }
+
+      #fabQuickAdd {
+        display: flex; z-index: 52;
+        bottom: calc(5.25rem + env(safe-area-inset-bottom)) !important;
+      }
+
+      .tx-table, .tx-table tbody { display: block; width: 100%; }
+      .tx-table thead { display: none; }
+      #transactionsTableBody tr {
+        display: grid; grid-template-columns: auto 1fr auto;
+        grid-template-areas: "concept concept amount" "badge account account" "date actions actions";
+        align-items: center; gap: 0.25rem 0.5rem; padding: 0.6rem 0.5rem;
+      }
+      #transactionsTableBody td { padding: 0 !important; text-align: left; min-width: 0; }
+      #transactionsTableBody td:nth-child(1) { grid-area: date; }
+      #transactionsTableBody td:nth-child(2) { grid-area: concept; font-size: 0.9rem; }
+      #transactionsTableBody td:nth-child(3) { grid-area: badge; }
+      #transactionsTableBody td:nth-child(4) { grid-area: account; }
+      #transactionsTableBody td:nth-child(5) { grid-area: amount; text-align: right; white-space: nowrap; }
+      #transactionsTableBody td:nth-child(6) { grid-area: actions; text-align: right; }
+      #transactionsTableBody td[colspan] { grid-area: auto; grid-column: 1 / -1; text-align: center; padding: 1rem !important; }
+      #transactionsTableBody button { min-height: 36px; padding: 0.35rem 0.8rem; }
+
+      #balanceSnapshotsTable, #fundSnapshotsTable { white-space: nowrap; }
     }
   </style>
 </head>
@@ -79,7 +133,7 @@
     </div>
 
     <!-- Barra de Pestañas -->
-    <div class="max-w-7xl mx-auto px-3 border-t border-slate-100 dark:border-slate-800/80">
+    <div id="tabBar" class="max-w-7xl mx-auto px-3 border-t border-slate-100 dark:border-slate-800/80">
       <nav class="flex space-x-1 overflow-x-auto py-2 no-scrollbar justify-between sm:justify-start" aria-label="Tabs">
         <button onclick="switchTab('panel')" id="tab-btn-panel" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1">
           <span>📊</span> Panel
@@ -1033,6 +1087,8 @@
 
   </main>
 
+  <button id="fabQuickAdd" onclick="quickAdd()" aria-label="Añadir movimiento" class="fixed right-4 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl font-light shadow-lg items-center justify-center active:scale-95 transition">+</button>
+
   <script>
     const GITHUB_OWNER = 'lcapi06';
     const GITHUB_REPO = 'FINANZAS-EFM';
@@ -1053,6 +1109,66 @@
     }
 
     let currentFileSha = null;
+    const DIRTY_KEY = 'mi_patrimonio_dirty';
+    let isSyncing = false;
+    let syncQueued = false;
+    let lastForegroundSync = 0;
+
+    function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+
+    function markDirty() {
+      state.updatedAt = new Date().toISOString();
+      try { localStorage.setItem(DIRTY_KEY, '1'); } catch (e) {}
+    }
+    function isDirty() { return localStorage.getItem(DIRTY_KEY) === '1'; }
+    function clearDirty() { try { localStorage.removeItem(DIRTY_KEY); } catch (e) {} }
+
+    function normalizeMoney() {
+      if (!state || !state.accounts) return;
+      Object.keys(state.accounts).forEach(function(k) { state.accounts[k] = round2(state.accounts[k]); });
+      state.btcCash = round2(state.btcCash);
+      state.btcInvestedCost = round2(state.btcInvestedCost);
+      if (state.myinvestor) {
+        state.myinvestor.cash = round2(state.myinvestor.cash);
+        ['funds', 'fundsCost'].forEach(function(group) {
+          if (!state.myinvestor[group]) return;
+          Object.keys(state.myinvestor[group]).forEach(function(k) {
+            state.myinvestor[group][k] = round2(state.myinvestor[group][k]);
+          });
+        });
+      }
+    }
+
+    function adjustOrigin(acc, delta) {
+      if (acc === 'myinvestor' || acc === 'myinvestor_cash') {
+        state.myinvestor.cash = round2(state.myinvestor.cash + delta);
+      } else if (state.accounts[acc] !== undefined) {
+        state.accounts[acc] = round2(state.accounts[acc] + delta);
+      }
+    }
+    function adjustDestination(dest, delta) {
+      if (dest === 'trade_republic_btc') {
+        const next = round2((parseFloat(state.btcCash) || 0) + delta);
+        state.btcCash = delta < 0 ? Math.max(0, next) : next;
+      } else {
+        adjustOrigin(dest, delta);
+      }
+    }
+    function applySimpleTx(tx, sign) {
+      const a = round2(tx.amount) * sign;
+      if (tx.type === 'expense') {
+        adjustOrigin(tx.account, -a);
+      } else if (tx.type === 'income') {
+        adjustOrigin(tx.account, a);
+      } else if (tx.type === 'transfer') {
+        adjustOrigin(tx.account, -a);
+        adjustDestination(tx.destination, a);
+      }
+    }
+    function getAccountBalance(acc) {
+      if (acc === 'myinvestor' || acc === 'myinvestor_cash') return state.myinvestor.cash;
+      return state.accounts[acc] || 0;
+    }
     let fireSource = 'invested'; 
     let contribMode = 'monthly';
 
@@ -1353,7 +1469,7 @@
       const cash = state.myinvestor ? (state.myinvestor.cash || 0) : 0;
       const funds = state.myinvestor && state.myinvestor.funds ? 
         (state.myinvestor.funds.fidelity_sp500 + state.myinvestor.funds.vanguard_emerging + state.myinvestor.funds.vanguard_smallcaps) : 0;
-      return cash + funds;
+      return round2(cash + funds);
     }
 
     function getFundsTotalCost() {
@@ -1674,6 +1790,7 @@
     }
 
     function switchTab(tabId) {
+      window.scrollTo({ top: 0 });
       document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.add('hidden');
       });
@@ -1743,8 +1860,23 @@
         const cloudState = JSON.parse(decodedJson);
 
         if (cloudState && cloudState.accounts) {
+          const localUpdated = state.updatedAt ? new Date(state.updatedAt).getTime() : 0;
+          const cloudUpdated = cloudState.updatedAt ? new Date(cloudState.updatedAt).getTime() : 0;
+          if (isDirty()) {
+            if (localUpdated >= cloudUpdated) {
+              setSyncStatus('☁️ Cambios locales pendientes', 'loading');
+              return 'local';
+            }
+            const useCloud = confirm('Hay cambios sin guardar en este dispositivo y la nube tiene datos más recientes.\n\nAceptar = usar los datos de la nube (se pierden los cambios locales).\nCancelar = conservar este dispositivo y subirlo a la nube.');
+            if (!useCloud) {
+              setSyncStatus('☁️ Cambios locales pendientes', 'loading');
+              return 'local';
+            }
+          }
           state = cloudState;
           runMigrations();
+          try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
+          clearDirty();
 
           const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
           setSyncStatus('☁️ Sincronizado (' + syncDate + ')', 'ok');
@@ -1783,7 +1915,37 @@
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
 
+      normalizeMoney();
       state.version = 7;
+    }
+
+    function ghUrl() {
+      return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+    }
+
+    async function fetchCloudFile(token) {
+      const res = await fetch(ghUrl() + '?t=' + Date.now(), {
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+        cache: 'no-store'
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+      return { sha: data.sha, state: JSON.parse(decoded) };
+    }
+
+    async function putCloudFile(token, base64Content, sha) {
+      const body = { message: 'Actualización desde Finanzas App', content: base64Content };
+      if (sha) body.sha = sha;
+      return fetch(ghUrl(), {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
     }
 
     async function syncToGitHub(isManual = false) {
@@ -1796,60 +1958,80 @@
         return;
       }
 
+      if (isSyncing) {
+        syncQueued = true;
+        return;
+      }
+      isSyncing = true;
+
       const btn = document.getElementById('btnSaveCloud');
-      if (btn) btn.innerHTML = '<span>⏳</span> <span class="hidden sm:inline">Guardando...</span>';
+      if (btn) btn.innerHTML = '<span>⏳</span> Guardando...';
       setSyncStatus('☁️ Guardando...', 'loading');
 
       try {
         if (!currentFileSha) {
-          const checkUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?t=${Date.now()}`;
-          const checkRes = await fetch(checkUrl, {
-            headers: { 'Authorization': `token ${token}` },
-            cache: 'no-store'
-          });
-          if (checkRes.ok) {
-            const checkData = await checkRes.json();
-            currentFileSha = checkData.sha;
-          }
+          const existing = await fetchCloudFile(token);
+          if (existing) currentFileSha = existing.sha;
         }
 
+        if (!state.updatedAt) state.updatedAt = new Date().toISOString();
+        const sentUpdatedAt = state.updatedAt;
         state.lastCloudSync = new Date().toISOString();
         localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
 
         const jsonString = JSON.stringify(state, null, 2);
         const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
 
-        const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
-        const bodyData = {
-          message: 'Actualización de VL y fondos desde Finanzas App',
-          content: base64Content
-        };
-        if (currentFileSha) bodyData.sha = currentFileSha;
+        let putRes = await putCloudFile(token, base64Content, currentFileSha);
 
-        const putRes = await fetch(putUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bodyData)
-        });
+        if (putRes.status === 409 || putRes.status === 422) {
+          const latest = await fetchCloudFile(token);
+          if (latest) {
+            const cloudUpdated = latest.state && latest.state.updatedAt ? new Date(latest.state.updatedAt).getTime() : 0;
+            const localUpdated = new Date(state.updatedAt).getTime();
+            if (cloudUpdated > localUpdated) {
+              const useCloud = confirm('Otro dispositivo ha guardado cambios más recientes en la nube.\n\nAceptar = descargar los de la nube (se pierden los cambios de este dispositivo).\nCancelar = sobrescribir la nube con los de este dispositivo.');
+              if (useCloud) {
+                state = latest.state;
+                runMigrations();
+                currentFileSha = latest.sha;
+                localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+                clearDirty();
+                refreshUIAfterSync();
+                setSyncStatus('☁️ Sincronizado con la nube', 'ok');
+                return;
+              }
+            }
+            currentFileSha = latest.sha;
+            putRes = await putCloudFile(token, base64Content, currentFileSha);
+          }
+        }
 
         if (!putRes.ok) throw new Error('Error al subir: ' + putRes.status);
 
         const putData = await putRes.json();
         currentFileSha = putData.content.sha;
 
+        if (state.updatedAt === sentUpdatedAt) {
+          clearDirty();
+        } else {
+          syncQueued = true;
+        }
+
         const syncDate = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         setSyncStatus('☁️ Guardado (' + syncDate + ')', 'ok');
         if (isManual) alert('¡Datos guardados en GitHub correctamente!');
       } catch (err) {
         console.error('Error al guardar en GitHub:', err);
-        setSyncStatus('❌ Error al guardar', 'error');
-        if (isManual) alert('Error al guardar en GitHub. Revisa tu Token.');
+        setSyncStatus('❌ Error al guardar (pendiente)', 'error');
+        if (isManual) alert('Error al guardar en GitHub. Revisa tu Token o tu conexión.');
       } finally {
-        if (btn) btn.innerHTML = '☁️ <span class="hidden sm:inline">Guardar</span>';
+        isSyncing = false;
+        if (btn) btn.innerHTML = '☁️ Guardar en Nube';
+        if (syncQueued) {
+          syncQueued = false;
+          syncToGitHub(false);
+        }
       }
     }
 
@@ -1863,7 +2045,7 @@
     function createSnapshotObject(dateObj, isFirstEver = false) {
       const myInvTotal = getMyInvestorTotal();
       const btcValueForSnapshot = isFirstEver ? (state.btcInvestedCost || 0) : state.accounts.trade_republic_btc;
-      const total = state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcValueForSnapshot + (state.btcCash || 0);
+      const total = round2(state.accounts.bbva + myInvTotal + state.accounts.trade_republic_liq + btcValueForSnapshot + (state.btcCash || 0));
       return {
         id: Date.now(),
         date: dateObj.toISOString(),
@@ -1923,6 +2105,7 @@
       }
 
       if (updated) {
+        markDirty();
         localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
         return true;
       }
@@ -1985,6 +2168,8 @@
             destination: autoType === 'transfer' ? autoDestination : null
           });
 
+          normalizeMoney();
+          markDirty();
           localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
           window.history.replaceState({}, document.title, window.location.pathname);
           return true;
@@ -1995,6 +2180,8 @@
     }
 
     async function init() {
+      const txTbl = document.getElementById('transactionsTableBody');
+      if (txTbl && txTbl.closest('table')) txTbl.closest('table').classList.add('tx-table');
       const saved = localStorage.getItem('mi_patrimonio_data_v4') || localStorage.getItem('mi_patrimonio_data_v3');
       if (saved) {
         try {
@@ -2016,13 +2203,16 @@
       let needsCloudSync = false;
 
       if (getGitHubToken()) {
-        await syncFromGitHub();
+        const syncResult = await syncFromGitHub();
+        if (syncResult === 'local') needsCloudSync = true;
         applyTheme();
         updateYearFilterOptions();
         populateCategoryDropdowns();
       } else {
         setSyncStatus('⚠️ Configura Token', 'error');
       }
+
+      if (isDirty()) needsCloudSync = true;
 
       if (checkAndTakeMonthlySnapshot()) {
         needsCloudSync = true;
@@ -2143,6 +2333,8 @@
     }
 
     function saveAndSync() {
+      normalizeMoney();
+      markDirty();
       localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
       updateYearFilterOptions();
       render();
@@ -2215,7 +2407,7 @@
         const sortedInv = investmentTxs.sort((a,b) => new Date(b.date) - new Date(a.date));
         lastDate = new Date(sortedInv[0].date);
       } else if (state.monthlySnapshots.length > 0) {
-        const sortedSnaps = state.monthlySnapshots.sort((a,b) => new Date(b.date) - new Date(a.date));
+        const sortedSnaps = state.monthlySnapshots.slice().sort((a,b) => new Date(b.date) - new Date(a.date));
         lastDate = new Date(sortedSnaps[0].date);
       }
 
@@ -2821,67 +3013,52 @@
       }
     }
 
-    function addTransaction(e) {
+    function readTxForm() {
       const type = document.getElementById('txType').value;
-      const concept = document.getElementById('txConcept').value;
-      const amount = parseFloat(document.getElementById('txAmount').value);
+      const concept = document.getElementById('txConcept').value.trim();
+      const amount = round2(parseFloat(document.getElementById('txAmount').value));
       const account = document.getElementById('txAccount').value;
-      
       let category = null;
       let destination = null;
-
       if (type === 'transfer') {
         destination = document.getElementById('txDestination').value;
-        if (account === destination) {
-          alert('La cuenta origen y destino no pueden ser la misma.');
-          return;
-        }
       } else {
         category = document.getElementById('txCategory').value;
       }
+      return { type: type, concept: concept, amount: amount, account: account, category: category, destination: destination };
+    }
 
-      if (!amount || amount <= 0) return;
+    function validateTxForm(f) {
+      if (!f.concept) { alert('Escribe un concepto.'); return false; }
+      if (!f.amount || f.amount <= 0) { alert('Introduce un importe mayor que 0.'); return false; }
+      if (f.type === 'transfer' && f.account === f.destination) {
+        alert('La cuenta origen y destino no pueden ser la misma.');
+        return false;
+      }
+      return true;
+    }
 
-      if (type === 'expense') {
-        if (account === 'myinvestor') {
-          if (state.myinvestor.cash < amount) {
-            if (!confirm('Atención: El efectivo apartado en MyInvestor se quedará en negativo. ¿Continuar?')) return;
-          }
-        } else if (state.accounts[account] < amount) {
-          if (!confirm('Atención: Esta cuenta se quedará con saldo negativo. ¿Deseas continuar?')) return;
-        }
+    function addTransaction(e) {
+      const f = readTxForm();
+      if (!validateTxForm(f)) return;
+
+      if (f.type !== 'income' && getAccountBalance(f.account) < f.amount) {
+        if (!confirm('Atención: esta cuenta se quedará con saldo negativo. ¿Deseas continuar?')) return;
       }
 
-      if (type === 'expense') {
-        if (account === 'myinvestor') state.myinvestor.cash -= amount;
-        else state.accounts[account] -= amount;
-      } else if (type === 'income') {
-        if (account === 'myinvestor') state.myinvestor.cash += amount;
-        else state.accounts[account] += amount;
-      } else if (type === 'transfer') {
-        if (account === 'myinvestor') state.myinvestor.cash -= amount;
-        else state.accounts[account] -= amount;
-
-        if (destination === 'trade_republic_btc') {
-          state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
-        } else if (destination === 'myinvestor') {
-          if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-          state.myinvestor.cash += amount;
-        } else if (state.accounts[destination] !== undefined) {
-          state.accounts[destination] += amount;
-        }
-      }
-
-      state.transactions.push({
+      const tx = {
         id: Date.now(),
         date: new Date().toISOString(),
-        type: type,
-        concept: concept,
-        amount: amount,
-        category: category,
-        account: account,
-        destination: destination
-      });
+        type: f.type,
+        concept: f.concept,
+        amount: f.amount,
+        category: f.category,
+        account: f.account,
+        destination: f.destination
+      };
+
+      applySimpleTx(tx, 1);
+      state.transactions.push(tx);
 
       resetTxForm();
       saveAndSync();
@@ -2891,13 +3068,24 @@
       const tx = state.transactions.find(function(t) { return t.id === id; });
       if (!tx) return;
 
+      if (tx.btcUnitsBought || tx.fundKeyBought) {
+        const newConcept = prompt('Este movimiento es una compra de inversión: solo se puede cambiar el concepto.\nPara cambiar importes, elimínalo y vuelve a registrarlo.\n\nConcepto:', tx.concept);
+        if (newConcept === null) return;
+        const c = newConcept.trim();
+        if (!c) return;
+        tx.concept = c;
+        saveAndSync();
+        return;
+      }
+
       document.getElementById('editTxId').value = tx.id;
-      document.getElementById('txType').value = tx.type; setTxTypeTab(tx.type);
+      document.getElementById('txType').value = tx.type;
+      setTxTypeTab(tx.type);
       handleTypeChange();
 
       document.getElementById('txConcept').value = tx.concept;
       document.getElementById('txAmount').value = tx.amount;
-      document.getElementById('txAccount').value = tx.account;
+      document.getElementById('txAccount').value = tx.account === 'myinvestor_cash' ? 'myinvestor' : tx.account;
 
       if (tx.type === 'transfer') {
         document.getElementById('txDestination').value = tx.destination;
@@ -2915,89 +3103,32 @@
     function updateTransaction(id) {
       const idx = state.transactions.findIndex(function(t) { return t.id === id; });
       if (idx === -1) return;
-
       const oldTx = state.transactions[idx];
 
-      if (oldTx.type === 'expense') {
-        if (oldTx.account === 'myinvestor') state.myinvestor.cash += oldTx.amount;
-        else state.accounts[oldTx.account] += oldTx.amount;
-      } else if (oldTx.type === 'income') {
-        if (oldTx.account === 'myinvestor') state.myinvestor.cash -= oldTx.amount;
-        else state.accounts[oldTx.account] -= oldTx.amount;
-      } else if (oldTx.type === 'transfer') {
-        if (oldTx.account === 'myinvestor' || oldTx.account === 'myinvestor_cash') state.myinvestor.cash += oldTx.amount;
-        else if (state.accounts[oldTx.account] !== undefined) state.accounts[oldTx.account] += oldTx.amount;
+      const f = readTxForm();
+      if (!validateTxForm(f)) return;
 
-        if (oldTx.destination === 'trade_republic_btc') {
-          if (oldTx.btcUnitsBought) {
-            state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - oldTx.btcUnitsBought);
-            state.btcInvestedCost = Math.max(0, (parseFloat(state.btcInvestedCost) || 0) - oldTx.btcEurSpent);
-            const marketPrice = state.btcPrice > 0 ? state.btcPrice : (oldTx.btcEurSpent / oldTx.btcUnitsBought);
-            state.accounts.trade_republic_btc = state.btcUnits * marketPrice;
-          } else {
-            state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - oldTx.amount);
-          }
-        } else if (oldTx.destination === 'myinvestor_fund' && oldTx.fundKeyBought) {
-          if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[oldTx.fundKeyBought] !== undefined) {
-            state.myinvestor.funds[oldTx.fundKeyBought] = Math.max(0, state.myinvestor.funds[oldTx.fundKeyBought] - oldTx.fundEurInvested);
-            if (state.myinvestor.fundsCost) {
-              state.myinvestor.fundsCost[oldTx.fundKeyBought] = Math.max(0, (state.myinvestor.fundsCost[oldTx.fundKeyBought] || 0) - oldTx.fundEurInvested);
-            }
-          }
-        } else if (oldTx.destination === 'myinvestor') {
-          state.myinvestor.cash -= oldTx.amount;
-        } else if (state.accounts[oldTx.destination] !== undefined) {
-          state.accounts[oldTx.destination] -= oldTx.amount;
-        }
-      }
+      applySimpleTx(oldTx, -1);
 
-      const type = document.getElementById('txType').value;
-      const concept = document.getElementById('txConcept').value;
-      const amount = parseFloat(document.getElementById('txAmount').value);
-      const account = document.getElementById('txAccount').value;
-      
-      let category = null;
-      let destination = null;
-
-      if (type === 'transfer') {
-        destination = document.getElementById('txDestination').value;
-        if (account === destination) {
-          alert('La cuenta origen y destino no pueden ser la misma.');
+      if (f.type !== 'income' && getAccountBalance(f.account) < f.amount) {
+        if (!confirm('Atención: esta cuenta se quedará con saldo negativo. ¿Deseas continuar?')) {
+          applySimpleTx(oldTx, 1);
           return;
         }
-      } else {
-        category = document.getElementById('txCategory').value;
       }
 
-      if (type === 'expense') {
-        if (account === 'myinvestor') state.myinvestor.cash -= amount;
-        else state.accounts[account] -= amount;
-      } else if (type === 'income') {
-        if (account === 'myinvestor') state.myinvestor.cash += amount;
-        else state.accounts[account] += amount;
-      } else if (type === 'transfer') {
-        if (account === 'myinvestor') state.myinvestor.cash -= amount;
-        else state.accounts[account] -= amount;
-
-        if (destination === 'trade_republic_btc') {
-          state.btcCash = (parseFloat(state.btcCash) || 0) + amount;
-        } else if (destination === 'myinvestor') {
-          state.myinvestor.cash += amount;
-        } else {
-          state.accounts[destination] += amount;
-        }
-      }
-
-      state.transactions[idx] = {
+      const newTx = {
         id: oldTx.id,
         date: oldTx.date,
-        type: type,
-        concept: concept,
-        amount: amount,
-        category: category,
-        account: account,
-        destination: destination
+        type: f.type,
+        concept: f.concept,
+        amount: f.amount,
+        category: f.category,
+        account: f.account,
+        destination: f.destination
       };
+      applySimpleTx(newTx, 1);
+      state.transactions[idx] = newTx;
 
       resetTxForm();
       saveAndSync();
@@ -3017,49 +3148,30 @@
       if (!confirm('¿Estás seguro de que deseas eliminar este movimiento?')) return;
 
       const txIndex = state.transactions.findIndex(function(t) { return t.id === id; });
-      if (txIndex !== -1) {
-        const tx = state.transactions[txIndex];
+      if (txIndex === -1) return;
+      const tx = state.transactions[txIndex];
 
-        if (tx.type === 'expense') {
-          if (tx.account === 'myinvestor') state.myinvestor.cash += tx.amount;
-          else state.accounts[tx.account] += tx.amount;
-        } else if (tx.type === 'income') {
-          if (tx.account === 'myinvestor') state.myinvestor.cash -= tx.amount;
-          else state.accounts[tx.account] -= tx.amount;
-        } else if (tx.type === 'transfer') {
-          if (tx.account === 'myinvestor' || tx.account === 'myinvestor_cash') {
-            state.myinvestor.cash += tx.amount;
-          } else if (state.accounts[tx.account] !== undefined) {
-            state.accounts[tx.account] += tx.amount;
-          }
-
-          if (tx.destination === 'trade_republic_btc') {
-            if (tx.btcUnitsBought && tx.btcEurSpent) {
-              state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - tx.btcUnitsBought);
-              state.btcInvestedCost = Math.max(0, (parseFloat(state.btcInvestedCost) || 0) - tx.btcEurSpent);
-              const marketPrice = state.btcPrice > 0 ? state.btcPrice : (tx.btcEurSpent / tx.btcUnitsBought);
-              state.accounts.trade_republic_btc = state.btcUnits * marketPrice;
-            } else {
-              state.btcCash = Math.max(0, (parseFloat(state.btcCash) || 0) - tx.amount);
-            }
-          } else if (tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
-            if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
-              state.myinvestor.funds[tx.fundKeyBought] = Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested);
-              if (state.myinvestor.fundsCost) {
-                state.myinvestor.fundsCost[tx.fundKeyBought] = Math.max(0, (state.myinvestor.fundsCost[tx.fundKeyBought] || 0) - tx.fundEurInvested);
-              }
-            }
-          } else if (tx.destination === 'myinvestor') {
-            state.myinvestor.cash -= tx.amount;
-          } else if (state.accounts[tx.destination] !== undefined) {
-            state.accounts[tx.destination] -= tx.amount;
+      if (tx.type === 'transfer' && tx.destination === 'trade_republic_btc' && tx.btcUnitsBought && tx.btcEurSpent) {
+        adjustOrigin(tx.account, tx.amount);
+        state.btcUnits = Math.max(0, (parseFloat(state.btcUnits) || 0) - tx.btcUnitsBought);
+        state.btcInvestedCost = round2(Math.max(0, (parseFloat(state.btcInvestedCost) || 0) - tx.btcEurSpent));
+        const marketPrice = state.btcPrice > 0 ? state.btcPrice : (tx.btcEurSpent / tx.btcUnitsBought);
+        state.accounts.trade_republic_btc = round2(state.btcUnits * marketPrice);
+      } else if (tx.type === 'transfer' && tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
+        adjustOrigin(tx.account, tx.amount);
+        if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
+          state.myinvestor.funds[tx.fundKeyBought] = round2(Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested));
+          if (state.myinvestor.fundsCost) {
+            state.myinvestor.fundsCost[tx.fundKeyBought] = round2(Math.max(0, (state.myinvestor.fundsCost[tx.fundKeyBought] || 0) - tx.fundEurInvested));
           }
         }
-
-        state.transactions.splice(txIndex, 1);
-        saveAndSync();
-        alert('¡Movimiento eliminado y saldos de cuentas, apartado y fondos restaurados correctamente!');
+      } else {
+        applySimpleTx(tx, -1);
       }
+
+      state.transactions.splice(txIndex, 1);
+      saveAndSync();
+      alert('¡Movimiento eliminado y saldos de cuentas, apartado y fondos restaurados correctamente!');
     }
 
     function updateAccountBalance(acc) {
@@ -3609,6 +3721,41 @@
         menu.classList.add('hidden');
       }
     });
+
+    function refreshUIAfterSync() {
+      const catSel = document.getElementById('txCategory');
+      const prevCat = catSel ? catSel.value : null;
+      applyTheme();
+      updateYearFilterOptions();
+      populateCategoryDropdowns();
+      render();
+      if (catSel && prevCat) catSel.value = prevCat;
+    }
+
+    document.addEventListener('visibilitychange', async function() {
+      if (document.visibilityState !== 'visible' || !getGitHubToken() || isSyncing) return;
+      const now = Date.now();
+      if (now - lastForegroundSync < 60000) return;
+      lastForegroundSync = now;
+      if (isDirty()) {
+        syncToGitHub(false);
+        return;
+      }
+      const r = await syncFromGitHub();
+      if (r === true) refreshUIAfterSync();
+    });
+
+    function quickAdd() {
+      switchTab('movimientos');
+      if (!document.getElementById('editTxId').value) setTxTypeTab('expense');
+      setTimeout(function() {
+        const el = document.getElementById('txAmount');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.focus();
+        }
+      }, 80);
+    }
 
     init();
   </script>
