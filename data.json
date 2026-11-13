@@ -5,7 +5,7 @@
     "bbva": 4633.43,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
-    "trade_republic_btc": 695.80851488
+    "trade_republic_btc": 675.28
   },
   "transactions": [
     {
@@ -41,9 +41,9 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T08:12:51.384Z",
+  "lastCloudSync": "2026-11-13T12:16:04.244Z",
   "btcUnits": 0.010744,
-  "btcPrice": 64762.52,
+  "btcPrice": 62852.175,
   "categories": {
     "expense": [
       "Supermercado",
@@ -64,9 +64,9 @@
   "myinvestor": {
     "cash": 0,
     "funds": {
-      "fidelity_sp500": 12753.552839027594,
-      "vanguard_emerging": 2563.6467233676367,
-      "vanguard_smallcaps": 2585.4132041680546
+      "fidelity_sp500": 12753.55,
+      "vanguard_emerging": 2563.65,
+      "vanguard_smallcaps": 2585.41
     },
     "fundsCost": {
       "fidelity_sp500": 11426.65,
@@ -126,5 +126,6 @@
     "btc": {
       "2026-11-11": 67026.03
     }
-  }
+  },
+  "updatedAt": "2026-11-13T12:16:04.215Z"
 }
