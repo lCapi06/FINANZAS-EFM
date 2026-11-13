@@ -87,6 +87,76 @@
 
       #balanceSnapshotsTable, #fundSnapshotsTable { white-space: nowrap; }
     }
+
+    /* ===== Modo privacidad (opcional): desenfoca cifras, deja el texto visible ===== */
+    .privacy-on .pv,
+    .privacy-on #totalBalance,
+    .privacy-on #trendTotal,
+    .privacy-on #bbvaBalance,
+    .privacy-on #trendBbva,
+    .privacy-on #trLiquidityBalance,
+    .privacy-on #trendTrLiq,
+    .privacy-on #myinvestorBalance,
+    .privacy-on #trendMyinvestor,
+    .privacy-on #trBtcBalance,
+    .privacy-on #trendTrBtc,
+    .privacy-on #fundFidelityVal,
+    .privacy-on #fundEmergingVal,
+    .privacy-on #fundSmallCapsVal,
+    .privacy-on #trendFundFidelity,
+    .privacy-on #trendFundEmerging,
+    .privacy-on #trendFundSmallCaps,
+    .privacy-on #liquidAmount,
+    .privacy-on #investedAmount,
+    .privacy-on #efMonthlyCost,
+    .privacy-on #efTargetMonths,
+    .privacy-on #periodIncome,
+    .privacy-on #periodExpense,
+    .privacy-on #periodSavings,
+    .privacy-on #forecastAmount,
+    .privacy-on #topCategoryAmount,
+    .privacy-on #topCategoryShare,
+    .privacy-on #fireCurrentCapital,
+    .privacy-on #fireAnnualExpense,
+    .privacy-on #fireTargetNumber,
+    .privacy-on #fireMonthlySafe,
+    .privacy-on #fireProgressText,
+    .privacy-on #fireMonthlyExpense,
+    .privacy-on #compInitial,
+    .privacy-on #compMonthly,
+    .privacy-on #compFinalTotal,
+    .privacy-on #compNetRealTotal,
+    .privacy-on #compTotalContributed,
+    .privacy-on #inputBBVA,
+    .privacy-on #inputTRLiq,
+    .privacy-on #inputTRBtc,
+    .privacy-on #inputBtcCost,
+    .privacy-on #inputFundCostFidelity,
+    .privacy-on #inputFundVlBaseFidelity,
+    .privacy-on #inputFundCostEmerging,
+    .privacy-on #inputFundVlBaseEmerging,
+    .privacy-on #inputFundCostSmallCaps,
+    .privacy-on #inputFundVlBaseSmallCaps,
+    .privacy-on #transactionsTableBody td:nth-child(5),
+    .privacy-on #balanceSnapshotsTable td:nth-child(n+2):nth-child(-n+7),
+    .privacy-on #fundSnapshotsTable td:nth-child(n+2):nth-child(-n+6) {
+      filter: blur(7px);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .privacy-on .pv-bar,
+    .privacy-on #goalProgressBar,
+    .privacy-on #liquidBar,
+    .privacy-on #investedBar,
+    .privacy-on #efProgressBar,
+    .privacy-on #fireProgressBar {
+      width: 100% !important;
+      background: #64748b !important;
+      opacity: 0.55;
+      filter: blur(4px);
+    }
+    .privacy-on canvas { filter: blur(9px); pointer-events: none; }
+    .privacy-on input:focus { filter: none !important; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors pb-12">
@@ -104,6 +174,9 @@
       
       <div class="flex items-center gap-1 shrink-0">
         <!-- Tema y Token siempre visibles fuera del desplegable para total tranquilidad -->
+        <button onclick="togglePrivacy()" id="btnPrivacy" aria-pressed="false" class="p-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm" title="Modo privacidad (ocultar cifras)">
+          <span id="privacyIcon">👁️</span>
+        </button>
         <button onclick="toggleTheme()" class="p-2 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm" title="Cambiar Tema">
           <span id="themeIcon">☀️</span>
         </button>
@@ -1114,6 +1187,26 @@
     let syncQueued = false;
     let lastForegroundSync = 0;
 
+    // ----- Modo privacidad (solo visual, se guarda por dispositivo, apagado por defecto) -----
+    const PRIVACY_KEY = 'mi_patrimonio_privacy';
+    function isPrivacyOn() {
+      try { return localStorage.getItem(PRIVACY_KEY) === '1'; } catch (e) { return false; }
+    }
+    function applyPrivacy() {
+      const on = isPrivacyOn();
+      document.documentElement.classList.toggle('privacy-on', on);
+      const icon = document.getElementById('privacyIcon');
+      if (icon) icon.innerText = on ? '🙈' : '👁️';
+      const btn = document.getElementById('btnPrivacy');
+      if (btn) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    function togglePrivacy() {
+      try { localStorage.setItem(PRIVACY_KEY, isPrivacyOn() ? '0' : '1'); } catch (e) {}
+      applyPrivacy();
+    }
+    // Envuelve una cifra para que el modo privacidad la desenfoque sin tocar el texto que la rodea
+    function pv(x) { return '<span class="pv">' + x + '</span>'; }
+
     function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
 
     function markDirty() {
@@ -1279,8 +1372,8 @@
       const monthsCovered = cost > 0 ? (bbva / cost) : 0;
       const pct = targetAmount > 0 ? Math.min((bbva / targetAmount) * 100, 100) : 0;
 
-      document.getElementById('efMonthsCovered').innerText = monthsCovered.toFixed(1).replace('.', ',') + ' meses cubiertos';
-      document.getElementById('efTargetAmount').innerText = 'Meta: ' + targetAmount.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('efMonthsCovered').innerHTML = pv(monthsCovered.toFixed(1).replace('.', ',')) + ' meses cubiertos';
+      document.getElementById('efTargetAmount').innerHTML = 'Meta: ' + pv(targetAmount.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €');
       
       const bar = document.getElementById('efProgressBar');
       bar.style.width = pct + '%';
@@ -1289,11 +1382,11 @@
       if (bbva >= targetAmount) {
         bar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-500';
         const excess = bbva - targetAmount;
-        statusText.innerText = '✅ ¡Objetivo cumplido! Tienes un excedente de ' + excess.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € en BBVA listo para invertir si lo deseas.';
+        statusText.innerHTML = '✅ ¡Objetivo cumplido! Tienes un excedente de ' + pv(excess.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €') + ' en BBVA listo para invertir si lo deseas.';
       } else {
         bar.className = 'h-full bg-indigo-500 rounded-full transition-all duration-500';
         const missing = targetAmount - bbva;
-        statusText.innerText = 'Te faltan ' + missing.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € en BBVA para cubrir tus ' + targetMonths + ' meses de colchón.';
+        statusText.innerHTML = 'Te faltan ' + pv(missing.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €') + ' en BBVA para cubrir tus ' + targetMonths + ' meses de colchón.';
       }
     }
 
@@ -1345,10 +1438,10 @@
         if (limit > 0) {
           if (spent >= limit) {
             barColor = 'bg-rose-500';
-            alertBadge = '<span class="text-[9px] font-bold text-rose-600 dark:text-rose-400">🚨 +100%</span>';
+            alertBadge = '<span class="pv text-[9px] font-bold text-rose-600 dark:text-rose-400">🚨 +100%</span>';
           } else if (spent >= limit * 0.8) {
             barColor = 'bg-amber-500';
-            alertBadge = '<span class="text-[9px] font-bold text-amber-600 dark:text-amber-400">⚠️ +80%</span>';
+            alertBadge = '<span class="pv text-[9px] font-bold text-amber-600 dark:text-amber-400">⚠️ +80%</span>';
           }
         }
 
@@ -1357,13 +1450,13 @@
         card.innerHTML = 
           '<div class="flex justify-between items-center gap-1">' +
             '<span class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">' + cat + '</span>' +
-            '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Tope €" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="w-14 sm:w-16 px-1.5 py-0.5 text-[10px] text-right font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-white focus:outline-none">' +
+            '<input type="number" value="' + (limit > 0 ? limit : '') + '" placeholder="Tope €" onchange="saveBudget(\'' + cat.replace(/'/g, "\\'") + '\', this.value)" class="pv w-14 sm:w-16 px-1.5 py-0.5 text-[10px] text-right font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-white focus:outline-none">' +
           '</div>' +
           '<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">' +
-            '<div class="h-full ' + barColor + ' transition-all duration-500" style="width: ' + pct + '%"></div>' +
+            '<div class="pv-bar h-full ' + barColor + ' transition-all duration-500" style="width: ' + pct + '%"></div>' +
           '</div>' +
           '<div class="flex justify-between items-center text-[10px] leading-tight">' +
-            '<span class="text-slate-600 dark:text-slate-300 font-medium"><strong>' + spent.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €</strong>' + (limit > 0 ? ' / ' + limit.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €' : '') + '</span>' +
+            '<span class="pv text-slate-600 dark:text-slate-300 font-medium"><strong>' + spent.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €</strong>' + (limit > 0 ? ' / ' + limit.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €' : '') + '</span>' +
             alertBadge +
           '</div>';
         grid.appendChild(card);
@@ -2212,7 +2305,7 @@
       localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
 
       const label = autoType === 'income' ? 'Ingreso' : (autoType === 'expense' ? 'Gasto' : 'Traspaso');
-      let message = '✅ ' + label + ' de ' + autoAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € registrado' +
+      let message = '✅ ' + label + (isPrivacyOn() ? '' : ' de ' + autoAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €') + ' registrado' +
         (autoType === 'transfer' ? ' (' + names[autoAccount] + ' → ' + names[autoDestination] + ')' : ' en ' + names[autoAccount]) + '.';
       if (autoType !== 'income' && getAccountBalance(autoAccount) < 0) {
         message += ' ⚠️ Saldo negativo en ' + names[autoAccount] + '.';
@@ -2221,6 +2314,7 @@
     }
 
     async function init() {
+      applyPrivacy();
       const txTbl = document.getElementById('transactionsTableBody');
       if (txTbl && txTbl.closest('table')) txTbl.closest('table').classList.add('tx-table');
       const saved = localStorage.getItem('mi_patrimonio_data_v4') || localStorage.getItem('mi_patrimonio_data_v3');
@@ -2485,7 +2579,7 @@
       
       const cashApartado = state.myinvestor ? state.myinvestor.cash : 0;
       const fundsTotal = myInvTotal - cashApartado;
-      document.getElementById('myinvestorSubtext').innerText = 'Fondos: ' + fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € | Apartado: ' + cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
+      document.getElementById('myinvestorSubtext').innerHTML = 'Fondos: ' + pv(fundsTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €') + ' | Apartado: ' + pv(cashApartado.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €');
 
       document.getElementById('trBtcBalance').innerText = state.accounts.trade_republic_btc.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
@@ -2493,7 +2587,7 @@
 
       const units = parseFloat(state.btcUnits) || 0;
       const unitsLabel = units > 0 ? units.toLocaleString('es-ES', { maximumFractionDigits: 8 }) + ' BTC' : '0 BTC';
-      document.getElementById('btcUnitsSubtext').innerText = unitsLabel + ' | Apartado: ' + btcCashVal.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €';
+      document.getElementById('btcUnitsSubtext').innerHTML = pv(unitsLabel) + ' | Apartado: ' + pv(btcCashVal.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €');
 
       document.getElementById('inputBBVA').value = state.accounts.bbva;
       document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
@@ -2518,9 +2612,9 @@
         }
 
         if (state.myinvestor.fundsCurrentVl) {
-          document.getElementById('fundFidelityVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.fidelity_sp500 || '--');
-          document.getElementById('fundEmergingVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.vanguard_emerging || '--');
-          document.getElementById('fundSmallCapsVLSub').innerText = 'VL Actual: ' + (state.myinvestor.fundsCurrentVl.vanguard_smallcaps || '--');
+          document.getElementById('fundFidelityVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.fidelity_sp500 || '--');
+          document.getElementById('fundEmergingVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.vanguard_emerging || '--');
+          document.getElementById('fundSmallCapsVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.vanguard_smallcaps || '--');
         }
       }
 
@@ -2545,16 +2639,16 @@
       const currentInMilestone = total - milestoneStart;
       const milestonePercent = Math.min(Math.max((currentInMilestone / step) * 100, 0), 100);
 
-      document.getElementById('goalMilestoneBadge').innerText = 'Hito Actual: ' + milestoneStart.toLocaleString('es-ES') + ' € - ' + milestoneTarget.toLocaleString('es-ES') + ' €';
-      document.getElementById('goalCurrentText').innerText = 'Actual en tramo: ' + currentInMilestone.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €';
-      document.getElementById('goalTargetText').innerText = 'Meta del tramo: ' + milestoneTarget.toLocaleString('es-ES') + ' €';
-      document.getElementById('goalProgressPercent').innerText = milestonePercent.toFixed(0) + '% completado';
+      document.getElementById('goalMilestoneBadge').innerHTML = 'Hito Actual: ' + pv(milestoneStart.toLocaleString('es-ES') + ' € - ' + milestoneTarget.toLocaleString('es-ES') + ' €');
+      document.getElementById('goalCurrentText').innerHTML = 'Actual en tramo: ' + pv(currentInMilestone.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €');
+      document.getElementById('goalTargetText').innerHTML = 'Meta del tramo: ' + pv(milestoneTarget.toLocaleString('es-ES') + ' €');
+      document.getElementById('goalProgressPercent').innerHTML = pv(milestonePercent.toFixed(0) + '%') + ' completado';
       document.getElementById('goalProgressBar').style.width = milestonePercent + '%';
 
       const successBanner = document.getElementById('milestoneSuccessBanner');
       if (currentMilestoneIndex > 0) {
         successBanner.classList.remove('hidden');
-        successBanner.innerText = '🎉 ¡' + milestoneStart.toLocaleString('es-ES') + ' € superados!';
+        successBanner.innerHTML = '🎉 ¡' + pv(milestoneStart.toLocaleString('es-ES') + ' €') + ' superados!';
       } else {
         successBanner.classList.add('hidden');
       }
@@ -2736,7 +2830,7 @@
         let colorClass = isGood ? 'text-emerald-300' : 'text-rose-300';
 
         el.className = 'text-[10px] font-semibold ' + colorClass;
-        el.innerText = sign + pct.toFixed(1).replace('.', ',') + '% vs periodo ant.';
+        el.innerHTML = pv(sign + pct.toFixed(1).replace('.', ',') + '%') + ' vs periodo ant.';
       }
 
       setTrendLabel('trendIncome', pInc, prevInc, false);
@@ -2785,7 +2879,7 @@
         const projectedMonthExpense = dailyBurnRate * daysInMonth;
         const projectedSavings = pInc - projectedMonthExpense;
         forecastAmtEl.innerText = (projectedSavings >= 0 ? '+' : '') + projectedSavings.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-        forecastDescEl.innerText = 'Basado en tu ritmo de gasto actual (' + dailyBurnRate.toFixed(1) + ' €/día).';
+        forecastDescEl.innerHTML = 'Basado en tu ritmo de gasto actual (' + pv(dailyBurnRate.toFixed(1) + ' €/día') + ').';
       } else {
         forecastAmtEl.innerText = pInc > 0 ? 'Periodo Seleccionado' : 'Sin datos';
         forecastDescEl.innerText = 'Resultado neto acumulado del rango de fechas.';
@@ -2797,10 +2891,10 @@
         const savingsRate = (pSavings / pInc) * 100;
         if (savingsRate >= 30) {
           healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
-          healthText.innerText = 'Excelente (' + savingsRate.toFixed(0) + '% ahorro)';
+          healthText.innerHTML = 'Excelente (' + pv(savingsRate.toFixed(0) + '% ahorro') + ')';
         } else if (savingsRate >= 10) {
           healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
-          healthText.innerText = 'Saludable (' + savingsRate.toFixed(0) + '% ahorro)';
+          healthText.innerHTML = 'Saludable (' + pv(savingsRate.toFixed(0) + '% ahorro') + ')';
         } else if (savingsRate >= 0) {
           healthBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
           healthText.innerText = 'Precaución (Ahorro bajo)';
@@ -3361,7 +3455,7 @@
       document.getElementById('fireProgressBar').style.width = pct + '%';
 
       if (remaining > 0) {
-        document.getElementById('fireRemainingText').innerText = 'Te faltan ' + remaining.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' € para alcanzar tu objetivo FIRE.';
+        document.getElementById('fireRemainingText').innerHTML = 'Te faltan ' + pv(remaining.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €') + ' para alcanzar tu objetivo FIRE.';
       } else if (targetFire > 0) {
         document.getElementById('fireRemainingText').innerText = '🎉 ¡Enhorabuena! Ya has alcanzado tu objetivo FIRE.';
       } else {
