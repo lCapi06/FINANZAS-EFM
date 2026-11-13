@@ -2124,59 +2124,100 @@
       saveAndSync();
     }
 
+    // Acepta "12,50", "12.50", "1.234,56" y "1,234.56"
+    function parseAmountInput(raw) {
+      if (raw === null || raw === undefined) return NaN;
+      let t = String(raw).trim().replace(/[\s€]/g, '');
+      if (!t) return NaN;
+      const lastComma = t.lastIndexOf(',');
+      const lastDot = t.lastIndexOf('.');
+      if (lastComma !== -1 && lastDot !== -1) {
+        if (lastComma > lastDot) t = t.replace(/\./g, '').replace(',', '.');
+        else t = t.replace(/,/g, '');
+      } else if (lastComma !== -1) {
+        t = t.replace(',', '.');
+      }
+      return /^-?\d*\.?\d+$/.test(t) ? parseFloat(t) : NaN;
+    }
+
+    function showToast(message, kind) {
+      const old = document.getElementById('appToast');
+      if (old) old.remove();
+      const el = document.createElement('div');
+      el.id = 'appToast';
+      el.setAttribute('role', 'status');
+      el.className = 'fixed left-1/2 -translate-x-1/2 z-[80] max-w-[92vw] w-max px-4 py-3 rounded-2xl shadow-2xl text-sm font-semibold text-white transition-opacity duration-500 ' +
+        (kind === 'error' ? 'bg-rose-600' : 'bg-emerald-600');
+      el.style.top = 'calc(env(safe-area-inset-top) + 0.75rem)';
+      el.textContent = message;
+      document.body.appendChild(el);
+      setTimeout(function() { el.style.opacity = '0'; }, kind === 'error' ? 6000 : 3500);
+      setTimeout(function() { el.remove(); }, kind === 'error' ? 6600 : 4100);
+    }
+
+    // Registra un movimiento desde la URL (atajos de iOS). Devuelve null si no hay parámetros auto_*
+    // o { ok, message } con el resultado.
     function processUrlShortcuts() {
       const params = new URLSearchParams(window.location.search);
-      const autoType = params.get('auto_type');
-      const autoConcept = params.get('auto_concept');
-      const autoAmount = parseFloat(params.get('auto_amount'));
-      const autoAccount = params.get('auto_account');
-      const autoCategory = params.get('auto_category');
-      const autoDestination = params.get('auto_destination');
+      const hasAuto = Array.from(params.keys()).some(function(k) { return k.indexOf('auto_') === 0; });
+      if (!hasAuto) return null;
 
-      if (autoType && autoConcept && !isNaN(autoAmount) && autoAmount > 0 && autoAccount) {
-        if (autoAccount === 'myinvestor' || state.accounts[autoAccount] !== undefined) {
-          if (autoType === 'expense') {
-            if (autoAccount === 'myinvestor') state.myinvestor.cash = Math.max(0, state.myinvestor.cash - autoAmount);
-            else state.accounts[autoAccount] -= autoAmount;
-          } else if (autoType === 'income') {
-            if (autoAccount === 'myinvestor') state.myinvestor.cash += autoAmount;
-            else state.accounts[autoAccount] += autoAmount;
-          } else if (autoType === 'transfer' && autoDestination) {
-            if (autoAccount === 'myinvestor') state.myinvestor.cash = Math.max(0, state.myinvestor.cash - autoAmount);
-            else state.accounts[autoAccount] -= autoAmount;
+      // URLSearchParams ya decodifica los valores: no se vuelve a decodificar
+      const autoType = (params.get('auto_type') || '').trim();
+      const autoConcept = (params.get('auto_concept') || '').trim();
+      const autoAmount = round2(parseAmountInput(params.get('auto_amount')));
+      const autoAccount = (params.get('auto_account') || '').trim();
+      const autoCategory = (params.get('auto_category') || '').trim();
+      const autoDestination = (params.get('auto_destination') || '').trim();
 
-            if (autoDestination === 'trade_republic_btc') {
-              state.btcCash = (parseFloat(state.btcCash) || 0) + autoAmount;
-            } else if (autoDestination === 'myinvestor') {
-              if (!state.myinvestor) state.myinvestor = { cash: 1200, funds: { fidelity_sp500: 12302.97, vanguard_emerging: 2437.22, vanguard_smallcaps: 4000 }, fundsCost: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsVlBase: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 }, fundsCurrentVl: { fidelity_sp500: 0, vanguard_emerging: 0, vanguard_smallcaps: 0 } };
-              state.myinvestor.cash += autoAmount;
-            } else if (state.accounts[autoDestination] !== undefined) {
-              state.accounts[autoDestination] += autoAmount;
-            }
-          }
+      window.history.replaceState({}, document.title, window.location.pathname);
 
-          const finalCategory = autoCategory ? decodeURIComponent(autoCategory) : (autoType === 'income' ? 'Nomina' : (autoType === 'transfer' ? autoDestination : 'Otros'));
+      const validAccounts = ['bbva', 'myinvestor', 'trade_republic_liq', 'trade_republic_btc'];
+      const names = { bbva: 'BBVA', myinvestor: 'MyInvestor', trade_republic_liq: 'Trade Republic', trade_republic_btc: 'Bitcoin' };
 
-          state.transactions.push({
-            id: Date.now(),
-            date: new Date().toISOString(),
-            type: autoType,
-            concept: decodeURIComponent(autoConcept),
-            amount: autoAmount,
-            category: finalCategory,
-            account: autoAccount,
-            destination: autoType === 'transfer' ? autoDestination : null
-          });
-
-          normalizeMoney();
-          markDirty();
-          localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
-          window.history.replaceState({}, document.title, window.location.pathname);
-          return true;
-        }
-        window.history.replaceState({}, document.title, window.location.pathname);
+      if (['expense', 'income', 'transfer'].indexOf(autoType) === -1) {
+        return { ok: false, message: 'Atajo no registrado: tipo "' + autoType + '" no válido.' };
       }
-      return false;
+      if (!autoAmount || autoAmount <= 0) {
+        return { ok: false, message: 'Atajo no registrado: el importe no es válido.' };
+      }
+      if (validAccounts.indexOf(autoAccount) === -1) {
+        return { ok: false, message: 'Atajo no registrado: la cuenta "' + autoAccount + '" no existe.' };
+      }
+      if (autoType === 'transfer') {
+        if (validAccounts.indexOf(autoDestination) === -1) {
+          return { ok: false, message: 'Atajo no registrado: la cuenta destino "' + autoDestination + '" no existe.' };
+        }
+        if (autoDestination === autoAccount) {
+          return { ok: false, message: 'Atajo no registrado: origen y destino son la misma cuenta.' };
+        }
+      }
+
+      const finalCategory = autoCategory || (autoType === 'income' ? 'Nomina' : (autoType === 'transfer' ? autoDestination : 'Otros'));
+      const tx = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: autoType,
+        concept: autoConcept || 'Movimiento',
+        amount: autoAmount,
+        category: finalCategory,
+        account: autoAccount,
+        destination: autoType === 'transfer' ? autoDestination : null
+      };
+
+      applySimpleTx(tx, 1);
+      state.transactions.push(tx);
+      normalizeMoney();
+      markDirty();
+      localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
+
+      const label = autoType === 'income' ? 'Ingreso' : (autoType === 'expense' ? 'Gasto' : 'Traspaso');
+      let message = '✅ ' + label + ' de ' + autoAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € registrado' +
+        (autoType === 'transfer' ? ' (' + names[autoAccount] + ' → ' + names[autoDestination] + ')' : ' en ' + names[autoAccount]) + '.';
+      if (autoType !== 'income' && getAccountBalance(autoAccount) < 0) {
+        message += ' ⚠️ Saldo negativo en ' + names[autoAccount] + '.';
+      }
+      return { ok: true, message: message };
     }
 
     async function init() {
@@ -2218,8 +2259,8 @@
         needsCloudSync = true;
       }
 
-      const addedFromShortcut = processUrlShortcuts();
-      if (addedFromShortcut) {
+      const shortcutResult = processUrlShortcuts();
+      if (shortcutResult && shortcutResult.ok) {
         needsCloudSync = true;
       }
 
@@ -2227,6 +2268,10 @@
       populateCategoryDropdowns();
       render();
       fillCompoundWith('invested');
+
+      if (shortcutResult) {
+        showToast(shortcutResult.message, shortcutResult.ok ? 'ok' : 'error');
+      }
 
       if (needsCloudSync) {
         await syncToGitHub(false);
