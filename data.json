@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 4633.43,
+    "bbva": 4621.74,
     "myinvestor": 17145.98,
     "trade_republic_liq": 46493.31,
     "trade_republic_btc": 675.28
@@ -27,6 +27,16 @@
       "category": "Nómina",
       "account": "bbva",
       "destination": null
+    },
+    {
+      "id": 1794588490595,
+      "date": "2026-11-13T16:48:10.595Z",
+      "type": "expense",
+      "concept": "AliExpress",
+      "amount": 11.69,
+      "category": "Otros",
+      "account": "bbva",
+      "destination": null
     }
   ],
   "monthlySnapshots": [
@@ -41,7 +51,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T12:17:32.117Z",
+  "lastCloudSync": "2026-11-13T16:48:10.611Z",
   "btcUnits": 0.010744,
   "btcPrice": 62852.175,
   "categories": {
@@ -127,5 +137,5 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T12:17:11.453Z"
+  "updatedAt": "2026-11-13T16:48:10.595Z"
 }
