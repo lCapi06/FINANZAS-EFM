@@ -41,7 +41,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T12:16:30.814Z",
+  "lastCloudSync": "2026-11-13T12:16:54.371Z",
   "btcUnits": 0.010744,
   "btcPrice": 62852.175,
   "categories": {
@@ -65,7 +65,7 @@
     "cash": 0,
     "funds": {
       "fidelity_sp500": 12743.49,
-      "vanguard_emerging": 2563.65,
+      "vanguard_emerging": 2535.82,
       "vanguard_smallcaps": 2585.41
     },
     "fundsCost": {
@@ -80,7 +80,7 @@
     },
     "fundsCurrentVl": {
       "fidelity_sp500": 16.974,
-      "vanguard_emerging": 299.8467,
+      "vanguard_emerging": 296.5918,
       "vanguard_smallcaps": 440.448
     }
   },
@@ -89,10 +89,10 @@
       "id": 1794234135536,
       "date": "2026-11-09T14:22:15.536Z",
       "dateLabel": "09/11/2026",
-      "fidelity_sp500": 12743.492582128776,
-      "vanguard_emerging": 2563.65,
+      "fidelity_sp500": 12743.49,
+      "vanguard_emerging": 2535.81779038325,
       "vanguard_smallcaps": 2585.41,
-      "total": 17892.55
+      "total": 17864.72
     }
   ],
   "btcInvestedCost": 820,
@@ -127,5 +127,5 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T12:16:30.798Z"
+  "updatedAt": "2026-11-13T12:16:54.339Z"
 }
