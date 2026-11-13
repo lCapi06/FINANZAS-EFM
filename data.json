@@ -2,9 +2,9 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 4621.74,
+    "bbva": 3991.74,
     "myinvestor": 17145.98,
-    "trade_republic_liq": 46493.31,
+    "trade_republic_liq": 47123.31,
     "trade_republic_btc": 675.28
   },
   "transactions": [
@@ -37,6 +37,16 @@
       "category": "Otros",
       "account": "bbva",
       "destination": null
+    },
+    {
+      "id": 1794588662612,
+      "date": "2026-11-13T16:51:02.612Z",
+      "type": "transfer",
+      "concept": "Ahorro",
+      "amount": 630,
+      "category": "trade_republic_liq",
+      "account": "bbva",
+      "destination": "trade_republic_liq"
     }
   ],
   "monthlySnapshots": [
@@ -51,7 +61,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T16:48:10.611Z",
+  "lastCloudSync": "2026-11-13T16:51:02.636Z",
   "btcUnits": 0.010744,
   "btcPrice": 62852.175,
   "categories": {
@@ -137,5 +147,5 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T16:48:10.595Z"
+  "updatedAt": "2026-11-13T16:51:02.613Z"
 }
