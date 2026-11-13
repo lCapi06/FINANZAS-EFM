@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3991.74,
+    "bbva": 3987.04,
     "myinvestor": 17145.98,
     "trade_republic_liq": 47123.31,
     "trade_republic_btc": 668.03
@@ -47,6 +47,16 @@
       "category": "trade_republic_liq",
       "account": "bbva",
       "destination": "trade_republic_liq"
+    },
+    {
+      "id": 1794588939826,
+      "date": "2026-11-13T16:55:39.826Z",
+      "type": "expense",
+      "concept": "Parking BCN",
+      "amount": 4.7,
+      "category": "Transporte",
+      "account": "bbva",
+      "destination": null
     }
   ],
   "monthlySnapshots": [
@@ -61,7 +71,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T16:53:29.109Z",
+  "lastCloudSync": "2026-11-13T16:55:39.844Z",
   "btcUnits": 0.010744,
   "btcPrice": 62177.16,
   "categories": {
@@ -147,5 +157,5 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T16:53:29.067Z"
+  "updatedAt": "2026-11-13T16:55:39.826Z"
 }
