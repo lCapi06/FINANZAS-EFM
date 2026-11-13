@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3987.04,
+    "bbva": 3987.41,
     "myinvestor": 17145.98,
     "trade_republic_liq": 47123.31,
     "trade_republic_btc": 668.03
@@ -22,9 +22,9 @@
       "id": 1794557571233,
       "date": "2026-11-13T08:12:51.233Z",
       "type": "income",
-      "concept": "Nómina ",
-      "amount": 2080,
-      "category": "Nómina",
+      "concept": "Nómina",
+      "amount": 2080.37,
+      "category": "",
       "account": "bbva",
       "destination": null
     },
@@ -71,7 +71,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T16:55:39.844Z",
+  "lastCloudSync": "2026-11-13T16:56:25.497Z",
   "btcUnits": 0.010744,
   "btcPrice": 62177.16,
   "categories": {
@@ -157,5 +157,5 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T16:55:39.826Z"
+  "updatedAt": "2026-11-13T16:56:25.460Z"
 }
