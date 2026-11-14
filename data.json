@@ -2,7 +2,7 @@
   "goal": 40000,
   "theme": "dark",
   "accounts": {
-    "bbva": 3985.82,
+    "bbva": 3913.1,
     "myinvestor": 17145.98,
     "trade_republic_liq": 47123.31,
     "trade_republic_btc": 668.03
@@ -67,6 +67,16 @@
       "category": "Supermercado",
       "account": "bbva",
       "destination": null
+    },
+    {
+      "id": 1794658282150,
+      "date": "2026-11-14T12:11:22.150Z",
+      "type": "expense",
+      "concept": "Funkos",
+      "amount": 72.72,
+      "category": "Otros",
+      "account": "bbva",
+      "destination": null
     }
   ],
   "monthlySnapshots": [
@@ -81,7 +91,7 @@
       "total": 67113.6
     }
   ],
-  "lastCloudSync": "2026-11-13T19:23:15.104Z",
+  "lastCloudSync": "2026-11-14T12:11:22.168Z",
   "btcUnits": 0.010744,
   "btcPrice": 62177.16,
   "categories": {
@@ -167,5 +177,6 @@
       "2026-11-11": 67026.03
     }
   },
-  "updatedAt": "2026-11-13T19:22:42.878Z"
+  "updatedAt": "2026-11-14T12:11:22.150Z",
+  "recurring": []
 }
