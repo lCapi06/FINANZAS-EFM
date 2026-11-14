@@ -157,6 +157,16 @@
     }
     .privacy-on canvas { filter: blur(9px); pointer-events: none; }
     .privacy-on input:focus { filter: none !important; }
+
+    /* Flujo de caja: filtros plegables en móvil */
+    #cfFilters { display: none; }
+    #cfFilters.open { display: flex; }
+    @media (min-width: 640px) { #cfFilters { display: flex; } }
+    /* Barra inferior con 5 pestañas */
+    @media (max-width: 768px) {
+      #tabBar .tab-btn { padding-left: 0.1rem !important; padding-right: 0.1rem !important; }
+      #tabBar nav { gap: 0.1rem !important; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors pb-12">
@@ -217,6 +227,9 @@
         <button onclick="switchTab('movimientos')" id="tab-btn-movimientos" class="tab-btn px-3 py-1.5 text-xs font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
           <span>⇄</span> Movimientos
         </button>
+        <button onclick="switchTab('historicos')" id="tab-btn-historicos" class="tab-btn px-3 py-1.5 text-xs font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
+          <span>🗂️</span> Históricos
+        </button>
         <button onclick="switchTab('herramientas')" id="tab-btn-herramientas" class="tab-btn px-3 py-1.5 text-xs font-semibold rounded-xl transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
           <span>🎯</span> Libertad
         </button>
@@ -237,6 +250,9 @@
       </div>
       <button onclick="switchTab('movimientos')" class="px-3 py-1.5 text-xs font-bold bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition shrink-0">Invertir ahora</button>
     </div>
+
+    <!-- Gastos recurrentes pendientes de confirmar -->
+    <div id="recurringBanner" class="hidden p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 shadow-sm space-y-2"></div>
 
     <!-- ==================== PESTAÑA 1: PANEL ==================== -->
     <div id="tab-panel" class="tab-content space-y-6">
@@ -472,6 +488,20 @@
         </div>
       </section>
 
+      <!-- Salud Financiera (movida desde Resumen) -->
+      <section class="relative z-10 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🩺</span>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Salud Financiera</h3>
+          </div>
+          <div id="healthBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            <span>⚪</span> <span id="healthText">Calculando...</span>
+          </div>
+        </div>
+        <p id="healthDesc" class="text-xs text-slate-500 dark:text-slate-400 mt-2">Basado en tu tasa de ahorro neta del mes (o del periodo que elijas en Resumen).</p>
+      </section>
+
       <!-- Fondo de Emergencia (Solo BBVA) -->
       <section class="relative z-10 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -513,16 +543,18 @@
       
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <!-- Balance de Flujo de Caja (Con filtros Desde - Hasta y comparativa con periodo anterior) -->
-        <div id="cashFlowCard" class="lg:col-span-2 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl border border-indigo-500/20 shadow-lg transition-all flex flex-col justify-between space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">Balance de Flujo de Caja</span>
-              <h3 class="text-lg font-bold text-white mt-1">Resumen de Ingresos y Gastos</h3>
+        <!-- Balance de Flujo de Caja (compacto en móvil; filtros de periodo plegables) -->
+        <div id="cashFlowCard" class="lg:col-span-3 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-3.5 sm:p-6 rounded-2xl border border-indigo-500/20 shadow-lg transition-all flex flex-col justify-between space-y-2.5 sm:space-y-6">
+          <div class="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-2 sm:gap-3">
+            <div class="min-w-0">
+              <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-indigo-500/30">Balance de Flujo de Caja</span>
+              <h3 class="hidden sm:block text-lg font-bold text-white mt-1">Resumen de Ingresos y Gastos</h3>
             </div>
-            
-            <!-- Filtros Desde - Hasta específicos para el Flujo de Caja -->
-            <div class="flex flex-wrap items-center gap-2 bg-black/20 p-2 rounded-xl border border-white/10">
+
+            <button type="button" onclick="toggleCfFilters()" class="sm:hidden shrink-0 text-[11px] font-semibold px-2.5 py-1 bg-white/10 hover:bg-white/20 text-slate-100 rounded-lg border border-white/10 transition" aria-label="Elegir periodo">📅 <span id="cfPeriodLabel">Este mes</span></button>
+
+            <!-- Filtros Desde - Hasta (en móvil se despliegan con el botón 📅) -->
+            <div id="cfFilters" class="w-full sm:w-auto flex-wrap items-center gap-2 bg-black/20 p-2 rounded-xl border border-white/10">
               <div class="flex items-center gap-1">
                 <label class="text-[10px] text-slate-300 font-medium">Desde:</label>
                 <input type="date" id="cfDateFrom" onchange="renderCashFlow()" class="px-2 py-1 text-xs bg-slate-900 text-white rounded-lg border border-white/20 focus:outline-none">
@@ -535,45 +567,29 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
-              <p class="text-xs text-emerald-300 font-medium">➕ Ingresos Totales</p>
-              <h4 id="periodIncome" class="text-xl font-bold text-emerald-300">0,00 €</h4>
-              <p id="trendIncome" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
+          <div class="grid grid-cols-3 gap-2 sm:gap-4">
+            <div class="p-2.5 sm:p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-0.5 sm:space-y-1 min-w-0">
+              <p class="text-[10px] sm:text-xs text-emerald-300 font-medium truncate">➕ Ingresos<span class="hidden sm:inline"> Totales</span></p>
+              <h4 id="periodIncome" class="text-[13px] sm:text-xl font-bold text-emerald-300 whitespace-nowrap tracking-tight">0,00 €</h4>
+              <p id="trendIncome" class="text-[9px] sm:text-[10px] text-slate-300 leading-tight">-- vs periodo anterior</p>
             </div>
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
-              <p class="text-xs text-rose-300 font-medium">➖ Gastos Totales</p>
-              <h4 id="periodExpense" class="text-xl font-bold text-rose-300">0,00 €</h4>
-              <p id="trendExpense" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
+            <div class="p-2.5 sm:p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-0.5 sm:space-y-1 min-w-0">
+              <p class="text-[10px] sm:text-xs text-rose-300 font-medium truncate">➖ Gastos<span class="hidden sm:inline"> Totales</span></p>
+              <h4 id="periodExpense" class="text-[13px] sm:text-xl font-bold text-rose-300 whitespace-nowrap tracking-tight">0,00 €</h4>
+              <p id="trendExpense" class="text-[9px] sm:text-[10px] text-slate-300 leading-tight">-- vs periodo anterior</p>
             </div>
-            <div class="p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-1">
-              <p class="text-xs text-indigo-200 font-medium">⚖️ Capacidad de Ahorro</p>
-              <h4 id="periodSavings" class="text-xl font-bold text-white">0,00 €</h4>
-              <p id="trendSavings" class="text-[10px] text-slate-300">-- vs periodo anterior</p>
+            <div class="p-2.5 sm:p-4 rounded-xl bg-black/20 border border-white/10 backdrop-blur-sm space-y-0.5 sm:space-y-1 min-w-0">
+              <p class="text-[10px] sm:text-xs text-indigo-200 font-medium truncate">⚖️ <span class="sm:hidden">Ahorro</span><span class="hidden sm:inline">Capacidad de Ahorro</span></p>
+              <h4 id="periodSavings" class="text-[13px] sm:text-xl font-bold text-white whitespace-nowrap tracking-tight">0,00 €</h4>
+              <p id="trendSavings" class="text-[9px] sm:text-[10px] text-slate-300 leading-tight">-- vs periodo anterior</p>
             </div>
           </div>
 
           <!-- Indicador extra de Gasto Destacado -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-white/10 text-xs">
-            <div>
-              <span class="text-slate-300">💡 Mayor categoría de gasto: <strong id="topCategoryName" class="text-white">Ninguna</strong></span>
-            </div>
-            <div>
-              <span class="text-slate-300"><strong id="topCategoryAmount" class="text-white">0,00 €</strong> (<span id="topCategoryShare" class="text-indigo-200">0%</span>)</span>
-            </div>
+          <div class="flex justify-between items-center gap-2 pt-2 border-t border-white/10 text-[11px] sm:text-xs">
+            <span class="text-slate-300 min-w-0 truncate">💡 <span class="hidden sm:inline">Mayor categoría de gasto: </span><span class="sm:hidden">Mayor gasto: </span><strong id="topCategoryName" class="text-white">Ninguna</strong></span>
+            <span class="text-slate-300 shrink-0"><strong id="topCategoryAmount" class="text-white">0,00 €</strong> (<span id="topCategoryShare" class="text-indigo-200">0%</span>)</span>
           </div>
-
-
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors flex flex-col justify-between">
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-slate-400">Salud Financiera</h3>
-          <div class="text-center my-auto py-2">
-            <div id="healthBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              <span>⚪</span> <span id="healthText">Calculando...</span>
-            </div>
-          </div>
-          <p id="healthDesc" class="text-xs text-slate-500 text-center">Basado en tu tasa de ahorro neta del periodo.</p>
         </div>
 
         <!-- Módulo Independiente: Previsión Inteligente de Fin de Mes -->
@@ -651,6 +667,7 @@
           <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4" id="formTitle">Registrar Movimiento</h3>
           <form id="txForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4" onsubmit="handleTxSubmit(event)">
             <input type="hidden" id="editTxId" value="">
+            <input type="hidden" id="editRecId" value="">
             
             <div class="sm:col-span-2">
               <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tipo de Movimiento</label>
@@ -694,11 +711,33 @@
               </select>
             </div>
 
+            <div id="repeatBlock" class="sm:col-span-2 space-y-2">
+              <label class="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                <input type="checkbox" id="txRepeat" onchange="handleRepeatChange()" class="w-4 h-4 accent-indigo-600">
+                🔁 Repetir este gasto (recurrente)
+              </label>
+              <div id="repeatFields" class="hidden grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Frecuencia</label>
+                  <select id="txRepeatFreq" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+                    <option value="monthly">Mensual</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="yearly">Anual</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Primer cobro</label>
+                  <input type="date" id="txRepeatStart" class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+                </div>
+                <p class="col-span-2 text-[10px] text-slate-500 dark:text-slate-400">No se registra nada solo: cada cobro te aparecerá arriba para confirmarlo. El día se repite según el primer cobro (si el mes no tiene ese día, se usa el último).</p>
+              </div>
+            </div>
+
             <div class="sm:col-span-2 flex gap-2 pt-2">
               <button type="submit" id="txSubmitBtn" class="flex-1 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg hover:bg-indigo-700 transition shadow-sm">
                 Guardar Movimiento
               </button>
-              <button type="button" id="txCancelBtn" onclick="resetTxForm()" class="hidden px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm rounded-lg hover:bg-slate-300 transition">
+              <button type="button" id="txCancelBtn" onclick="cancelTxEdit()" class="hidden px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm rounded-lg hover:bg-slate-300 transition">
                 Cancelar
               </button>
             </div>
@@ -734,6 +773,119 @@
           </div>
         </section>
       </div>
+
+      <!-- Gastos recurrentes -->
+      <section id="recurringSection" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-3">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">🔁 Gastos recurrentes</h3>
+            <p class="text-[11px] text-slate-500">A partir de las 10:00 del día de cobro te pedirán confirmación (puedes cambiar el importe o saltarlo).</p>
+          </div>
+          <button type="button" onclick="startNewRecurring()" class="shrink-0 px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm">+ Nuevo</button>
+        </div>
+        <div id="recurringList" class="space-y-2"></div>
+      </section>
+
+      <!-- Ajuste Directo de Saldos General -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
+        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>⚙️ Ajuste Directo de Saldos General</span>
+          </h3>
+          <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
+        </div>
+        
+        <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
+            <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
+            <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
+            <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Coste Adquisición BTC (€)</label>
+            <input type="number" step="0.01" id="inputBtcCost" placeholder="Ej: 2500.00" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
+            <button onclick="updateAccountBalance('btc_cost')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Actualizar Coste BTC</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ajuste Directo de Fondos Indexados -->
+      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
+        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📈 Ajuste Directo de Fondos Indexados y Costes Iniciales</span>
+            </h3>
+            <p class="text-xs text-slate-500">Introduce tu capital invertido (coste de adquisición) y tu VL medio inicial para que los botones de VL diario calculen tu rentabilidad real.</p>
+          </div>
+          <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
+        </div>
+
+        <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <!-- Fondo 1 -->
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseFidelity" placeholder="Ej: 150.25" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base S&P</button>
+            </div>
+          </div>
+
+          <!-- Fondo 2 -->
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Emergentes</h4>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseEmerging" placeholder="Ej: 25.50" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Emergentes</button>
+            </div>
+          </div>
+
+          <!-- Fondo 3 -->
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
+                <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseSmallCaps" placeholder="Ej: 40.10" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+              </div>
+              <button onclick="updateFundConfig('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Small Caps</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== PESTAÑA: HISTÓRICOS ==================== -->
+    <div id="tab-historicos" class="tab-content hidden space-y-6">
 
       <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -831,102 +983,6 @@
             <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
             </tbody>
           </table>
-        </div>
-      </section>
-
-      <!-- Ajuste Directo de Saldos General -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span>⚙️ Ajuste Directo de Saldos General</span>
-          </h3>
-          <span id="toggleIconGeneral" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
-        </div>
-        
-        <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
-            <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
-            <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
-            <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Coste Adquisición BTC (€)</label>
-            <input type="number" step="0.01" id="inputBtcCost" placeholder="Ej: 2500.00" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('btc_cost')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Actualizar Coste BTC</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Ajuste Directo de Fondos Indexados -->
-      <section class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-rose-500/50 shadow-sm transition-colors space-y-4">
-        <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
-          <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>📈 Ajuste Directo de Fondos Indexados y Costes Iniciales</span>
-            </h3>
-            <p class="text-xs text-slate-500">Introduce tu capital invertido (coste de adquisición) y tu VL medio inicial para que los botones de VL diario calculen tu rentabilidad real.</p>
-          </div>
-          <span id="toggleIconFunds" class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">▼ Desplegar</span>
-        </div>
-
-        <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <!-- Fondo 1 -->
-          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
-            <div class="space-y-2">
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseFidelity" placeholder="Ej: 150.25" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <button onclick="updateFundConfig('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base S&P</button>
-            </div>
-          </div>
-
-          <!-- Fondo 2 -->
-          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Emergentes</h4>
-            <div class="space-y-2">
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseEmerging" placeholder="Ej: 25.50" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <button onclick="updateFundConfig('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Emergentes</button>
-            </div>
-          </div>
-
-          <!-- Fondo 3 -->
-          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
-            <div class="space-y-2">
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseSmallCaps" placeholder="Ej: 40.10" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
-              </div>
-              <button onclick="updateFundConfig('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Small Caps</button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -1207,6 +1263,375 @@
     // Envuelve una cifra para que el modo privacidad la desenfoque sin tocar el texto que la rodea
     function pv(x) { return '<span class="pv">' + x + '</span>'; }
 
+// ===== Gastos recurrentes (siempre con confirmación) =====
+    const RECURRING_HOUR = 10; // hora local desde la que el cobro del día queda pendiente de confirmar
+    const ACCOUNT_NAMES = { bbva: 'BBVA', myinvestor: 'MyInvestor', myinvestor_cash: 'MyInvestor', trade_republic_liq: 'Trade Republic', trade_republic_btc: 'Bitcoin' };
+    const WEEKDAYS_ES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const MONTHS_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function dateKey(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+    function keyToDate(k) { const p = k.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2], RECURRING_HOUR, 0, 0, 0); }
+    function formatKey(k) { const p = k.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+    function validKey(k) { return /^\d{4}-\d{2}-\d{2}$/.test(k || '') && dateKey(keyToDate(k)) === k; }
+    function fmtEuro2(n) { return (Number(n) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+
+    // Fechas (AAAA-MM-DD) de los cobros de una recurrencia hasta `until` (a las 10:00 de cada día)
+    function recurringOccurrences(rec, until) {
+      const start = keyToDate(rec.startDate);
+      const fromKey = rec.from || rec.startDate;
+      const sy = start.getFullYear(), sm = start.getMonth(), sd = start.getDate();
+      const out = [];
+      for (let i = 0; i < 1500; i++) {
+        let dt;
+        if (rec.frequency === 'weekly') {
+          dt = new Date(sy, sm, sd + 7 * i, RECURRING_HOUR, 0, 0, 0);
+        } else if (rec.frequency === 'yearly') {
+          const y = sy + i;
+          dt = new Date(y, sm, Math.min(sd, new Date(y, sm + 1, 0).getDate()), RECURRING_HOUR, 0, 0, 0);
+        } else {
+          const y = sy + Math.floor((sm + i) / 12);
+          const m = (sm + i) % 12;
+          dt = new Date(y, m, Math.min(sd, new Date(y, m + 1, 0).getDate()), RECURRING_HOUR, 0, 0, 0);
+        }
+        if (dt > until) break;
+        const k = dateKey(dt);
+        if (k >= fromKey) out.push(k);
+      }
+      return out;
+    }
+
+    function recurringDoneSet() {
+      const set = new Set();
+      state.transactions.forEach(function(t) { if (t.recurringId) set.add(t.recurringId + '|' + t.recurringDate); });
+      return set;
+    }
+
+    // Cobros ya vencidos que aún no se han registrado ni saltado
+    function getPendingRecurring(now) {
+      now = now || new Date();
+      const done = recurringDoneSet();
+      const list = [];
+      (state.recurring || []).forEach(function(rec) {
+        if (rec.active === false) return;
+        const handled = new Set(rec.handled || []);
+        recurringOccurrences(rec, now).forEach(function(k) {
+          if (handled.has(k) || done.has(rec.id + '|' + k)) return;
+          list.push({ rec: rec, key: k });
+        });
+      });
+      list.sort(function(a, b) { return a.key < b.key ? -1 : (a.key > b.key ? 1 : 0); });
+      return list;
+    }
+
+    function nextRecurringKey(rec, now) {
+      now = now || new Date();
+      const todayK = dateKey(now);
+      const far = new Date(now.getFullYear() + 2, now.getMonth(), now.getDate());
+      const handled = new Set(rec.handled || []);
+      const done = recurringDoneSet();
+      return recurringOccurrences(rec, far).find(function(k) {
+        return k >= todayK && !handled.has(k) && !done.has(rec.id + '|' + k);
+      }) || null;
+    }
+
+    function describeRecurring(rec) {
+      const d = keyToDate(rec.startDate);
+      if (rec.frequency === 'weekly') return 'Semanal · cada ' + WEEKDAYS_ES[d.getDay()];
+      if (rec.frequency === 'yearly') return 'Anual · ' + d.getDate() + ' de ' + MONTHS_ES[d.getMonth()];
+      return 'Mensual · día ' + d.getDate();
+    }
+
+    function mkEl(tag, className, text) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    let recurringBannerSig = null;
+    function renderRecurringBanner() {
+      const box = document.getElementById('recurringBanner');
+      if (!box) return;
+      const pending = getPendingRecurring();
+      const sig = pending.map(function(p) { return p.rec.id + '|' + p.key + '|' + p.rec.amount; }).join(';');
+      if (sig === recurringBannerSig) return; // sin cambios: no tocar (para no borrar un importe que se esté editando)
+      recurringBannerSig = sig;
+      box.innerHTML = '';
+      if (pending.length === 0) { box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+
+      const head = mkEl('div', 'flex items-center justify-between gap-2');
+      head.appendChild(mkEl('h4', 'text-xs font-bold text-indigo-800 dark:text-indigo-300 uppercase', '🔁 Gastos recurrentes por confirmar (' + pending.length + ')'));
+      if (pending.length > 1) {
+        const all = mkEl('button', 'text-[11px] font-semibold text-slate-500 dark:text-slate-400 underline shrink-0', 'Saltar todos');
+        all.type = 'button';
+        all.onclick = skipAllRecurring;
+        head.appendChild(all);
+      }
+      box.appendChild(head);
+
+      pending.forEach(function(p) {
+        const rec = p.rec;
+        const row = mkEl('div', 'flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-indigo-100 dark:border-indigo-900/60');
+        const info = mkEl('div', 'min-w-0');
+        info.appendChild(mkEl('div', 'text-sm font-semibold text-slate-900 dark:text-white truncate', rec.concept));
+        info.appendChild(mkEl('div', 'text-[11px] text-slate-500 dark:text-slate-400', formatKey(p.key) + ' · ' + (rec.category || 'Otros') + ' · ' + (ACCOUNT_NAMES[rec.account] || rec.account)));
+
+        const actions = mkEl('div', 'flex items-center gap-2 shrink-0');
+        const inp = document.createElement('input');
+        inp.type = 'number';
+        inp.step = '0.01';
+        inp.inputMode = 'decimal';
+        inp.value = rec.amount;
+        inp.setAttribute('aria-label', 'Importe de ' + rec.concept);
+        inp.className = 'pv w-24 px-2 py-1.5 text-sm font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500';
+        const ok = mkEl('button', 'flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm', '✓ Registrar');
+        ok.type = 'button';
+        ok.onclick = function() { confirmRecurring(rec.id, p.key, inp); };
+        const sk = mkEl('button', 'px-3 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition', 'Saltar');
+        sk.type = 'button';
+        sk.onclick = function() { skipRecurring(rec.id, p.key); };
+        actions.appendChild(inp);
+        actions.appendChild(mkEl('span', 'text-xs text-slate-500', '€'));
+        actions.appendChild(ok);
+        actions.appendChild(sk);
+
+        row.appendChild(info);
+        row.appendChild(actions);
+        box.appendChild(row);
+      });
+    }
+
+    function renderRecurringList() {
+      const box = document.getElementById('recurringList');
+      if (!box) return;
+      box.innerHTML = '';
+      const recs = state.recurring || [];
+      if (recs.length === 0) {
+        box.appendChild(mkEl('p', 'text-xs text-slate-400 py-2', 'Aún no tienes gastos recurrentes. Pulsa «+ Nuevo» o marca «Repetir este gasto» en el formulario.'));
+        return;
+      }
+      const pendingCount = {};
+      getPendingRecurring().forEach(function(p) { pendingCount[p.rec.id] = (pendingCount[p.rec.id] || 0) + 1; });
+
+      recs.forEach(function(rec) {
+        const paused = rec.active === false;
+        const card = mkEl('div', 'p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1.5' + (paused ? ' opacity-70' : ''));
+        const top = mkEl('div', 'flex items-center justify-between gap-2');
+        top.appendChild(mkEl('span', 'text-sm font-semibold text-slate-900 dark:text-white truncate', rec.concept));
+        top.appendChild(mkEl('span', 'pv text-sm font-bold text-rose-600 dark:text-rose-400 shrink-0', '-' + fmtEuro2(rec.amount)));
+        card.appendChild(top);
+        card.appendChild(mkEl('div', 'text-[11px] text-slate-500 dark:text-slate-400', describeRecurring(rec) + ' · ' + (rec.category || 'Otros') + ' · ' + (ACCOUNT_NAMES[rec.account] || rec.account)));
+
+        let status;
+        if (paused) status = '⏸ En pausa';
+        else if (pendingCount[rec.id]) status = '⏳ Pendiente de confirmar (' + pendingCount[rec.id] + ')';
+        else { const nk = nextRecurringKey(rec); status = nk ? 'Próximo cobro: ' + formatKey(nk) + ' a las ' + RECURRING_HOUR + ':00' : 'Sin próximos cobros'; }
+        card.appendChild(mkEl('div', 'text-[11px] font-medium text-indigo-600 dark:text-indigo-400', status));
+
+        const btns = mkEl('div', 'flex flex-wrap gap-1.5 pt-0.5');
+        const bEdit = mkEl('button', 'text-xs text-sky-600 dark:text-sky-300 font-medium px-2.5 py-1 bg-sky-50 dark:bg-sky-950/40 rounded', 'Editar');
+        bEdit.type = 'button'; bEdit.onclick = function() { editRecurring(rec.id); };
+        const bPause = mkEl('button', 'text-xs text-amber-700 dark:text-amber-300 font-medium px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 rounded', paused ? 'Reanudar' : 'Pausar');
+        bPause.type = 'button'; bPause.onclick = function() { toggleRecurringActive(rec.id); };
+        const bDel = mkEl('button', 'text-xs text-rose-600 dark:text-rose-300 font-medium px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 rounded', 'Eliminar');
+        bDel.type = 'button'; bDel.onclick = function() { deleteRecurring(rec.id); };
+        btns.appendChild(bEdit); btns.appendChild(bPause); btns.appendChild(bDel);
+        card.appendChild(btns);
+        box.appendChild(card);
+      });
+    }
+
+    function confirmRecurring(recId, key, inputEl) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === recId; });
+      if (!rec) return;
+      if ((rec.handled || []).indexOf(key) !== -1 || recurringDoneSet().has(recId + '|' + key)) {
+        recurringBannerSig = null; renderRecurringBanner(); return; // ya registrado (p. ej. desde otro dispositivo)
+      }
+      const amount = round2(parseAmountInput(inputEl ? inputEl.value : rec.amount));
+      if (!amount || amount <= 0) { showToast('Introduce un importe válido.', 'error'); return; }
+
+      let id = Date.now();
+      while (state.transactions.some(function(t) { return t.id === id; })) id++;
+      const tx = {
+        id: id,
+        date: keyToDate(key).toISOString(),
+        type: 'expense',
+        concept: rec.concept,
+        amount: amount,
+        category: rec.category,
+        account: rec.account,
+        destination: null,
+        recurringId: rec.id,
+        recurringDate: key
+      };
+      applySimpleTx(tx, 1);
+      state.transactions.push(tx);
+      if (!Array.isArray(rec.handled)) rec.handled = [];
+      rec.handled.push(key);
+      saveAndSync();
+
+      let msg = '✅ ' + rec.concept + ' registrado' + (isPrivacyOn() ? '' : ' (' + fmtEuro2(amount) + ')') + '.';
+      if (getAccountBalance(rec.account) < 0) msg += ' ⚠️ Saldo negativo en ' + (ACCOUNT_NAMES[rec.account] || rec.account) + '.';
+      showToast(msg, 'ok');
+    }
+
+    function skipRecurring(recId, key) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === recId; });
+      if (!rec) return;
+      if (!Array.isArray(rec.handled)) rec.handled = [];
+      if (rec.handled.indexOf(key) === -1) rec.handled.push(key);
+      saveAndSync();
+      showToast('⏭️ ' + rec.concept + ' (' + formatKey(key) + ') saltado.', 'ok');
+    }
+
+    function skipAllRecurring() {
+      const pending = getPendingRecurring();
+      if (pending.length === 0) return;
+      if (!confirm('¿Saltar los ' + pending.length + ' cobros pendientes sin registrarlos?')) return;
+      pending.forEach(function(p) {
+        if (!Array.isArray(p.rec.handled)) p.rec.handled = [];
+        if (p.rec.handled.indexOf(p.key) === -1) p.rec.handled.push(p.key);
+      });
+      saveAndSync();
+      showToast('⏭️ Cobros pendientes saltados.', 'ok');
+    }
+
+    function toggleRecurringActive(id) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === id; });
+      if (!rec) return;
+      if (rec.active === false) {
+        rec.active = true;
+        const today = dateKey(new Date());
+        if (!rec.from || rec.from < today) rec.from = today; // al reanudar no se reclaman los cobros del periodo en pausa
+      } else {
+        rec.active = false;
+      }
+      saveAndSync();
+    }
+
+    function deleteRecurring(id) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === id; });
+      if (!rec) return;
+      if (!confirm('¿Eliminar el gasto recurrente «' + rec.concept + '»? Los movimientos ya registrados se conservan.')) return;
+      state.recurring = state.recurring.filter(function(r) { return r.id !== id; });
+      saveAndSync();
+    }
+
+    // ----- Formulario: casilla "Repetir" -----
+    function handleRepeatChange() {
+      const cb = document.getElementById('txRepeat');
+      const fields = document.getElementById('repeatFields');
+      if (!cb || !fields) return;
+      const editingRec = !!document.getElementById('editRecId').value;
+      const editingTx = !!document.getElementById('editTxId').value;
+      fields.classList.toggle('hidden', !cb.checked);
+      const startEl = document.getElementById('txRepeatStart');
+      if (cb.checked && !startEl.value) startEl.value = dateKey(new Date());
+      const btn = document.getElementById('txSubmitBtn');
+      if (editingRec) btn.innerText = 'Guardar recurrente';
+      else if (!editingTx) btn.innerText = cb.checked ? 'Crear gasto recurrente' : 'Guardar Movimiento';
+    }
+
+    function validateRepeatFields() {
+      const start = document.getElementById('txRepeatStart').value;
+      if (!validKey(start)) { alert('Elige la fecha del primer cobro.'); return null; }
+      const min = new Date(); min.setDate(min.getDate() - 366);
+      if (start < dateKey(min)) { alert('El primer cobro no puede tener más de un año de antigüedad.'); return null; }
+      return { frequency: document.getElementById('txRepeatFreq').value, startDate: start };
+    }
+
+    function startNewRecurring() {
+      switchTab('movimientos');
+      resetTxForm();
+      document.getElementById('txRepeat').checked = true;
+      handleRepeatChange();
+      setTimeout(function() {
+        const el = document.getElementById('txConcept');
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+      }, 80);
+    }
+
+    function addRecurringFromForm() {
+      const f = readTxForm();
+      if (!validateTxForm(f)) return;
+      const r = validateRepeatFields();
+      if (!r) return;
+      state.recurring.push({
+        id: Date.now(), concept: f.concept, amount: f.amount, category: f.category, account: f.account,
+        frequency: r.frequency, startDate: r.startDate, from: r.startDate, active: true, handled: []
+      });
+      resetTxForm();
+      saveAndSync();
+      const now = new Date();
+      let msg;
+      if (r.startDate < dateKey(now) || (r.startDate === dateKey(now) && now.getHours() >= RECURRING_HOUR)) msg = 'Ya puedes confirmar el primer cobro arriba.';
+      else if (r.startDate === dateKey(now)) msg = 'Te pedirá confirmación hoy a las ' + RECURRING_HOUR + ':00.';
+      else msg = 'Primer cobro el ' + formatKey(r.startDate) + '.';
+      showToast('🔁 Gasto recurrente creado. ' + msg, 'ok');
+    }
+
+    function editRecurring(id) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === id; });
+      if (!rec) return;
+      switchTab('movimientos');
+      resetTxForm();
+      document.getElementById('editRecId').value = rec.id;
+      const cb = document.getElementById('txRepeat');
+      cb.checked = true;
+      cb.disabled = true;
+      setTxTypeTab('expense');
+      document.getElementById('txConcept').value = rec.concept;
+      document.getElementById('txAmount').value = rec.amount;
+      document.getElementById('txCategory').value = rec.category;
+      document.getElementById('txAccount').value = rec.account === 'myinvestor_cash' ? 'myinvestor' : rec.account;
+      document.getElementById('txRepeatFreq').value = rec.frequency;
+      document.getElementById('txRepeatStart').value = rec.startDate;
+      handleRepeatChange();
+      document.getElementById('formTitle').innerText = 'Editar gasto recurrente';
+      document.getElementById('txSubmitBtn').innerText = 'Guardar recurrente';
+      document.getElementById('txCancelBtn').classList.remove('hidden');
+      document.getElementById('txForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function updateRecurringFromForm(id) {
+      const rec = (state.recurring || []).find(function(r) { return r.id === id; });
+      if (!rec) { resetTxForm(); return; }
+      const f = readTxForm();
+      if (!validateTxForm(f)) return;
+      const r = validateRepeatFields();
+      if (!r) return;
+      rec.concept = f.concept;
+      rec.amount = f.amount;
+      rec.category = f.category;
+      rec.account = f.account;
+      if (r.startDate !== rec.startDate || r.frequency !== rec.frequency) {
+        // Se re-ancla la planificación: solo cuentan los cobros desde hoy (o desde la nueva fecha si es futura)
+        const today = dateKey(new Date());
+        rec.frequency = r.frequency;
+        rec.startDate = r.startDate;
+        rec.from = r.startDate > today ? r.startDate : today;
+      }
+      resetTxForm();
+      saveAndSync();
+      showToast('✅ Gasto recurrente actualizado.', 'ok');
+    }
+
+    // ----- Volver a la pestaña de origen tras editar un movimiento -----
+    let txEditReturnTab = null;
+    function currentTabId() {
+      const el = document.querySelector('.tab-content:not(.hidden)');
+      return el ? el.id.replace('tab-', '') : 'panel';
+    }
+    function returnFromEdit() {
+      if (txEditReturnTab) { const t = txEditReturnTab; txEditReturnTab = null; switchTab(t); }
+    }
+    function cancelTxEdit() {
+      resetTxForm();
+      returnFromEdit();
+    }
+
     function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
 
     function markDirty() {
@@ -1278,6 +1703,7 @@
         targetMonths: 6
       },
       budgets: {},
+      recurring: [],
       accounts: {
         bbva: 3500.00,
         trade_republic_liq: 6000.00,
@@ -2007,6 +2433,7 @@
       }
       if (!Array.isArray(state.monthlySnapshots)) state.monthlySnapshots = [];
       if (!Array.isArray(state.fundSnapshots)) state.fundSnapshots = [];
+      if (!Array.isArray(state.recurring)) state.recurring = [];
 
       normalizeMoney();
       state.version = 7;
@@ -2315,6 +2742,7 @@
 
     async function init() {
       applyPrivacy();
+      const wantsRecurring = new URLSearchParams(window.location.search).has('recurrentes');
       const txTbl = document.getElementById('transactionsTableBody');
       if (txTbl && txTbl.closest('table')) txTbl.closest('table').classList.add('tx-table');
       const saved = localStorage.getItem('mi_patrimonio_data_v4') || localStorage.getItem('mi_patrimonio_data_v3');
@@ -2365,6 +2793,14 @@
 
       if (shortcutResult) {
         showToast(shortcutResult.message, shortcutResult.ok ? 'ok' : 'error');
+      }
+
+      if (wantsRecurring) {
+        switchTab('panel');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        const rb = document.getElementById('recurringBanner');
+        if (rb && !rb.classList.contains('hidden')) rb.scrollIntoView({ block: 'start' });
+        else if (!shortcutResult) showToast('No hay gastos recurrentes pendientes.', 'ok');
       }
 
       if (needsCloudSync) {
@@ -2430,6 +2866,19 @@
         labelCatDest.innerText = 'Categoría';
         labelAccount.innerText = 'Cuenta';
         populateCategoryDropdowns();
+      }
+
+      const repeatBlock = document.getElementById('repeatBlock');
+      if (repeatBlock) {
+        const editingTx = !!document.getElementById('editTxId').value;
+        const editingRec = !!document.getElementById('editRecId').value;
+        const showRepeat = (type === 'expense' && !editingTx) || editingRec;
+        repeatBlock.classList.toggle('hidden', !showRepeat);
+        if (!showRepeat) {
+          document.getElementById('txRepeat').checked = false;
+          document.getElementById('repeatFields').classList.add('hidden');
+        }
+        handleRepeatChange();
       }
     }
 
@@ -2656,6 +3105,8 @@
       renderTransactions();
       renderSnapshots();
       renderFundSnapshots();
+      renderRecurringBanner();
+      renderRecurringList();
       updateCharts();
       calculate4Percent();
       calculateCompound();
@@ -2734,6 +3185,10 @@
       }
     }
 
+    function toggleCfFilters() {
+      document.getElementById('cfFilters').classList.toggle('open');
+    }
+
     function resetCashFlowDates() {
       document.getElementById('cfDateFrom').value = '';
       document.getElementById('cfDateTo').value = '';
@@ -2747,6 +3202,8 @@
       let filteredTxs = state.transactions;
       let prevFilteredTxs = [];
       let hasCustomRange = Boolean(dateFromVal || dateToVal);
+      const cfLabel = document.getElementById('cfPeriodLabel');
+      if (cfLabel) cfLabel.innerText = hasCustomRange ? 'Personalizado' : 'Este mes';
 
       if (hasCustomRange) {
         let fromD = dateFromVal ? new Date(dateFromVal + 'T00:00:00') : new Date('2020-01-01');
@@ -2817,20 +3274,20 @@
         const el = document.getElementById(elementId);
         if (!el) return;
         if (prevVal === 0) {
-          el.innerText = 'Sin datos periodo ant.';
+          el.innerHTML = 'Sin datos <span class="hidden sm:inline">periodo </span>ant.';
           el.className = 'text-[10px] text-slate-300';
           return;
         }
         const diff = currVal - prevVal;
-        const pct = (diff / prevVal) * 100;
+        const pct = (diff / Math.abs(prevVal)) * 100;
         const sign = diff >= 0 ? '+' : '';
-        
+
         // Para gastos, subir es rojo (malo) y bajar es verde (bueno). Para ingresos/ahorro al revés.
         let isGood = isExpense ? (diff <= 0) : (diff >= 0);
         let colorClass = isGood ? 'text-emerald-300' : 'text-rose-300';
 
         el.className = 'text-[10px] font-semibold ' + colorClass;
-        el.innerHTML = pv(sign + pct.toFixed(1).replace('.', ',') + '%') + ' vs periodo ant.';
+        el.innerHTML = pv(sign + pct.toFixed(1).replace('.', ',') + '%') + ' vs <span class="hidden sm:inline">periodo </span>ant.';
       }
 
       setTrendLabel('trendIncome', pInc, prevInc, false);
@@ -2865,7 +3322,7 @@
       const topShare = pExp > 0 ? (topAmt / pExp) * 100 : 0;
       document.getElementById('topCategoryName').innerText = topCat;
       document.getElementById('topCategoryAmount').innerText = topAmt.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-      document.getElementById('topCategoryShare').innerText = topShare.toFixed(0) + '% del total de gastos';
+      document.getElementById('topCategoryShare').innerHTML = topShare.toFixed(0) + '%<span class="hidden sm:inline"> del total de gastos</span>';
 
       // Previsión y salud
       const now = new Date();
@@ -2954,7 +3411,9 @@
         return;
       }
 
-      const sorted = list.slice().reverse();
+      const sorted = list.map(function(t, i) { return { t: t, i: i }; })
+        .sort(function(a, b) { return (new Date(b.t.date) - new Date(a.t.date)) || (b.i - a.i); })
+        .map(function(x) { return x.t; });
       sorted.forEach(function(tx) {
         const tr = document.createElement('tr');
         const dateStr = new Date(tx.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -3144,9 +3603,16 @@
 
     function handleTxSubmit(e) {
       e.preventDefault();
+      const editRecId = document.getElementById('editRecId').value;
+      if (editRecId) {
+        updateRecurringFromForm(parseInt(editRecId));
+        return;
+      }
       const editId = document.getElementById('editTxId').value;
       if (editId) {
         updateTransaction(parseInt(editId));
+      } else if (document.getElementById('txRepeat').checked && document.getElementById('txType').value === 'expense') {
+        addRecurringFromForm();
       } else {
         addTransaction(e);
       }
@@ -3217,7 +3683,12 @@
         return;
       }
 
+      const originTab = currentTabId();
+      txEditReturnTab = originTab !== 'movimientos' ? originTab : null;
+      switchTab('movimientos');
+
       document.getElementById('editTxId').value = tx.id;
+      document.getElementById('editRecId').value = '';
       document.getElementById('txType').value = tx.type;
       setTxTypeTab(tx.type);
       handleTypeChange();
@@ -3272,11 +3743,16 @@
       resetTxForm();
       saveAndSync();
       alert('¡Movimiento actualizado correctamente!');
+      returnFromEdit();
     }
 
     function resetTxForm() {
       document.getElementById('editTxId').value = '';
-      document.getElementById('txForm').reset(); setTxTypeTab('expense');
+      document.getElementById('editRecId').value = '';
+      document.getElementById('txForm').reset();
+      document.getElementById('txRepeat').disabled = false;
+      document.getElementById('repeatFields').classList.add('hidden');
+      setTxTypeTab('expense');
       document.getElementById('formTitle').innerText = 'Registrar Movimiento';
       document.getElementById('txSubmitBtn').innerText = 'Guardar Movimiento';
       document.getElementById('txCancelBtn').classList.add('hidden');
@@ -3895,6 +4371,11 @@
         }
       }, 80);
     }
+
+    setInterval(function() { renderRecurringBanner(); renderRecurringList(); }, 5 * 60 * 1000);
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') { renderRecurringBanner(); renderRecurringList(); }
+    });
 
     init();
   </script>
