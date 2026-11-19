@@ -108,9 +108,8 @@
     .tw-title { color: rgb(15 23 42) !important; filter: none !important; }
     html.dark .tw-title { color: #fff !important; }
     /* Estructura estable (PWA de iOS): la página no se desplaza; solo #scrollArea. Así la cabecera nunca se mueve ni rebota. */
-    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
-    body { display: flex; flex-direction: column; min-height: 0 !important; padding: 0 !important; }
-    @supports (height: 100dvh) { html, body { height: 100dvh; } }
+    html { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    body { position: fixed; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; overscroll-behavior: none; display: flex; flex-direction: column; min-height: 0 !important; padding: 0 !important; }
     header.sticky { position: relative !important; flex: none; padding-top: env(safe-area-inset-top); }
     #scrollArea { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-bottom: 3rem; }
     .dd-arrow { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 700; line-height: 1; }
@@ -344,6 +343,9 @@
             </button>
             <button onclick="showVersions(); toggleHeaderActionsMenu();" class="w-full text-left px-3 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2">
               🕘 Versiones anteriores
+            </button>
+            <button onclick="showScreenDiag(); toggleHeaderActionsMenu();" class="w-full text-left px-3 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 rounded-xl">
+              📱 Diagnóstico de pantalla
             </button>
             <button onclick="exportCsv(); toggleHeaderActionsMenu();" class="w-full text-left px-3 py-2 text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/50 transition flex items-center gap-2">
               📊 Exportar CSV (Excel)
@@ -2155,6 +2157,27 @@
       }
     }
 
+    function showScreenDiag() {
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;top:0;left:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);visibility:hidden';
+      document.body.appendChild(probe);
+      const cs = getComputedStyle(probe);
+      const vv = window.visualViewport;
+      const tb = document.getElementById('tabBar').getBoundingClientRect();
+      const hd = document.querySelector('header').getBoundingClientRect();
+      const lines = [
+        'standalone: ' + (navigator.standalone === true || matchMedia('(display-mode: standalone)').matches),
+        'pantalla (screen): ' + screen.width + ' × ' + screen.height,
+        'innerHeight: ' + innerHeight + ' · outerHeight: ' + outerHeight,
+        'visualViewport: ' + (vv ? Math.round(vv.height) + ' (offsetTop ' + Math.round(vv.offsetTop) + ')' : 'n/d'),
+        'html alto: ' + document.documentElement.clientHeight + ' · body: ' + document.body.offsetHeight,
+        'margen seguro arriba/abajo: ' + cs.paddingTop + ' / ' + cs.paddingBottom,
+        'cabecera top: ' + Math.round(hd.top) + ' · alto: ' + Math.round(hd.height),
+        'pestañas: ' + Math.round(tb.top) + ' → ' + Math.round(tb.bottom)
+      ];
+      probe.remove();
+      uiConfirm(lines.join('\n'), { title: '📱 Diagnóstico de pantalla', okText: 'Cerrar', cancelText: 'Cancelar' });
+    }
     function ccAfterOpen(id) {
       if (id === 'charts' || id === 'fundevo') { try { updateCharts(); } catch (e) {} }
       if (id === 'compare') { try { renderMonthlyCompare(); } catch (e) {} }
