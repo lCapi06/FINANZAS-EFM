@@ -2533,15 +2533,14 @@
         message: 'Tienes ' + fmtEuro2(state.myinvestor.cash) + ' apartados en MyInvestor.',
         okText: 'Registrar inversión',
         fields: [
-          { name: 'pct', label: '% del efectivo que destinas al fondo', kind: 'decimal', value: '100', required: true, min: 0, minExclusive: true, max: 100 },
+          { name: 'amount', label: 'Cantidad a invertir en el fondo (€)', kind: 'decimal', value: String(round2(state.myinvestor.cash)), required: true, min: 0, minExclusive: true, max: round2(state.myinvestor.cash), hint: 'Por defecto, todo el efectivo disponible. Cámbialo por el importe que inviertes.' },
           { name: 'vl', label: 'VL de compra de las participaciones (€)', kind: 'decimal', value: lastKnownVl, required: true, min: 0, minExclusive: true }
         ]
       });
       if (v === null) return;
-      const pct = v.pct;
       const buyVl = v.vl;
 
-      const amountToInvest = round2(state.myinvestor.cash * (pct / 100));
+      const amountToInvest = Math.min(round2(v.amount), round2(state.myinvestor.cash));
       if (amountToInvest <= 0) {
         showToast('El importe a invertir es 0 €.', 'error');
         return;
