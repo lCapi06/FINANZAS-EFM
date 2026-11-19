@@ -107,9 +107,12 @@
     main h3, main .cc-head > span:first-child, #rangeToggle .tw-title { text-transform: uppercase; letter-spacing: 0.04em; }
     .tw-title { color: rgb(15 23 42) !important; filter: none !important; }
     html.dark .tw-title { color: #fff !important; }
-    /* PWA a pantalla completa en iPhone: la cabecera respeta la zona del reloj/cámara y no rebota */
-    html { overscroll-behavior-y: none; }
-    header.sticky { padding-top: env(safe-area-inset-top); }
+    /* Estructura estable (PWA de iOS): la página no se desplaza; solo #scrollArea. Así la cabecera nunca se mueve ni rebota. */
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    body { display: flex; flex-direction: column; min-height: 0 !important; padding: 0 !important; }
+    @supports (height: 100dvh) { html, body { height: 100dvh; } }
+    header.sticky { position: relative !important; flex: none; padding-top: env(safe-area-inset-top); }
+    #scrollArea { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-bottom: 3rem; }
     .dd-arrow { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 700; line-height: 1; }
     /* Resumen semanal */
     #weeklyPill, #dailyPill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.28rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; line-height: 1.2;
@@ -140,7 +143,7 @@
     #fabQuickAdd { display: none; }
     @media (max-width: 768px) {
       header { z-index: 55 !important; }
-      body { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)) !important; }
+      #scrollArea { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
       input, select, textarea { font-size: 16px !important; }
       button, label, select, summary { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
       select, input[type=number], input[type=text], input[type=date] { min-height: 40px; }
@@ -381,6 +384,7 @@
   </header>
 
   <!-- Resumen semanal (una línea, esquina superior derecha, bajo el cabezal) -->
+  <div id="scrollArea">
   <div id="topStrip" class="max-w-7xl mx-auto px-3 pt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
     <span id="dailyPill" class="hidden" title="Gasto de hoy y lo que queda del límite mensual">☀️ —</span>
     <span id="weeklyPill" class="ml-auto" title="Gasto de esta semana (lunes hasta hoy) frente al mismo tramo de la semana anterior">🗓️ —</span>
@@ -1579,6 +1583,7 @@
     </div>
 
   </main>
+  </div>
 
   <button id="fabQuickAdd" onclick="quickAdd()" aria-label="Añadir movimiento" class="fixed right-4 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl font-light shadow-lg items-center justify-center active:scale-95 transition">+</button>
 
@@ -1612,7 +1617,7 @@
       if (passChanged && v.token.trim() && currentFileSha !== undefined) {
         // Al cambiar la contraseña, reescribimos la nube con el nuevo formato (si se puede leer primero)
         const r = await syncFromGitHub();
-        if (r === true || r === 'local' || r === 'merged') { markDirty(); syncToGitHub(true); }
+        if (r === true && (!!getDataPass()) !== lastCloudEncrypted) { markDirty(); syncToGitHub(true); }
         return;
       }
       syncFromGitHub();
@@ -2755,7 +2760,7 @@
     }
 
     function switchTab(tabId) {
-      window.scrollTo({ top: 0 });
+      document.getElementById('scrollArea').scrollTo({ top: 0 });
       document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.add('hidden');
       });
@@ -2808,6 +2813,10 @@
     function loadBase() {
       try { const b = JSON.parse(localStorage.getItem(BASE_KEY) || 'null'); return (b && b.accounts) ? b : null; } catch (e) { return null; }
     }
+    // Un dispositivo "ya se ha sincronizado" si guarda una copia base de la nube. Uno recién instalado NO:
+    // sus datos de arranque (de ejemplo) nunca deben pisar los de la nube.
+    function hasSyncedOnce() { return loadBase() !== null; }
+    let lastCloudEncrypted = false;
     function atob_utf8(b64) { return decodeURIComponent(escape(atob(b64))); }
     function jeq(a, b) { return JSON.stringify(a === undefined ? null : a) === JSON.stringify(b === undefined ? null : b); }
 
@@ -2977,7 +2986,21 @@
 
         const data = await response.json();
         const cloudState = await cloudDecode(data.content);
+        lastCloudEncrypted = isEncryptedContent(data.content);
         currentFileSha = data.sha;
+        if (cloudState && cloudState.accounts && !hasSyncedOnce()) {
+          // Primera conexión de este dispositivo: se descargan los datos de la nube tal cual.
+          try { localStorage.setItem('mi_patrimonio_pre_first_sync', JSON.stringify(state)); } catch (e) {}
+          state = cloudState;
+          mutationSeq++;
+          runMigrations();
+          try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
+          clearDirty();
+          saveBase(cloudState);
+          setTimeout(function() { try { refreshUIAfterSync(); } catch (e) {} }, 0);
+          setSyncStatus('☁️ Sincronizado (datos de la nube)', 'ok');
+          return true;
+        }
 
         if (cloudState && cloudState.accounts) {
           const localUpdated = state.updatedAt ? new Date(state.updatedAt).getTime() : 0;
@@ -3114,6 +3137,7 @@
     function passErrorMsg(err) {
       if (err && err.message === 'NEEDPASS') return 'Los datos de la nube están cifrados: introduce la contraseña (⚙️).';
       if (err && err.message === 'BADPASS') return 'Contraseña incorrecta para los datos de la nube (⚙️).';
+      if (err && err.message === 'FIRSTSYNC') return 'Este dispositivo aún no ha descargado los datos de la nube. Abre ⚙️ y pulsa Guardar para descargarlos primero.';
       return null;
     }
 
@@ -3178,6 +3202,7 @@
           const existing = await fetchCloudMeta(token);
           if (existing) {
             if (existing.encrypted && !getDataPass()) throw new Error('NEEDPASS');
+            if (!hasSyncedOnce()) throw new Error('FIRSTSYNC');
             currentFileSha = existing.sha;
           }
         }
@@ -5474,7 +5499,7 @@
       document.getElementById('txSubmitBtn').innerText = 'Actualizar Movimiento';
       document.getElementById('txCancelBtn').classList.remove('hidden');
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('scrollArea').scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function updateTransaction(id) {
