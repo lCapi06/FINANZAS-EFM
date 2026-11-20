@@ -897,12 +897,16 @@
               </label>
               <div id="repeatFields" class="hidden grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Frecuencia</label>
-                  <select id="txRepeatFreq" class="w-full px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
-                    <option value="monthly">Mensual</option>
-                    <option value="weekly">Semanal</option>
-                    <option value="yearly">Anual</option>
-                  </select>
+                  <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Repetir cada</label>
+                  <div class="flex gap-1.5">
+                    <input type="number" id="txRepeatEvery" value="1" min="1" max="365" step="1" inputmode="numeric" aria-label="Cada cuántos periodos" class="w-14 shrink-0 px-2 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border border-slate-300 dark:border-slate-700 text-center">
+                    <select id="txRepeatFreq" class="min-w-0 flex-1 px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-700 focus:outline-none">
+                      <option value="daily">días</option>
+                      <option value="weekly">semanas</option>
+                      <option value="monthly" selected>meses</option>
+                      <option value="yearly">años</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Primer cobro</label>
@@ -1339,6 +1343,12 @@
         <div class="cc-body hidden">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-3 transition-colors space-y-4">
           <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">Evolución Histórica por Fondo Indexado</h3>
+          <div class="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800" role="group" aria-label="Qué mostrar en el gráfico">
+            <button type="button" id="fundEvoBtn-value" onclick="setFundEvoMode('value')">Valor €</button>
+            <button type="button" id="fundEvoBtn-pct" onclick="setFundEvoMode('pct')">Rentab. %</button>
+            <button type="button" id="fundEvoBtn-gain" onclick="setFundEvoMode('gain')">Ganancia €</button>
+          </div>
+          <p id="fundEvoHint" class="text-[11px] text-slate-500 dark:text-slate-400"></p>
           <div class="h-64">
             <canvas id="fundEvolutionChart"></canvas>
           </div>
@@ -1666,17 +1676,20 @@
       const start = keyToDate(rec.startDate);
       const fromKey = rec.from || rec.startDate;
       const sy = start.getFullYear(), sm = start.getMonth(), sd = start.getDate();
+      const n = Math.max(1, Math.round(Number(rec.interval) || 1));
       const out = [];
-      for (let i = 0; i < 1500; i++) {
+      for (let i = 0; i < 3000; i++) {
         let dt;
-        if (rec.frequency === 'weekly') {
-          dt = new Date(sy, sm, sd + 7 * i, RECURRING_HOUR, 0, 0, 0);
+        if (rec.frequency === 'daily') {
+          dt = new Date(sy, sm, sd + n * i, RECURRING_HOUR, 0, 0, 0);
+        } else if (rec.frequency === 'weekly') {
+          dt = new Date(sy, sm, sd + 7 * n * i, RECURRING_HOUR, 0, 0, 0);
         } else if (rec.frequency === 'yearly') {
-          const y = sy + i;
+          const y = sy + n * i;
           dt = new Date(y, sm, Math.min(sd, new Date(y, sm + 1, 0).getDate()), RECURRING_HOUR, 0, 0, 0);
         } else {
-          const y = sy + Math.floor((sm + i) / 12);
-          const m = (sm + i) % 12;
+          const y = sy + Math.floor((sm + n * i) / 12);
+          const m = (sm + n * i) % 12;
           dt = new Date(y, m, Math.min(sd, new Date(y, m + 1, 0).getDate()), RECURRING_HOUR, 0, 0, 0);
         }
         if (dt > until) break;
@@ -1722,9 +1735,11 @@
 
     function describeRecurring(rec) {
       const d = keyToDate(rec.startDate);
-      if (rec.frequency === 'weekly') return 'Semanal · cada ' + WEEKDAYS_ES[d.getDay()];
-      if (rec.frequency === 'yearly') return 'Anual · ' + d.getDate() + ' de ' + MONTHS_ES[d.getMonth()];
-      return 'Mensual · día ' + d.getDate();
+      const n = Math.max(1, Math.round(Number(rec.interval) || 1));
+      if (rec.frequency === 'daily') return n === 1 ? 'Diario' : 'Cada ' + n + ' días';
+      if (rec.frequency === 'weekly') return n === 1 ? 'Semanal · cada ' + WEEKDAYS_ES[d.getDay()] : 'Cada ' + n + ' semanas · ' + WEEKDAYS_ES[d.getDay()];
+      if (rec.frequency === 'yearly') return (n === 1 ? 'Anual' : 'Cada ' + n + ' años') + ' · ' + d.getDate() + ' de ' + MONTHS_ES[d.getMonth()];
+      return (n === 1 ? 'Mensual' : 'Cada ' + n + ' meses') + ' · día ' + d.getDate();
     }
 
     function mkEl(tag, className, text) {
@@ -1927,7 +1942,9 @@
       if (!validKey(start)) { showToast('Elige la fecha del primer cobro.', 'error'); return null; }
       const min = new Date(); min.setDate(min.getDate() - 366);
       if (start < dateKey(min)) { showToast('El primer cobro no puede tener más de un año de antigüedad.', 'error'); return null; }
-      return { frequency: document.getElementById('txRepeatFreq').value, startDate: start };
+      const every = parseInt(document.getElementById('txRepeatEvery').value, 10);
+      if (!(every >= 1 && every <= 365)) { showToast('Indica cada cuántos periodos se repite (1 o más).', 'error'); return null; }
+      return { frequency: document.getElementById('txRepeatFreq').value, interval: every, startDate: start };
     }
 
     function startNewRecurring() {
@@ -1949,7 +1966,7 @@
       if (!r) return;
       state.recurring.push({
         id: Date.now(), concept: f.concept, amount: f.amount, category: f.category, account: f.account,
-        frequency: r.frequency, startDate: r.startDate, from: r.startDate, active: true, handled: []
+        frequency: r.frequency, interval: r.interval, startDate: r.startDate, from: r.startDate, active: true, handled: []
       });
       resetTxForm();
       saveAndSync();
@@ -1977,6 +1994,7 @@
       document.getElementById('txCategory').value = rec.category;
       document.getElementById('txAccount').value = rec.account === 'myinvestor_cash' ? 'myinvestor' : rec.account;
       document.getElementById('txRepeatFreq').value = rec.frequency;
+      document.getElementById('txRepeatEvery').value = rec.interval || 1;
       document.getElementById('txRepeatStart').value = rec.startDate;
       handleRepeatChange();
       document.getElementById('formTitle').innerText = 'Editar gasto recurrente';
@@ -1996,10 +2014,11 @@
       rec.amount = f.amount;
       rec.category = f.category;
       rec.account = f.account;
-      if (r.startDate !== rec.startDate || r.frequency !== rec.frequency) {
+      if (r.startDate !== rec.startDate || r.frequency !== rec.frequency || r.interval !== (rec.interval || 1)) {
         // Se re-ancla la planificación: solo cuentan los cobros desde hoy (o desde la nueva fecha si es futura)
         const today = dateKey(new Date());
         rec.frequency = r.frequency;
+        rec.interval = r.interval;
         rec.startDate = r.startDate;
         rec.from = r.startDate > today ? r.startDate : today;
       }
@@ -6332,87 +6351,130 @@
         }
       });
 
-      const ctxFundEvol = document.getElementById('fundEvolutionChart').getContext('2d');
-      if (chartFundEvol) chartFundEvol.destroy();
+      renderFundEvolution();
+    }
 
-      let fundLabels = [];
-      let fidelityData = [];
-      let emergingData = [];
-      let smallCapsData = [];
+    // ===== Evolución por fondo: un punto por día + interruptor Valor / Rentabilidad % / Ganancia € =====
+    const FUND_EVO_SERIES = [
+      { key: 'fidelity_sp500', label: 'Fidelity S&P 500', color: '#6366f1' },
+      { key: 'vanguard_emerging', label: 'Vanguard Emergentes', color: '#10b981' },
+      { key: 'vanguard_smallcaps', label: 'Vanguard Small Caps', color: '#f59e0b' }
+    ];
+    const FUND_EVO_HINTS = {
+      value: 'Valor: lo que valen hoy tus participaciones. Incluye lo que has aportado y lo que ha rendido el fondo.',
+      pct: 'Rentabilidad: % que has ganado o perdido sobre lo invertido en cada fondo. No cambia al aportar más dinero.',
+      gain: 'Ganancia: euros ganados o perdidos (valor menos lo invertido). No cambia al aportar más dinero.'
+    };
+    let fundEvoMode = 'value';
+    try { const m = localStorage.getItem('mi_fundevo_mode'); if (m === 'value' || m === 'pct' || m === 'gain') fundEvoMode = m; } catch (e) {}
 
-      if (Array.isArray(state.fundSnapshots) && state.fundSnapshots.length > 0) {
-        let sortedFunds = state.fundSnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        sortedFunds.forEach(function(s) {
-          fundLabels.push(formatDateDDMMYYYY(new Date(s.date)));
-          fidelityData.push(s.fidelity_sp500 || 0);
-          emergingData.push(s.vanguard_emerging || 0);
-          smallCapsData.push(s.vanguard_smallcaps || 0);
-        });
-        if (fundLabels[fundLabels.length - 1] !== formatDateDDMMYYYY(new Date())) {
-          fundLabels.push('Hoy');
-          fidelityData.push(state.myinvestor.funds.fidelity_sp500 || 0);
-          emergingData.push(state.myinvestor.funds.vanguard_emerging || 0);
-          smallCapsData.push(state.myinvestor.funds.vanguard_smallcaps || 0);
-        }
-      } else {
-        fundLabels.push(formatDateDDMMYYYY(new Date()));
-        fidelityData.push(state.myinvestor.funds.fidelity_sp500);
-        emergingData.push(state.myinvestor.funds.vanguard_emerging);
-        smallCapsData.push(state.myinvestor.funds.vanguard_smallcaps);
+    function setFundEvoMode(m) {
+      fundEvoMode = m;
+      try { localStorage.setItem('mi_fundevo_mode', m); } catch (e) {}
+      renderFundEvolution();
+    }
+
+    function renderFundEvolution() {
+      const canvas = document.getElementById('fundEvolutionChart');
+      if (!canvas) return;
+      ['value', 'pct', 'gain'].forEach(function(k) {
+        const b = document.getElementById('fundEvoBtn-' + k);
+        if (!b) return;
+        const on = k === fundEvoMode;
+        b.className = 'flex-1 px-2 py-2 text-xs font-bold rounded-lg transition ' + (on ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300');
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      const hint = document.getElementById('fundEvoHint');
+      if (hint) hint.textContent = FUND_EVO_HINTS[fundEvoMode];
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+
+      // Valores por día: fotos mensuales + fotos diarias (las diarias mandan) + hoy
+      const byDay = {};
+      (state.fundSnapshots || []).forEach(function(sn) {
+        byDay[dateKey(new Date(sn.date))] = { fidelity_sp500: sn.fidelity_sp500 || 0, vanguard_emerging: sn.vanguard_emerging || 0, vanguard_smallcaps: sn.vanguard_smallcaps || 0 };
+      });
+      (state.dailySnapshots || []).forEach(function(x) { if (x && x.funds && validKey(x.d)) byDay[x.d] = x.funds; });
+      byDay[dateKey(new Date())] = liveFunds();
+      const days = Object.keys(byDay).filter(validKey).sort();
+
+      // Lo invertido en cada fondo a cada fecha: coste actual menos lo invertido después
+      const cur = (state.myinvestor && state.myinvestor.fundsCost) || {};
+      const invs = (state.transactions || []).filter(function(t) { return t.fundKeyBought && t.fundEurInvested; })
+        .map(function(t) { return { k: dateKey(new Date(t.date)), f: t.fundKeyBought, a: t.fundEurInvested }; });
+      function costAt(fund, day) {
+        let c = cur[fund] || 0;
+        invs.forEach(function(i) { if (i.f === fund && i.k > day) c -= i.a; });
+        return c;
       }
 
-      chartFundEvol = new Chart(ctxFundEvol, {
+      const datasets = FUND_EVO_SERIES.map(function(sr) {
+        const data = days.map(function(d) {
+          const v = (byDay[d] || {})[sr.key] || 0;
+          const t = keyToDate(d).getTime();
+          if (v <= 0) return { x: t, y: null };
+          if (fundEvoMode === 'value') return { x: t, y: v };
+          const c = costAt(sr.key, d);
+          if (c <= 0) return { x: t, y: null };
+          return { x: t, y: fundEvoMode === 'pct' ? (v / c - 1) * 100 : v - c };
+        });
+        return {
+          label: sr.label, data: data, borderColor: sr.color, backgroundColor: sr.color,
+          borderWidth: 2, tension: 0.25, spanGaps: false,
+          pointRadius: days.length > 40 ? 0 : 3, pointHoverRadius: 5
+        };
+      });
+
+      const first = keyToDate(days[0]).getTime(), last = keyToDate(days[days.length - 1]).getTime();
+      const DAY = 86400000;
+      const spanDays = (last - first) / DAY;
+      const fmtTick = function(ts) {
+        const d = new Date(ts);
+        return spanDays > 300
+          ? d.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' })
+          : d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      };
+      const fmtVal = function(v) {
+        if (v === null || v === undefined) return '—';
+        if (fundEvoMode === 'pct') return (v > 0 ? '+' : '') + v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+        if (fundEvoMode === 'gain') return (v > 0 ? '+' : '') + v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        return v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      };
+      const fmtAxis = function(v) {
+        if (fundEvoMode === 'pct') return (v > 0 ? '+' : '') + Number(v.toFixed(1)).toLocaleString('es-ES') + '%';
+        const r = Math.abs(v) >= 1000 ? Math.round(v) : Number(v.toFixed(0));
+        return (fundEvoMode === 'gain' && v > 0 ? '+' : '') + r.toLocaleString('es-ES') + ' €';
+      };
+
+      if (chartFundEvol) chartFundEvol.destroy();
+      chartFundEvol = new Chart(canvas.getContext('2d'), {
         type: 'line',
-        data: {
-          labels: fundLabels,
-          datasets: [
-            {
-              label: 'Fidelity S&P 500',
-              data: fidelityData,
-              borderColor: '#6366f1',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.3
-            },
-            {
-              label: 'Vanguard Emergentes',
-              data: emergingData,
-              borderColor: '#10b981',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.3
-            },
-            {
-              label: 'Vanguard Small Caps',
-              data: smallCapsData,
-              borderColor: '#f59e0b',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.3
-            }
-          ]
-        },
+        data: { datasets: datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
           plugins: {
             legend: { labels: { color: textColor, boxWidth: 12 } },
             tooltip: {
               callbacks: {
-                label: function(context) {
-                  return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + ' €';
-                }
+                title: function(items) { return items.length ? formatDateDDMMYYYY(new Date(items[0].parsed.x)) : ''; },
+                label: function(c) { return ' ' + c.dataset.label + ': ' + fmtVal(c.parsed.y); }
               }
             }
           },
           scales: {
             x: {
+              type: 'linear',
+              min: spanDays < 1 ? first - DAY : first,
+              max: spanDays < 1 ? last + DAY : last,
               grid: { display: false },
-              ticks: { color: textColor, font: { size: 10 } }
+              ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 5, maxRotation: 0, autoSkip: true, padding: 6, callback: function(v) { return fmtTick(v); } }
             },
             y: {
               grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
-              ticks: { color: textColor, font: { size: 10 } }
+              ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 6, callback: function(v) { return fmtAxis(v); } }
             }
           }
         }
