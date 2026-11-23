@@ -3461,6 +3461,56 @@
       return false;
     }
 
+    async function editSnapshot(id) {
+      const snap = (state.monthlySnapshots || []).find(function(x) { return x.id === id; });
+      if (!snap) return;
+      const v = await uiForm({
+        title: 'Editar foto de saldos · ' + formatDateDDMMYYYY(new Date(snap.date)),
+        message: 'Corrige los importes de esta foto. El patrimonio total se recalcula solo.',
+        okText: 'Guardar',
+        fields: [
+          { name: 'bbva', label: 'BBVA (€)', kind: 'decimal', value: String(snap.bbva || 0), required: true, min: 0 },
+          { name: 'myinvestor', label: 'MyInvestor, fondos + efectivo (€)', kind: 'decimal', value: String(snap.myinvestor || 0), required: true, min: 0 },
+          { name: 'trade_republic_liq', label: 'Trade Republic, liquidez (€)', kind: 'decimal', value: String(snap.trade_republic_liq || 0), required: true, min: 0 },
+          { name: 'trade_republic_btc', label: 'Bitcoin (€)', kind: 'decimal', value: String(snap.trade_republic_btc || 0), required: true, min: 0 }
+        ]
+      });
+      if (v === null) return;
+      const backup = JSON.stringify(state);
+      const oldSum = (snap.bbva || 0) + (snap.myinvestor || 0) + (snap.trade_republic_liq || 0) + (snap.trade_republic_btc || 0);
+      const extra = (snap.total || 0) - oldSum; // p. ej. efectivo de Bitcoin, que no se edita aquí
+      snap.bbva = round2(v.bbva);
+      snap.myinvestor = round2(v.myinvestor);
+      snap.trade_republic_liq = round2(v.trade_republic_liq);
+      snap.trade_republic_btc = round2(v.trade_republic_btc);
+      snap.total = round2(snap.bbva + snap.myinvestor + snap.trade_republic_liq + snap.trade_republic_btc + extra);
+      saveAndSync();
+      offerUndo('✅ Foto de saldos actualizada.', backup);
+    }
+
+    async function editFundSnapshot(id) {
+      const snap = (state.fundSnapshots || []).find(function(x) { return x.id === id; });
+      if (!snap) return;
+      const v = await uiForm({
+        title: 'Editar foto de fondos · ' + formatDateDDMMYYYY(new Date(snap.date)),
+        message: 'Corrige el valor de cada fondo en esta foto. El total se recalcula solo.',
+        okText: 'Guardar',
+        fields: [
+          { name: 'fidelity_sp500', label: 'Fidelity S&P 500 (€)', kind: 'decimal', value: String(snap.fidelity_sp500 || 0), required: true, min: 0 },
+          { name: 'vanguard_emerging', label: 'Vanguard Emergentes (€)', kind: 'decimal', value: String(snap.vanguard_emerging || 0), required: true, min: 0 },
+          { name: 'vanguard_smallcaps', label: 'Vanguard Small Caps (€)', kind: 'decimal', value: String(snap.vanguard_smallcaps || 0), required: true, min: 0 }
+        ]
+      });
+      if (v === null) return;
+      const backup = JSON.stringify(state);
+      snap.fidelity_sp500 = round2(v.fidelity_sp500);
+      snap.vanguard_emerging = round2(v.vanguard_emerging);
+      snap.vanguard_smallcaps = round2(v.vanguard_smallcaps);
+      snap.total = round2(snap.fidelity_sp500 + snap.vanguard_emerging + snap.vanguard_smallcaps);
+      saveAndSync();
+      offerUndo('✅ Foto de fondos actualizada.', backup);
+    }
+
     function deleteSnapshot(id) {
       const backup = JSON.stringify(state);
       state.monthlySnapshots = state.monthlySnapshots.filter(function(s) { return s.id !== id; });
@@ -4878,7 +4928,7 @@
 
       if (hasSnapshots) {
         const sortedAsc = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        baseline = sortedAsc[0];
+        baseline = sortedAsc[sortedAsc.length - 1]; // foto mensual más reciente
       }
 
       function applyCardGradient(cardId, diff) {
@@ -5328,7 +5378,7 @@
           '<td class="p-3 text-amber-600 dark:text-amber-400">' + (snap.trade_republic_btc||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.trade_republic_btc||0, prev ? prev.trade_republic_btc : null) + '</td>' +
           '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
           '<td class="p-3 text-right">' + formatPctBadge(snap.total||0, prev ? prev.total : null) + '</td>' +
-          '<td class="p-3 text-center"><button onclick="deleteSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
+          '<td class="p-3 text-center whitespace-nowrap"><button onclick="editSnapshot(' + snap.id + ')" class="text-xs text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 font-medium px-2 py-1 mr-1 bg-indigo-50 dark:bg-indigo-950/40 rounded">Editar</button><button onclick="deleteSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
         tbody.appendChild(tr);
       });
     }
@@ -5373,7 +5423,7 @@
           '<td class="p-3 text-slate-600 dark:text-slate-300">' + (snap.vanguard_smallcaps||0).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €' + formatPctBadge(snap.vanguard_smallcaps||0, prev ? prev.vanguard_smallcaps : null) + '</td>' +
           '<td class="p-3 text-right font-bold text-slate-900 dark:text-white">' + (snap.total||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €</td>' +
           '<td class="p-3 text-right">' + formatPctBadge(snap.total||0, prev ? prev.total : null) + '</td>' +
-          '<td class="p-3 text-center"><button onclick="deleteFundSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
+          '<td class="p-3 text-center whitespace-nowrap"><button onclick="editFundSnapshot(' + snap.id + ')" class="text-xs text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 font-medium px-2 py-1 mr-1 bg-indigo-50 dark:bg-indigo-950/40 rounded">Editar</button><button onclick="deleteFundSnapshot(' + snap.id + ')" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 bg-rose-50 dark:bg-rose-950/40 rounded">Eliminar</button></td>';
         tbody.appendChild(tr);
       });
     }
