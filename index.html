@@ -140,6 +140,8 @@
 
     /* ===== Optimización móvil ===== */
     #fabQuickAdd { display: none; }
+    .histFab { z-index: 52; line-height: 1; padding-bottom: 2px; bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+    #fabUndo { left: 1rem; } #fabRedo { left: 5rem; }
     @media (max-width: 768px) {
       header { z-index: 55 !important; }
       #scrollArea { padding-bottom: calc(8.25rem + env(safe-area-inset-bottom)); }
@@ -168,8 +170,10 @@
 
       #fabQuickAdd {
         display: flex; z-index: 52;
-        bottom: calc(7rem + env(safe-area-inset-bottom)) !important;
+        bottom: calc(6.1rem + env(safe-area-inset-bottom)) !important;
       }
+      .histFab { bottom: calc(6.1rem + env(safe-area-inset-bottom)) !important; }
+      
 
       .tx-table, .tx-table tbody { display: block; width: 100%; }
       .tx-table thead { display: none; }
@@ -1594,6 +1598,8 @@
   </main>
   </div>
 
+  <button id="fabUndo" onclick="histStep(-1)" aria-label="Deshacer" title="Deshacer" disabled class="histFab opacity-40 fixed w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center active:scale-95 transition"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button>
+  <button id="fabRedo" onclick="histStep(1)" aria-label="Rehacer" title="Rehacer" disabled class="histFab opacity-40 fixed w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center active:scale-95 transition"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="transform:scaleX(-1)"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button>
   <button id="fabQuickAdd" onclick="quickAdd()" aria-label="Añadir movimiento" class="fixed right-4 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl font-light shadow-lg items-center justify-center active:scale-95 transition">+</button>
 
   <script>
@@ -3011,6 +3017,7 @@
           state = cloudState;
           mutationSeq++;
           runMigrations();
+          histReset();
           try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
           clearDirty();
           saveBase(cloudState);
@@ -3030,6 +3037,7 @@
               state = mg.merged;
               mutationSeq++;
               runMigrations();
+              histReset();
               markDirty();
               try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
               saveBase(cloudState);
@@ -3050,6 +3058,7 @@
           state = cloudState;
           mutationSeq++;
           runMigrations();
+          histReset();
           try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
           clearDirty();
           saveBase(cloudState);
@@ -3244,6 +3253,7 @@
             if (mg) {
               state = mg.merged;
               runMigrations();
+              histReset();
               mutationSeq++;
               try { localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state)); } catch (e) {}
               currentFileSha = latest.sha;
@@ -3259,6 +3269,7 @@
               if (useCloud) {
                 state = latest.state;
                 runMigrations();
+                histReset();
                 currentFileSha = latest.sha;
                 localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
                 clearDirty();
@@ -3808,6 +3819,7 @@
         try {
           state = JSON.parse(saved);
           runMigrations();
+          histReset();
         } catch (e) {
           console.error("Error al cargar localStorage", e);
         }
@@ -3993,13 +4005,57 @@
       });
     }
 
+    // ===== Deshacer / rehacer (en memoria; se reinicia al recargar o al traer datos de la nube) =====
+    let histUndo = [], histRedo = [], histLast = null, histBusy = false;
+    function histKeyOf() {
+      const o = Object.assign({}, state); delete o.updatedAt; delete o.dailySnapshots;
+      return JSON.stringify(o);
+    }
+    function histReset() {
+      histUndo = []; histRedo = [];
+      try { histLast = { j: JSON.stringify(state), k: histKeyOf() }; } catch (e) { histLast = null; }
+      histUpdateButtons();
+    }
+    function histRecord() {
+      if (histBusy) return;
+      const k = histKeyOf();
+      if (histLast && histLast.k === k) return;
+      if (histLast) { histUndo.push(histLast); if (histUndo.length > 20) histUndo.shift(); histRedo = []; }
+      histLast = { j: JSON.stringify(state), k: k };
+    }
+    function histUpdateButtons() {
+      const u = document.getElementById('fabUndo'), r = document.getElementById('fabRedo');
+      if (u) { u.disabled = !histUndo.length; u.classList.toggle('opacity-40', !histUndo.length); }
+      if (r) { r.disabled = !histRedo.length; r.classList.toggle('opacity-40', !histRedo.length); }
+    }
+    function histStep(dir) {
+      const from = dir < 0 ? histUndo : histRedo, to = dir < 0 ? histRedo : histUndo;
+      if (!from.length || !histLast) return;
+      const entry = from.pop();
+      to.push(histLast);
+      histBusy = true;
+      try {
+        state = JSON.parse(entry.j);
+        histLast = entry;
+        runMigrations();
+        saveAndSync();
+        populateCategoryDropdowns();
+      } finally { histBusy = false; }
+      histUpdateButtons();
+      showToast(dir < 0 ? '↶ Movimiento deshecho.' : '↷ Movimiento rehecho.', 'ok');
+    }
+
+    histReset();
+
     function saveAndSync() {
       normalizeMoney();
       upsertDailySnapshot();
       markDirty();
+      histRecord();
       localStorage.setItem('mi_patrimonio_data_v4', JSON.stringify(state));
       updateYearFilterOptions();
       render();
+      histUpdateButtons();
       syncToGitHub(false);
     }
 
@@ -4981,6 +5037,16 @@
       setTrendBadge('trendTotal', totalCurrent, baseline ? baseline.total : null, '+0,00 € (0,00%)', 'cardTotal');
       setTrendBadge('trendBbva', state.accounts.bbva, baseline ? baseline.bbva : null, '+0,00 € (0,00%)', 'cardBbva');
       setTrendBadge('trendTrLiq', state.accounts.trade_republic_liq, baseline ? baseline.trade_republic_liq : null, '+0,00 € (0,00%)', 'cardTrLiq');
+      ['trendTotal', 'trendBbva', 'trendTrLiq'].forEach(function(id) {
+        const el = document.getElementById(id); if (!el) return;
+        let note = el.nextElementSibling;
+        if (!note || !note.classList.contains('trend-since')) {
+          note = document.createElement('div');
+          note.className = 'trend-since text-[9px] font-medium text-slate-300/70 mt-0.5 whitespace-nowrap';
+          el.insertAdjacentElement('afterend', note);
+        }
+        note.textContent = baseline ? 'vs foto del ' + formatDateDDMMYYYY(new Date(baseline.date)) : '';
+      });
       
       const fundsTotalCost = getFundsTotalCost();
       setTrendBadge('trendMyinvestor', myInvTotal, fundsTotalCost > 0 ? fundsTotalCost : null, 'Sin coste total de fondos', 'cardMyinvestor');
