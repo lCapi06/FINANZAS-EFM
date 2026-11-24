@@ -769,6 +769,7 @@
           <span id="toggleIconCal" class="dd-arrow text-slate-400 bg-slate-100 dark:bg-slate-800" aria-label="Desplegar">▼</span>
         </div>
         <div id="spendCalendarSection" class="hidden mt-3">
+          <div id="calNav" class="flex items-center justify-between gap-2 mb-2"></div>
           <div id="calGrid"></div>
           <div id="calSummary" class="text-[11px] text-slate-500 dark:text-slate-400 mt-2"></div>
           <div id="calDayDetail" class="mt-2"></div>
@@ -6752,10 +6753,35 @@
 
     // ===== Calendario de gasto (mes natural) =====
     let calSelectedDay = null;
+    let calView = null; // { y, m } mes que se ve en el calendario; null = el mes actual del resumen
+    function calShift(delta) {
+      const base = calView || getSummaryMonth();
+      const d = new Date(base.y, base.m + delta, 1);
+      const now = new Date();
+      if (d > new Date(now.getFullYear(), now.getMonth(), 1)) return; // no hay meses futuros
+      calView = { y: d.getFullYear(), m: d.getMonth() };
+      calSelectedDay = null;
+      renderSpendCalendar();
+    }
+    function calToday() { calView = null; calSelectedDay = null; renderSpendCalendar(); }
     function renderSpendCalendar() {
       const grid = document.getElementById('calGrid');
       if (!grid) return;
-      const sm = getSummaryMonth();
+      const sm = calView || getSummaryMonth();
+      const nav = document.getElementById('calNav');
+      if (nav) {
+        nav.innerHTML = '';
+        const nowM = new Date();
+        const atCurrent = sm.y === nowM.getFullYear() && sm.m === nowM.getMonth();
+        const btnCls = 'w-10 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-lg font-bold active:scale-95 transition';
+        const prevB = mkEl('button', btnCls, '‹'); prevB.type = 'button'; prevB.setAttribute('aria-label', 'Mes anterior');
+        prevB.onclick = function() { calShift(-1); };
+        const nextB = mkEl('button', btnCls + (atCurrent ? ' opacity-30' : ''), '›'); nextB.type = 'button'; nextB.setAttribute('aria-label', 'Mes siguiente');
+        nextB.disabled = atCurrent; nextB.onclick = function() { calShift(1); };
+        const mid = mkEl('button', 'flex-1 text-center text-sm font-bold text-slate-800 dark:text-slate-100', MONTH_NAMES[sm.m] + ' ' + sm.y + (atCurrent ? '' : '  ·  volver a hoy'));
+        mid.type = 'button'; mid.onclick = calToday;
+        nav.appendChild(prevB); nav.appendChild(mid); nav.appendChild(nextB);
+      }
       const dim = new Date(sm.y, sm.m + 1, 0).getDate();
       const prefix = sm.y + '-' + pad2(sm.m + 1) + '-';
       const byDay = {};
@@ -6816,13 +6842,17 @@
       det.innerHTML = '';
       if (calSelectedDay && byDay[calSelectedDay]) {
         const box = mkEl('div', 'rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3 space-y-1.5');
-        box.appendChild(mkEl('p', 'text-xs font-bold text-slate-700 dark:text-slate-200', calSelectedDay + ' de ' + MONTH_NAMES[sm.m]));
+        box.appendChild(mkEl('p', 'text-xs font-bold text-slate-700 dark:text-slate-200', calSelectedDay + ' de ' + MONTH_NAMES[sm.m] + (sm.y !== new Date().getFullYear() ? ' ' + sm.y : '')));
         byDay[calSelectedDay].list.forEach(function(t) {
           const row = mkEl('div', 'flex justify-between gap-2 text-xs');
           row.appendChild(mkEl('span', 'min-w-0 truncate text-slate-600 dark:text-slate-300', (isFixedExpense(t) ? '📌 ' : '') + t.concept + (t.category ? ' · ' + t.category : '')));
           row.appendChild(mkEl('span', 'pv font-bold shrink-0 text-rose-600 dark:text-rose-400', '-' + fmtEuro2(t.amount)));
           box.appendChild(row);
         });
+        const totRow = mkEl('div', 'flex justify-between gap-2 text-xs pt-1.5 mt-1 border-t border-slate-200 dark:border-slate-700');
+        totRow.appendChild(mkEl('span', 'font-bold text-slate-700 dark:text-slate-200', 'Total del día'));
+        totRow.appendChild(mkEl('span', 'pv font-bold shrink-0 text-rose-600 dark:text-rose-400', '-' + fmtEuro2(byDay[calSelectedDay].total)));
+        box.appendChild(totRow);
         det.appendChild(box);
       } else if (calSelectedDay) { calSelectedDay = null; }
     }
