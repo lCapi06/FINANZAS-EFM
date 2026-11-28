@@ -6292,6 +6292,14 @@
       } else if (tx.type === 'transfer' && tx.destination === 'myinvestor_fund' && tx.fundKeyBought) {
         // Compra de fondo: devolver el efectivo y restar del fondo y su coste
         if (!tx.imported) adjustOrigin(tx.account, tx.amount);
+        if (tx.fundBuyVl > 0 && state.myinvestor && state.myinvestor.fundsVlBase && state.myinvestor.fundsCost) {
+          // El VL medio de compra se recalcula con las participaciones que quedan (no solo el importe)
+          const k0 = tx.fundKeyBought, oldCost = state.myinvestor.fundsCost[k0] || 0, oldBase = state.myinvestor.fundsVlBase[k0] || 0;
+          if (oldBase > 0) {
+            const partsLeft = oldCost / oldBase - tx.fundEurInvested / tx.fundBuyVl, costLeft = oldCost - tx.fundEurInvested;
+            state.myinvestor.fundsVlBase[k0] = (partsLeft > 1e-9 && costLeft > 0) ? costLeft / partsLeft : 0;
+          }
+        }
         if (state.myinvestor && state.myinvestor.funds && state.myinvestor.funds[tx.fundKeyBought] !== undefined) {
           state.myinvestor.funds[tx.fundKeyBought] = round2(Math.max(0, state.myinvestor.funds[tx.fundKeyBought] - tx.fundEurInvested));
           if (state.myinvestor.fundsCost) {
