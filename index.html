@@ -4805,9 +4805,12 @@
         }
 
         if (state.myinvestor.fundsCurrentVl) {
-          document.getElementById('fundFidelityVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.fidelity_sp500 || '--');
-          document.getElementById('fundEmergingVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.vanguard_emerging || '--');
-          document.getElementById('fundSmallCapsVLSub').innerHTML = 'VL Actual: ' + pv(state.myinvestor.fundsCurrentVl.vanguard_smallcaps || '--');
+          const fundSub = function(id, k) {
+            const m = state.myinvestor, c = (m.fundsCost && m.fundsCost[k]) || 0, vb = (m.fundsVlBase && m.fundsVlBase[k]) || 0;
+            const parts = c > 0 && vb > 0 ? c / vb : 0;
+            document.getElementById(id).innerHTML = 'VL ' + pv(m.fundsCurrentVl[k] || '--') + (parts > 0 ? ' · ' + pv(parts.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })) + ' part.' : '');
+          };
+          fundSub('fundFidelityVLSub', 'fidelity_sp500'); fundSub('fundEmergingVLSub', 'vanguard_emerging'); fundSub('fundSmallCapsVLSub', 'vanguard_smallcaps');
         }
       }
 
