@@ -193,6 +193,7 @@
     main section.rounded-2xl.bgp-6::after { background-image: radial-gradient(circle, rgb(var(--sec) / 0.34) 1.4px, transparent 2px), radial-gradient(circle, rgb(var(--sec) / 0.34) 1.4px, transparent 2px); background-size: 16px 16px; background-position: 0 0, 8px 8px; }
     main section.rounded-2xl.bgp-7::after { background-image: repeating-linear-gradient(45deg, rgb(var(--sec) / 0.24) 0 1px, transparent 1px 9px), repeating-linear-gradient(-45deg, rgb(var(--sec) / 0.24) 0 1px, transparent 1px 9px); background-size: auto; }
     html.bg-off main section.rounded-2xl::after { display: none !important; }
+    html.bg-off #cardTotal::before, html.bg-off #cardBbva::before, html.bg-off #cardTrLiq::before, html.bg-off #cardMyinvestor::before, html.bg-off #cardBtc::before, html.bg-off #cardGoal::before, html.bg-off #cashFlowCard::before, html.bg-off #cardDist::before { display: none !important; }
     body .gv-0 { background-image: linear-gradient(135deg, rgb(var(--gA, var(--ac-900))), rgb(15 23 42) 55%, rgb(var(--gC, var(--ac-950)))); }
     body .gv-1 { background-image: linear-gradient(225deg, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 58%, rgb(var(--gC, var(--ac-950)))); }
     body .gv-2 { background-image: radial-gradient(130% 150% at 0% 0%, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 58%, rgb(var(--gC, var(--ac-950)))); }
@@ -363,6 +364,7 @@
     .privacy-on #inputTRLiq,
     .privacy-on #inputTRBtc,
     .privacy-on #inputBtcCost,
+    .privacy-on #inputBtcAvg,
     .privacy-on #inputFundCostFidelity,
     .privacy-on #inputFundVlBaseFidelity,
     .privacy-on #inputFundCostEmerging,
@@ -921,10 +923,12 @@
         </div>
       </section>
 
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-1 transition-colors">
           <h3 id="catChartTitle" class="text-base font-bold text-slate-900 dark:text-white mb-4">Gastos por Categoría (%)</h3>
-          <div class="h-72">
-            <canvas id="categoryChart"></canvas>
+          <div class="grid items-center gap-1" style="grid-template-columns:minmax(0,1fr) minmax(138px,42%) minmax(0,1fr)">
+            <div id="catLegendL" class="space-y-2.5 min-w-0"></div>
+            <div class="h-60 relative w-full"><canvas id="categoryChart"></canvas></div>
+            <div id="catLegendR" class="space-y-2.5 min-w-0"></div>
           </div>
         </div>
 
@@ -1207,6 +1211,19 @@
         </div>
       </section>
 
+      <section id="cc-xirr" data-cc="xirr" class="cc bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <button type="button" onclick="toggleCC(this)" aria-expanded="false" class="cc-head w-full flex items-center justify-between gap-3 text-left min-h-[48px] px-4 py-2">
+          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg>Rentabilidad anual (XIRR)</span>
+          <span class="dd-arrow text-slate-400 bg-slate-100 dark:bg-slate-800" aria-label="Desplegar">▼</span>
+        </button>
+        <div class="cc-body hidden">
+          <div class="p-4 space-y-3">
+            <p class="text-[11px] text-slate-500">El XIRR es lo que has ganado al año con tus aportaciones reales, teniendo en cuenta qué día metiste cada euro. Es distinto del % ponderado por tiempo, que mide cómo se ha comportado el fondo en sí. Con menos de 3 meses de historia el dato anualizado se dispara y no es fiable.</p>
+            <div id="xirrList" class="space-y-2"></div>
+          </div>
+        </div>
+      </section>
+
       <section id="cc-emergency" data-cc="emergency" class="cc bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <button type="button" onclick="toggleCC(this)" aria-expanded="false" class="cc-head w-full flex items-center justify-between gap-3 text-left min-h-[48px] px-4 py-2">
           <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Fondo de emergencia</span>
@@ -1309,18 +1326,7 @@
         </div>
       </section>
 
-      <section id="cc-xirr" data-cc="xirr" class="cc bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        <button type="button" onclick="toggleCC(this)" aria-expanded="false" class="cc-head w-full flex items-center justify-between gap-3 text-left min-h-[48px] px-4 py-2">
-          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg>Rentabilidad anual (XIRR)</span>
-          <span class="dd-arrow text-slate-400 bg-slate-100 dark:bg-slate-800" aria-label="Desplegar">▼</span>
-        </button>
-        <div class="cc-body hidden">
-          <div class="p-4 space-y-3">
-            <p class="text-[11px] text-slate-500">El XIRR es lo que has ganado al año con tus aportaciones reales, teniendo en cuenta qué día metiste cada euro. Es distinto del % ponderado por tiempo, que mide cómo se ha comportado el fondo en sí. Con menos de 3 meses de historia el dato anualizado se dispara y no es fiable.</p>
-            <div id="xirrList" class="space-y-2"></div>
-          </div>
-        </div>
-      </section>
+      
 
       <h2 class="text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 pt-2">Ajustes</h2>
       <section id="cc-recurring" data-cc="recurring" class="cc bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -1401,55 +1407,45 @@
 
       <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div class="sec-head flex justify-between items-center gap-3 cursor-pointer select-none min-h-[48px] px-4 py-2" onclick="toggleSection('adjustGeneralSection', 'toggleIconGeneral')">
-          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg>Ajuste de saldos</span>
+          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg>Saldos iniciales</span>
           <span id="toggleIconGeneral" class="dd-arrow text-slate-400 bg-slate-100 dark:bg-slate-800" aria-label="Desplegar">▼</span>
         </div>
         
-        <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 border-t border-slate-100 dark:border-slate-800">
+        <div id="adjustGeneralSection" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border-t border-slate-100 dark:border-slate-800">
+          <p class="col-span-full text-xs text-slate-500">Corrige solo el saldo con el que empezaste (la primera foto del historial). Al guardar eliges si el saldo actual cambia o no. No se crea ningún movimiento.</p>
           <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA (€)</label>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">BBVA · saldo inicial (€)</label>
             <input type="number" step="0.01" id="inputBBVA" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('bbva')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar BBVA</button>
+            <button onclick="updateInitialBalance('bbva', 'BBVA')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Guardar saldo inicial</button>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic (€)</label>
+            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Trade Republic · saldo inicial (€)</label>
             <input type="number" step="0.01" id="inputTRLiq" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('trade_republic_liq')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Actualizar Trade Republic</button>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bitcoin (Cantidad BTC)</label>
-            <input type="number" step="any" id="inputTRBtc" placeholder="Ej: 0.025" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('trade_republic_btc')" class="w-full py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-lg hover:bg-amber-100 border border-amber-200 dark:border-amber-800">Actualizar BTC y Precio</button>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Coste Adquisición BTC (€)</label>
-            <input type="number" step="0.01" id="inputBtcCost" placeholder="Ej: 2500.00" class="w-full px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg text-sm mb-2 text-slate-900 dark:text-white">
-            <button onclick="updateAccountBalance('btc_cost')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Actualizar Coste BTC</button>
+            <button onclick="updateInitialBalance('trade_republic_liq', 'Trade Republic')" class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-slate-200">Guardar saldo inicial</button>
           </div>
         </div>
       </section>
 
       <section class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-500/50 shadow-sm transition-colors">
         <div class="sec-head flex justify-between items-center gap-3 cursor-pointer select-none min-h-[48px] px-4 py-2" onclick="toggleSection('adjustFundsSection', 'toggleIconFunds')">
-          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg>Ajuste de fondos</span>
+          <span class="min-w-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg>Información de inversiones</span>
           <span id="toggleIconFunds" class="dd-arrow text-slate-400 bg-slate-100 dark:bg-slate-800" aria-label="Desplegar">▼</span>
         </div>
 
-        <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border-t border-slate-100 dark:border-slate-800">
-          <p class="col-span-full text-xs text-slate-500">Introduce tu capital invertido (coste de adquisición) y tu VL medio inicial para que los botones de VL diario calculen tu rentabilidad real.</p>
+        <div id="adjustFundsSection" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border-t border-slate-100 dark:border-slate-800">
+          <p class="col-span-full text-xs text-slate-500">Datos de solo lectura: lo que has invertido con tu dinero y el precio medio de compra de cada fondo y de Bitcoin. Se calculan solos con tus aportaciones (➕ Invertir o 📥 Importar aportaciones).</p>
           <!-- Fondo 1 -->
           <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Fidelity S&P 500</h4>
             <div class="space-y-2">
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostFidelity" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Invertido con tu dinero (€)</label>
+                <input type="number" step="0.01" id="inputFundCostFidelity" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseFidelity" placeholder="Ej: 150.25" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL medio de compra (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseFidelity" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
-              <button onclick="updateFundConfig('fidelity_sp500')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base S&P</button>
             </div>
           </div>
 
@@ -1458,14 +1454,13 @@
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Emergentes</h4>
             <div class="space-y-2">
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostEmerging" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Invertido con tu dinero (€)</label>
+                <input type="number" step="0.01" id="inputFundCostEmerging" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseEmerging" placeholder="Ej: 25.50" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL medio de compra (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseEmerging" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
-              <button onclick="updateFundConfig('vanguard_emerging')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Emergentes</button>
             </div>
           </div>
 
@@ -1474,14 +1469,31 @@
             <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Vanguard Global Small Caps</h4>
             <div class="space-y-2">
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Coste Adquisición (€)</label>
-                <input type="number" step="0.01" id="inputFundCostSmallCaps" placeholder="Dinero puesto de tu bolsillo" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">Invertido con tu dinero (€)</label>
+                <input type="number" step="0.01" id="inputFundCostSmallCaps" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
               <div>
-                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL Medio / Inicial (€)</label>
-                <input type="number" step="any" id="inputFundVlBaseSmallCaps" placeholder="Ej: 40.10" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
+                <label class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400 mb-1">VL medio de compra (€)</label>
+                <input type="number" step="any" id="inputFundVlBaseSmallCaps" readonly tabindex="-1" class="cursor-default opacity-90 w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white">
               </div>
-              <button onclick="updateFundConfig('vanguard_smallcaps')" class="w-full py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-lg hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">Guardar Coste y VL Base Small Caps</button>
+            </div>
+          </div>
+          <!-- Bitcoin -->
+          <div class="space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Bitcoin</h4>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-amber-600 dark:text-amber-400 mb-1">Cantidad (BTC)</label>
+                <input type="number" step="any" id="inputTRBtc" readonly tabindex="-1" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white cursor-default opacity-90">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-amber-600 dark:text-amber-400 mb-1">Invertido con tu dinero (€)</label>
+                <input type="number" step="0.01" id="inputBtcCost" readonly tabindex="-1" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white cursor-default opacity-90">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-amber-600 dark:text-amber-400 mb-1">Precio medio de compra (€/BTC)</label>
+                <input type="text" id="inputBtcAvg" readonly tabindex="-1" class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white cursor-default opacity-90">
+              </div>
             </div>
           </div>
         </div>
@@ -2320,6 +2332,7 @@
       const icon = document.getElementById('toggleIconTotalAccounts');
       if (!dd) return;
       dd.classList.toggle('hidden');
+      if (dd.classList.contains('hidden')) { const mp = document.getElementById('myinvestorDetailsPanel'); if (mp) mp.classList.add('hidden'); }
       if (icon) {
         icon.innerText = dd.classList.contains('hidden') ? '▼' : '▲';
       }
@@ -2798,11 +2811,11 @@
 
     async function promptUpdateVL(fundKey, fundName) {
       if (!state.myinvestor || !state.myinvestor.fundsVlBase || state.myinvestor.fundsVlBase[fundKey] <= 0) {
-        showToast('Configura primero el «VL Medio / Inicial» y el «Coste de Adquisición» en el Ajuste Directo de Fondos Indexados.', 'error');
+        showToast('Este fondo aún no tiene aportaciones. Añádelas con ➕ Invertir o 📥 Importar aportaciones.', 'error');
         return;
       }
       if ((state.myinvestor.fundsCost[fundKey] || 0) <= 0) {
-        showToast('Falta configurar el coste de adquisición de este fondo.', 'error');
+        showToast('Este fondo aún no tiene aportaciones registradas.', 'error');
         return;
       }
 
@@ -4782,10 +4795,12 @@
       const unitsLabel = units > 0 ? units.toLocaleString('es-ES', { maximumFractionDigits: 8 }) + ' BTC' : '0 BTC';
       document.getElementById('btcUnitsSubtext').innerHTML = pv(unitsLabel) + ' | Apartado: ' + pv(btcCashVal.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + ' €');
 
-      document.getElementById('inputBBVA').value = state.accounts.bbva;
-      document.getElementById('inputTRLiq').value = state.accounts.trade_republic_liq;
+      const firstSnap = (Array.isArray(state.monthlySnapshots) && state.monthlySnapshots.length) ? state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); })[0] : null;
+      document.getElementById('inputBBVA').value = firstSnap ? firstSnap.bbva : state.accounts.bbva;
+      document.getElementById('inputTRLiq').value = firstSnap ? firstSnap.trade_republic_liq : state.accounts.trade_republic_liq;
       document.getElementById('inputTRBtc').value = state.btcUnits || 0;
       document.getElementById('inputBtcCost').value = state.btcInvestedCost || 0;
+      document.getElementById('inputBtcAvg').value = (parseFloat(state.btcUnits) > 0 && parseFloat(state.btcInvestedCost) > 0) ? (state.btcInvestedCost / state.btcUnits).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '--';
 
       if (state.myinvestor && state.myinvestor.funds) {
         document.getElementById('fundFidelityVal').innerText = (state.myinvestor.funds.fidelity_sp500 || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -6328,6 +6343,47 @@
       offerUndo('🗑️ Movimiento eliminado y saldos restaurados.', backup);
     }
 
+    // Pregunta cómo aplicar la corrección de un saldo inicial: 'snap' (solo la foto) o 'both' (foto + saldo actual)
+    function askInitialMode(text, labelSnap, labelBoth) {
+      return new Promise(function(resolve) {
+        const ov = mkEl('div', 'fixed inset-0 flex items-center justify-center bg-black/60 p-4'); ov.style.zIndex = '130';
+        const box = mkEl('div', 'w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl p-4 space-y-3');
+        box.appendChild(mkEl('p', 'text-sm font-bold text-slate-900 dark:text-white', 'Corregir saldo inicial'));
+        box.appendChild(mkEl('p', 'text-xs text-slate-600 dark:text-slate-300', text));
+        box.appendChild(mkEl('p', 'text-[11px] text-slate-500', 'Elige qué cambiar. En ningún caso se crea un movimiento.'));
+        function done(v) { ov.remove(); resolve(v); }
+        const b1 = mkEl('button', 'w-full px-3 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white text-left', labelSnap); b1.type = 'button'; b1.onclick = function() { done('snap'); };
+        const b2 = mkEl('button', 'w-full px-3 py-2.5 text-xs font-bold rounded-xl bg-sky-600 text-white text-left', labelBoth); b2.type = 'button'; b2.onclick = function() { done('both'); };
+        const b3 = mkEl('button', 'w-full px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300', 'Cancelar'); b3.type = 'button'; b3.onclick = function() { done(null); };
+        box.appendChild(b1); box.appendChild(b2); box.appendChild(b3);
+        ov.appendChild(box); ov.addEventListener('click', function(e) { if (e.target === ov) done(null); });
+        document.body.appendChild(ov);
+      });
+    }
+
+    async function updateInitialBalance(acc, name) {
+      const input = document.getElementById(acc === 'bbva' ? 'inputBBVA' : 'inputTRLiq');
+      const val = round2(parseFloat(input.value));
+      if (isNaN(val) || val < 0) { showToast('Introduce un saldo válido.', 'error'); return; }
+      if (!Array.isArray(state.monthlySnapshots) || state.monthlySnapshots.length === 0) {
+        state.accounts[acc] = val;
+        state.monthlySnapshots = [createSnapshotObject(new Date(), true)];
+        saveAndSync(); showToast('✅ Saldo inicial de ' + name + ' guardado.', 'ok'); return;
+      }
+      const first = state.monthlySnapshots.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); })[0];
+      const delta = round2(val - (first[acc] || 0));
+      if (delta === 0) { showToast('El saldo inicial de ' + name + ' ya es ese.', 'info'); return; }
+      const cur = state.accounts[acc], curNew = round2(cur + delta);
+      const mode = await askInitialMode('Saldo inicial de ' + name + ' (foto del ' + formatDateDDMMYYYY(new Date(first.date)) + '): de ' + fmtEuro2(first[acc] || 0) + ' a ' + fmtEuro2(val) + '.', 'Solo la foto inicial', 'Foto inicial y saldo actual (' + (delta > 0 ? '+' : '') + fmtEuro2(delta) + ': ' + fmtEuro2(cur) + ' → ' + fmtEuro2(curNew) + ')');
+      if (!mode) return;
+      const backup = JSON.stringify(state);
+      first[acc] = val;
+      first.total = round2((first.total || 0) + delta);
+      if (mode === 'both') state.accounts[acc] = curNew;
+      saveAndSync();
+      offerUndo('✅ Saldo inicial de ' + name + ' corregido.', backup);
+    }
+
     function updateAccountBalance(acc) {
       let val = 0;
       let accountDisplayName = '';
@@ -6923,6 +6979,69 @@
       };
     }
 
+    // ===== Leyenda del gráfico de categorías: dibujo por categoría, mitad a cada lado =====
+    const CAT_ICON_PATHS = {
+      cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6"/>',
+      game: '<path d="M6 12h4M8 10v4"/><path d="M15 11h.01M18 13h.01"/><path d="M7 6h10a5 5 0 0 1 5 5v2a4 4 0 0 1-7 2.7L14 14h-4l-1 1.7A4 4 0 0 1 2 13v-2a5 5 0 0 1 5-5z"/>',
+      home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+      car: '<path d="M3 13l2-6h14l2 6v4H3z"/><path d="M3 17v2M21 17v2"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/>',
+      repeat: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+      heart: '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',
+      dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3.2"/>',
+      fork: '<path d="M7 3v7M11 3v7M7 10a2 2 0 0 0 4 0M9 12v9"/><path d="M17 3c-2 2-2 6 0 8v10"/>',
+      shirt: '<path d="M8 3L3 6l2 4 3-1v12h8V9l3 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+      book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+      plane: '<path d="M2 14l20-8-8 16-3-7z"/><path d="M11 15l11-9"/>',
+      gift: '<rect x="3" y="8" width="18" height="4"/><path d="M12 8v13M5 12v9h14v-9"/><path d="M12 8c-2-4-6-3-5 0 .5 1.3 5 0 5 0zM12 8c2-4 6-3 5 0-.5 1.3-5 0-5 0z"/>',
+      bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+      dumbbell: '<path d="M6 6v12M18 6v12M3 9v6M21 9v6M6 12h12"/>',
+      phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+      coffee: '<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h2a2 2 0 0 1 0 4h-2M7 2v3M11 2v3"/>',
+      paw: '<circle cx="5.5" cy="11" r="1.6"/><circle cx="9" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="18.5" cy="11" r="1.6"/><path d="M12 12c-3 0-5 3-4 5.5 1 2 3 1.5 4 1.5s3 .5 4-1.5c1-2.500-1-5.500-4-5.500z"/>',
+      tag: '<path d="M3 12V3h9l9 9-9 9z"/><path d="M7.5 7.5h.01" stroke-width="3"/>'
+    };
+    const CAT_ICON_RULES = [
+      [/super|compra|aliment|mercad|despensa/, 'cart'], [/ocio|cine|juego|entreten|fiesta|salida/, 'game'], [/vivienda|hipoteca|alquiler|hogar|casa|comunidad/, 'home'],
+      [/transp|coche|gasolin|combust|parking|taxi|tren|bus|metro/, 'car'], [/suscrip|stream|netflix|disney|spotify/, 'repeat'], [/salud|medic|farmac|dent|medico|clinic|seguro/, 'heart'],
+      [/restaur|comida|cena|bar$|bares|comer|delivery/, 'fork'], [/cafe|desayun/, 'coffee'], [/ropa|moda|vestir|zapat/, 'shirt'], [/educ|estudi|curso|libro|colegio|univers/, 'book'],
+      [/viaj|vacac|hotel|vuelo/, 'plane'], [/regalo|detalle/, 'gift'], [/luz|agua|gas$|factura|internet|electric|telefon.*fij/, 'bolt'], [/gimnas|deport|fitness/, 'dumbbell'],
+      [/tecnolog|movil|electron|telefon/, 'phone'], [/mascota|perro|gato|veterin/, 'paw'], [/otro|vario|misc/, 'dots']
+    ];
+    function catIconKey(name) {
+      const n = String(name || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      for (let i = 0; i < CAT_ICON_RULES.length; i++) if (CAT_ICON_RULES[i][0].test(n)) return CAT_ICON_RULES[i][1];
+      return 'tag';
+    }
+    function renderCatLegend(labels, data, colors, hasCat, total) {
+      const L = document.getElementById('catLegendL'), R = document.getElementById('catLegendR');
+      if (!L || !R) return;
+      L.innerHTML = ''; R.innerHTML = '';
+      if (!hasCat) { R.appendChild(mkEl('p', 'text-[11px] text-slate-400', 'Sin gastos este mes')); return; }
+      const half = Math.ceil(labels.length / 2);
+      labels.forEach(function(name, i) {
+        const left = i < half, color = colors[i % colors.length];
+        const pct = total > 0 ? data[i] / total * 100 : 0;
+        const item = mkEl('button', 'w-full flex items-center gap-1 min-w-0 ' + (left ? 'flex-row-reverse text-right' : 'text-left'));
+        item.type = 'button';
+        item.title = name;
+        const ic = mkEl('span', 'shrink-0 w-6 h-6 rounded-full flex items-center justify-center');
+        ic.style.background = color + '33'; ic.style.border = '1px solid ' + color + '88'; ic.style.color = color;
+        ic.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + CAT_ICON_PATHS[catIconKey(name)] + '</svg>';
+        const tx = mkEl('span', 'min-w-0 flex-1');
+        tx.appendChild(mkEl('span', 'block text-[11px] font-semibold text-slate-700 dark:text-slate-200 truncate leading-tight', name));
+        const amt = mkEl('span', 'block text-[10px] text-slate-500 dark:text-slate-400 leading-tight truncate');
+        amt.innerHTML = '<span class="pv">' + fmtEuro2(data[i]) + '</span>';
+        tx.appendChild(amt);
+        item.appendChild(ic); item.appendChild(tx);
+        item.onclick = function() {
+          if (!chartCat || !chartCat.toggleDataVisibility) return;
+          chartCat.toggleDataVisibility(i); chartCat.update();
+          item.style.opacity = chartCat.getDataVisibility(i) ? '1' : '0.4';
+        };
+        (left ? L : R).appendChild(item);
+      });
+    }
+
     let chartAnimNext = true; // true: los gráficos se dibujan con animación (primera vez, al entrar en la pestaña o al cambiar el periodo)
     function updateCharts() {
       const myInvTotal = getMyInvestorTotal();
@@ -7043,7 +7162,7 @@
           animation: chartAnimNext ? { duration: 1100, easing: 'easeOutQuart' } : false,
           layout: { padding: 4 },
           plugins: {
-            legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8, padding: 12, font: { size: 11 } } },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: function(context) {
@@ -7057,6 +7176,8 @@
         },
         plugins: [catDonutPlugin]
       });
+
+      renderCatLegend(catLabels, catData, hasCat ? catColors : ['#334155'], hasCat, totalGastos);
 
       const ctxEvol = document.getElementById('evolutionChart').getContext('2d');
       if (chartEvol) chartEvol.destroy();
