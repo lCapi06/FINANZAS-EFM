@@ -193,12 +193,15 @@
     main section.rounded-2xl.bgp-6::after { background-image: radial-gradient(circle, rgb(var(--sec) / 0.34) 1.4px, transparent 2px), radial-gradient(circle, rgb(var(--sec) / 0.34) 1.4px, transparent 2px); background-size: 16px 16px; background-position: 0 0, 8px 8px; }
     main section.rounded-2xl.bgp-7::after { background-image: repeating-linear-gradient(45deg, rgb(var(--sec) / 0.24) 0 1px, transparent 1px 9px), repeating-linear-gradient(-45deg, rgb(var(--sec) / 0.24) 0 1px, transparent 1px 9px); background-size: auto; }
     html.bg-off main section.rounded-2xl::after { display: none !important; }
-    body .gv-0 { background-image: linear-gradient(135deg, rgb(var(--ac-900)), rgb(15 23 42) 55%, rgb(var(--ac-950))); }
-    body .gv-1 { background-image: linear-gradient(225deg, rgb(var(--ac-800)), rgb(15 23 42) 58%, rgb(var(--ac-950))); }
-    body .gv-2 { background-image: radial-gradient(130% 150% at 0% 0%, rgb(var(--ac-800)), rgb(15 23 42) 58%, rgb(var(--ac-950))); }
-    body .gv-3 { background-image: radial-gradient(130% 150% at 100% 100%, rgb(var(--ac-800)), rgb(15 23 42) 58%, rgb(var(--ac-950))); }
-    body .gv-4 { background-image: linear-gradient(160deg, rgb(var(--ac-900)), rgb(15 23 42) 50%, rgb(var(--ac-800))); }
-    body .gv-5 { background-image: radial-gradient(90% 120% at 50% 0%, rgb(var(--ac-800)), rgb(15 23 42) 62%, rgb(var(--ac-950))); }
+    body .gv-0 { background-image: linear-gradient(135deg, rgb(var(--gA, var(--ac-900))), rgb(15 23 42) 55%, rgb(var(--gC, var(--ac-950)))); }
+    body .gv-1 { background-image: linear-gradient(225deg, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 58%, rgb(var(--gC, var(--ac-950)))); }
+    body .gv-2 { background-image: radial-gradient(130% 150% at 0% 0%, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 58%, rgb(var(--gC, var(--ac-950)))); }
+    body .gv-3 { background-image: radial-gradient(130% 150% at 100% 100%, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 58%, rgb(var(--gC, var(--ac-950)))); }
+    body .gv-4 { background-image: linear-gradient(160deg, rgb(var(--gA, var(--ac-900))), rgb(15 23 42) 50%, rgb(var(--gB, var(--ac-800)))); }
+    body .gv-5 { background-image: radial-gradient(90% 120% at 50% 0%, rgb(var(--gB, var(--ac-800))), rgb(15 23 42) 62%, rgb(var(--gC, var(--ac-950)))); }
+    /* Tarjetas de cuentas: el color depende de la rentabilidad (verde ganancia, rojo pérdida) */
+    body [data-perf="up"] { --gA: 4 74 56; --gB: 6 95 70; --gC: 2 44 34; }
+    body [data-perf="down"] { --gA: 110 12 40; --gB: 136 19 55; --gC: 76 5 25; }
     /* Tarjetas pequeñas internas */
     main .rounded-xl.bg-slate-50, main .rounded-xl.dark\:bg-slate-800\/60 { box-shadow: inset 0 0 0 1px rgb(var(--sec, var(--ac-500)) / 0.10); }
     /* Botones primarios con degradado */
@@ -5561,6 +5564,7 @@
       function applyCardGradient(cardId, diff) {
         const card = document.getElementById(cardId);
         if (!card) return;
+        card.dataset.perf = diff > 0.005 ? 'up' : (diff < -0.005 ? 'down' : 'flat');
         card.classList.remove(
           'from-indigo-900', 'via-slate-900', 'to-indigo-950', 'border-indigo-500/20',
           'from-emerald-950', 'to-emerald-900', 'border-emerald-500/30',
